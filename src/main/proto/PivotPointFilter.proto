@@ -1,0 +1,13 @@
+option java_package = "filters.generated";
+option java_outer_classname = "PivotPointFilter";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+
+message PivotsFilter2 {
+    required string spoint = 1;
+    required string epoint = 2;
+    required double threshold = 3;
+    required string traj = 4;
+    repeated string pivots = 5;
+}

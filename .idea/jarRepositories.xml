@@ -47,6 +47,16 @@
       <option name="url" value="https://repo.eclipse.org/content/repositories/jts-snapshots" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="libs-releases" />
+      <option name="url" value="http://artifactory.jd.com/libs-releases-local" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="snapshots" />
+      <option name="name" value="libs-snapshots" />
+      <option name="url" value="http://artifactory.jd.com/libs-snapshots-local" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />

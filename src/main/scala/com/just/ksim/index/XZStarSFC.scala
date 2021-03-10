@@ -2,8 +2,13 @@ package com.just.ksim.index
 
 import com.just.ksim.entity.Trajectory
 import org.locationtech.jts.geom._
+import org.locationtech.sfcurve.IndexRange
 
-class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) {
+import java.util
+import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
+
+class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), beta: Int) {
   private val xLo = xBounds._1
   private val xHi = xBounds._2
   private val yLo = yBounds._1
@@ -12,7 +17,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
   private val xSize = xHi - xLo
   private val ySize = yHi - yLo
 
-  def indexSpace(env: Envelope, posCode: Long): (Long, Long, Double, Double, Element) = {
+  def indexSpace(env: Envelope, posCode: Long): (Long, Int, Double, Double, Element) = {
     val mbr = env
     val (nxmin, nymin, nxmax, nymax) = normalize(mbr.getMinX, mbr.getMinY, mbr.getMaxX, mbr.getMaxY, false)
     val maxDim = math.max(nxmax - nxmin, nymax - nymin)
@@ -31,14 +36,17 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
       if (predicate(nxmin, nxmax) && predicate(nymin, nymax)) l1 + 1 else l1
     }
     val w = math.pow(0.5, length)
-    val x = math.floor(nxmin / w) * w * xSize + xLo
-    val y = math.floor(nymin / w) * w * ySize + yLo
-    val xWidth = w * xSize + xLo
-    val yWidth = w * ySize + yLo
+    //val x = math.floor(nxmin / w) * w * xSize + xLo
+    //val y = math.floor(nymin / w) * w * ySize + yLo
+    val x = math.floor(nxmin / w) * w
+    val y = math.floor(nymin / w) * w
+    val xWidth = w * xSize
+    val yWidth = w * ySize
     val sc = sequenceCode(nxmin, nymin, length, posCode)
     //val boud = new Envelope(x, x + xWidth, y, y + yWidth)
-    Element(x, x + xWidth, y, y + yWidth, xWidth * 2, yWidth * 2)
-    (sc, length, xWidth, yWidth, Element(x, x + xWidth, y, y + yWidth, xWidth * 2, yWidth * 2))
+    //Element(x, x + xWidth, y, y + yWidth, xWidth * 2, yWidth * 2, length)
+    //x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo
+    (sc, length, xWidth, yWidth, Element(x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo, xWidth * 2, yWidth * 2, length - 1))
   }
 
   def index(geometry: Geometry, lenient: Boolean = false): Long = {
@@ -61,15 +69,79 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
       if (predicate(nxmin, nxmax) && predicate(nymin, nymax)) l1 + 1 else l1
     }
     val w = math.pow(0.5, length)
-    val x = math.floor(nxmin / w) * w * xSize + xLo
-    val y = math.floor(nymin / w) * w * ySize + yLo
-    val posCode = positionCode(geometry, length, w, x, y)
-    sequenceCode(nxmin, nymin, length, posCode)
+    val x = math.floor(nxmin / w) * w
+    val y = math.floor(nymin / w) * w
+
+    val xWidth = w * xSize + xLo
+    val yWidth = w * ySize + yLo
+    val pc = signature(x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo, geometry)
+    //val posCode = positionCode(geometry, length, w, x, y)
+    //println(pc)
+    //println(s"$pc,$x,$y,$length")
+    sequenceCode(nxmin, nymin, length, pc)
   }
 
+  case class Element2(xmin: Double, ymin: Double, xmax: Double, ymax: Double, level: Int, code: Long) {
 
-  def positionCode(geometry: Geometry, length: Int, w: Double, x: Double, y: Double): Long = {
-    0L
+    def overlaps(traj: Geometry): Boolean = {
+      val cps = Array(new Coordinate(xmin, ymin), new Coordinate(xmin, ymin),
+        new Coordinate(xmin, ymax),
+        new Coordinate(xmax, ymax),
+        new Coordinate(xmax, ymin), new Coordinate(xmin, ymin))
+      val line = new LinearRing(cps, pre, 4326)
+      val polygon = new Polygon(line, null, pre, 4326)
+      //polygon.getEnvelopeInternal.intersects(traj.getEnvelopeInternal)
+      //traj.intersects(polygon)
+      for(i <- 0 until traj.getNumGeometries) {
+        if(polygon.contains(traj.getGeometryN(i))){
+          return true
+        }
+      }
+      false
+    }
+
+    def children: Seq[Element2] = {
+      val xCenter = (xmin + xmax) / 2.0
+      val yCenter = (ymin + ymax) / 2.0
+      val c0 = copy(xmax = xCenter, ymax = yCenter, level = level + 1, code = code)
+      val c1 = copy(xmin = xCenter, ymax = yCenter, level = level + 1, code = code + 1L * Math.pow(4, beta - level).toLong)
+      val c2 = copy(xmax = xCenter, ymin = yCenter, level = level + 1, code = code + 2L * Math.pow(4, beta - level).toLong)
+      val c3 = copy(xmin = xCenter, ymin = yCenter, level = level + 1, code = code + 3L * Math.pow(4, beta - level).toLong)
+      Seq(c0, c1, c2, c3)
+    }
+  }
+
+  //val ps = Array(0, 0, 0, 1, 0, 2, 0, 3, 0, 0, 0, 5, 0, 6, 7, 4)
+  val psMaximum = Array(0, 8, 0, 1, 0, 2, 0, 3, 0, 0, 0, 5, 0, 6, 7, 4)
+  val positionIndex = Array(3, 5, 7, 15, 11, 13, 14, 1)
+
+  def signature(x1: Double, y1: Double, x2: Double, y2: Double, traj: Geometry): Long = {
+    val remaining = new java.util.ArrayDeque[Element2](Math.pow(4, beta).toInt)
+    val levelOneElements = Element2(x1, y1, x2, y2, 1, 0L).children
+    val levelTerminator = Element2(-1.0, -1.0, -1.0, -1.0, 0, 0L)
+    levelOneElements.foreach(remaining.add)
+    remaining.add(levelTerminator)
+    var level = 1
+    var sig = 0
+    while (!remaining.isEmpty) {
+      val next = remaining.poll
+      if (next.eq(levelTerminator)) {
+        if (!remaining.isEmpty && level < beta) {
+          level = (level + 1).toShort
+          remaining.add(levelTerminator)
+        }
+      } else {
+        if (next.overlaps(traj)) {
+          if (level < beta) {
+            next.children.foreach(remaining.add)
+          } else {
+            sig |= 1 << next.code
+          }
+        }
+      }
+    }
+    psMaximum(sig).toLong
+    //sig
   }
 
   def sequenceCode(x: Double, y: Double, length: Int, posCode: Long): Long = {
@@ -170,11 +242,11 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
 
   val pre = new PrecisionModel()
 
-  private case class Element(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xLength: Double, yLength: Double) {
+  case class Element(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xLength: Double, yLength: Double, level: Int) {
 
-    val ee = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
 
-    def intersect(buffer: Geometry): Boolean = {
+    def intersectEE(buffer: Geometry): Boolean = {
+      val ee = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
       if (ee.intersects(buffer.getEnvelopeInternal)) {
         val cps = Array(new Coordinate(ee.getMinX, ee.getMinY), new Coordinate(ee.getMinX, ee.getMinY),
           new Coordinate(ee.getMinX, ee.getMaxY),
@@ -189,9 +261,50 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
       false
     }
 
+    def intersectElement(buffer: Geometry): Boolean = {
+      val el = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
+      if (el.intersects(buffer.getEnvelopeInternal)) {
+        val cps = Array(new Coordinate(el.getMinX, el.getMinY), new Coordinate(el.getMinX, el.getMinY),
+          new Coordinate(el.getMinX, el.getMaxY),
+          new Coordinate(el.getMaxX, el.getMaxY),
+          new Coordinate(el.getMaxX, el.getMinY), new Coordinate(el.getMinX, el.getMinY))
+        val line = new LinearRing(cps, pre, 4326)
+        val polygon = new Polygon(line, null, pre, 4326)
+        if (polygon.intersects(buffer)) {
+          return true
+        }
+      }
+      false
+    }
+
+    def dis(geo: Geometry): Double = {
+      val el = new Envelope(xmin, xmax, ymin, ymax)
+      val cps = Array(new Coordinate(el.getMinX, el.getMinY), new Coordinate(el.getMinX, el.getMinY),
+        new Coordinate(el.getMinX, el.getMaxY),
+        new Coordinate(el.getMaxX, el.getMaxY),
+        new Coordinate(el.getMaxX, el.getMinY), new Coordinate(el.getMinX, el.getMinY))
+      val line = new LinearRing(cps, pre, 4326)
+      val polygon = new Polygon(line, null, pre, 4326)
+      polygon.distance(geo)
+    }
+
+
+    def disWithEE(geo: Geometry): Double = {
+      //val el = new Envelope(xmin, xmax, ymin, ymax)
+      val cps = Array(new Coordinate(xmin, ymin), new Coordinate(xmin, ymin),
+        new Coordinate(xmin, ymax + yLength),
+        new Coordinate(xmax + xLength, ymax + yLength),
+        new Coordinate(xmax + xLength, ymin), new Coordinate(xmin, ymin))
+      val line = new LinearRing(cps, pre, 4326)
+      val polygon = new Polygon(line, null, pre, 4326)
+      polygon.distance(geo)
+    }
+
+
     //被包含
     def intersected(traj: Envelope, threshold: Double): Boolean = {
-      val copyEE = new Envelope(xmin, xmax, ymin, ymax)
+      val copyEE = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
+      //val copyEE = new Envelope(xmin, xmax, ymin, ymax)
       copyEE.expandBy(threshold)
       copyEE.contains(traj)
     }
@@ -201,28 +314,134 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
       val yCenter = (ymin + ymax) / 2.0
       val xlen = xLength / 2.0
       val ylen = yLength / 2.0
-      val c0 = copy(xmax = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen)
-      val c1 = copy(xmin = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen)
-      val c2 = copy(xmax = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen)
-      val c3 = copy(xmin = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen)
+      val c0 = copy(xmax = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      val c1 = copy(xmin = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      val c2 = copy(xmax = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      val c3 = copy(xmin = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
       Seq(c0, c1, c2, c3)
     }
 
-    def splitOnly3(): Seq[Element] = {
-      val xCenter = (xmin + xmax) / 2.0
-      val yCenter = (ymin + ymax) / 2.0
+    //两个维度
+    def checkPositionCodes(traj: Trajectory, buffer: Geometry, threshold: Double, spoint: Geometry, epoint: Geometry): util.List[IndexRange] = {
+      val xeMax = this.xmax + xLength
+      val yeMax = this.ymax + xLength
       val xlen = xLength / 2.0
       val ylen = yLength / 2.0
-      val c0 = copy(xmax = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen)
-      val c1 = copy(xmin = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen)
-      val c2 = copy(xmax = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen)
-      //val c3 = copy(xmin = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen)
-      Seq(c0, c1, c2)
-    }
+      val xCenter = this.xmax
+      val yCenter = this.ymax
+      val ymax = yeMax
+      val xmax = xeMax
+      //      val c0 = copy(xmax = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      //      val c1 = copy(xmin = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      //      val c2 = copy(xmax = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      //      val c3 = copy(xmin = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+      val c0 = copy(xmin, ymin, xCenter, yCenter, xlen, ylen, level + 1)
+      val c1 = copy(xCenter, ymin, xmax, yCenter, xlen, ylen, level + 1)
+      val c2 = copy(xmin, yCenter, xCenter, ymax, xlen, ylen, level + 1)
+      val c3 = copy(xCenter, yCenter, xmax, ymax, xlen, ylen, level + 1)
+      var outPositions = 0
+      //      if (!c0.intersectElement(buffer)) {
+      //        outPositions |= 1
+      //      }
+      //      if (!c1.intersectElement(buffer)) {
+      //        outPositions |= 1 << 1
+      //      }
+      //      if (!c2.intersectElement(buffer)) {
+      //        outPositions |= 1 << 2
+      //      }
+      //      if (!c3.intersectElement(buffer)) {
+      //        outPositions |= 1 << 3
+      //      }
+      //println(s"${c0.dis(traj)},${c1.dis(traj)},${c2.dis(traj)},${c3.dis(traj)}")
+      if (c0.dis(traj) > threshold) {
+        outPositions |= 1
+      }
+      if (c1.dis(traj) > threshold) {
+        outPositions |= 1 << 1
+      }
+      if (c2.dis(traj) > threshold) {
+        outPositions |= 1 << 2
+      }
+      if (c3.dis(traj) > threshold) {
+        outPositions |= 1 << 3
+      }
+      //println("out:" + outPositions)
 
-    //两个维度
-    def checkPositionCodes(traj: Envelope, buffer: Geometry, threshold: Double): java.util.ArrayList[Long] = {
-      null
+      val center = new Coordinate(xCenter, yCenter)
+      val upperCenter = new Coordinate(xCenter, ymax)
+      val lowerCenter = new Coordinate(xCenter, ymin)
+      val centerLeft = new Coordinate(xmin, yCenter)
+      val centerRight = new Coordinate(xmax, yCenter)
+
+      val lowerLeft = new Coordinate(xmin, ymin)
+      val upperLeft = new Coordinate(xmin, ymax)
+      val upperRight = new Coordinate(xmax, ymax)
+      val lowerRight = new Coordinate(xmax, ymin)
+      //      val cps = Array(new Coordinate(el.getMinX, el.getMinY), new Coordinate(el.getMinX, el.getMinY),
+      //        new Coordinate(el.getMinX, el.getMaxY),
+      //        new Coordinate(el.getMaxX, el.getMaxY),
+      //        new Coordinate(el.getMaxX, el.getMinY), new Coordinate(el.getMinX, el.getMinY))
+      val results = new java.util.ArrayList[Long](8)
+
+      def check(coordinats: Array[Coordinate]): Boolean = {
+        val line = new LinearRing(coordinats, pre, 4326)
+        val polygon = new Polygon(line, null, pre, 4326)
+
+        if (polygon.distance(spoint) <= threshold && polygon.distance(epoint) <= threshold) {
+          for (i <- 1 until traj.getNumGeometries - 1) {
+            if (polygon.distance(traj.getGeometryN(i)) > threshold) {
+              return false
+            }
+          }
+          return true
+//          if (polygon.buffer(threshold).contains(traj)) {
+//            return true
+//          }
+        }
+        false
+      }
+
+      for (i <- 0L to 7L) {
+        //val sig = psMaximum(positionIndex(i.toInt))
+        val sig = positionIndex(i.toInt)
+        if (!((sig.toInt & outPositions) > 0)) {
+          if (sig == 15) {
+            results.add(i + 1L)
+          } else {
+            var cps = new Array[Coordinate](4)
+            sig match {
+              case 1 =>
+                cps = Array(lowerLeft, centerLeft, center, lowerCenter, lowerLeft)
+              case 3 =>
+                cps = Array(lowerLeft, centerLeft, centerRight, lowerRight, lowerLeft)
+              case 5 =>
+                cps = Array(lowerLeft, upperLeft, upperCenter, lowerCenter, lowerLeft)
+              case 7 =>
+                cps = Array(lowerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerLeft)
+              case 11 =>
+                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, lowerRight, lowerLeft)
+              case 13 =>
+                cps = Array(lowerLeft, upperLeft, upperRight, centerRight, center, lowerCenter, lowerLeft)
+              case 14 =>
+                cps = Array(centerLeft, upperLeft, upperRight, lowerRight, lowerCenter, center, centerLeft)
+            }
+            //var st = System.currentTimeMillis()
+            if (check(cps)) {
+              results.add(i + 1L)
+              //println(s"$sig,${i + 1L}")
+            }
+            //var et = System.currentTimeMillis()
+            //println(s"checking----:${et-st}")
+          }
+        }
+      }
+      val nxmin = (xmin - xLo) / xSize
+      val nymin = (ymin - yLo) / ySize
+      val sc = sequenceCode(nxmin, nymin, level, 0L)
+      //println(sc)
+      results.asScala.map(v =>
+        IndexRange(v + sc, v + sc, contained = false)
+      ).asJava
     }
   }
 
@@ -230,186 +449,103 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double)) 
   // element, enlarged element, 如果ee和buffer不相交，或者ee的扩展没有完成包含，则不再细化element
   //enlarged element生成position code, position codes的过滤
   //
-  def simRange(searTraj: Trajectory, threshold: Double): Unit = {
-    val ranges = new java.util.ArrayList[Long](100)
+  def simRange(searTraj: Trajectory, threshold: Double): java.util.List[IndexRange] = {
+    val ranges = new java.util.ArrayList[IndexRange](100)
     val boundary1 = searTraj.getEnvelopeInternal
     val boundaryEnv = searTraj.getEnvelopeInternal
+
     boundary1.expandBy(threshold)
-    val buffer = searTraj.getBoundary.buffer(threshold)
-    val minimumResolution = indexSpace(boundary1, 0L)
+    //val buffer = searTraj.buffer(threshold)
     val remaining = new java.util.ArrayDeque[Element](20)
-    minimumResolution._5.splitOnly3().foreach(v => {
+    val minimumResolution = indexSpace(boundary1, 0L)
+    //这里的level减了1
+    minimumResolution._5.split().foreach(v => {
       remaining.add(v)
     })
+    val levelStop = Element(-1, -1, -1, -1, -1, -1, 0)
+    remaining.add(levelStop)
     //maximum resolution
-    //    searTraj.getEnvelopeInternal.getWidth
-    //    searTraj.getEnvelopeInternal.getHeight
-    //    var maximumResolution = minimumResolution._2
-    //    var xLength = minimumResolution._3
-    //    var yLength = minimumResolution._4
-    //    while ((xLength) && ()) {
-    //
+    var maximumResolution = minimumResolution._2
+    //    var currentSize = Math.max(minimumResolution._3 * 2, minimumResolution._4 * 2)
+    //    val maxHandW = Math.max(boundaryEnv.getWidth, boundaryEnv.getHeight)
+    //    while ((maxHandW - currentSize) / 2.0 < threshold && maximumResolution < g) {
+    //      maximumResolution += 1
+    //      currentSize /= 2
     //    }
+
+    var currXS = minimumResolution._3 * 2
+    var currYS = minimumResolution._4 * 2
+    while ((boundaryEnv.getWidth - currXS) / 2.0 < threshold && (boundaryEnv.getHeight - currYS) / 2.0 < threshold && maximumResolution < g) {
+      maximumResolution += 1
+      currXS /= 2.0
+      currYS /= 2.0
+    }
+
+    //println("maximumResolution")
+    //println(maximumResolution)
+    val spoint = searTraj.getGeometryN(0)
+    val epoint = searTraj.getGeometryN(searTraj.getNumGeometries - 1)
+    var level = minimumResolution._2
     while (!remaining.isEmpty) {
       val next = remaining.poll
-      if (next.intersect(buffer) && next.intersected(boundaryEnv, threshold)) {
-        val candidates = next.checkPositionCodes(boundaryEnv, buffer, threshold)
-        if (null != candidates) {
-          ranges.addAll(candidates)
+      if (next == levelStop && !remaining.isEmpty && level < maximumResolution) {
+        remaining.add(levelStop)
+        level = level + 1
+      } else {
+        //if (next.intersectEE(buffer) && next.intersected(boundaryEnv, threshold)) {
+        //val candidates = next.checkPositionCodes(searTraj, buffer, threshold)
+        if (next.intersected(boundaryEnv, threshold)) {
+          //var startTime = System.currentTimeMillis()
+          //println(s"${next.xmin},${next.ymin},${next.level}")
+          val candidates = next.checkPositionCodes(searTraj, null, threshold, spoint, epoint)
+          //var endTime = System.currentTimeMillis()
+          //println(s"checkPositionCodes:${endTime - startTime}")
+          if (null != candidates) {
+            ranges.addAll(candidates)
+          }
+          if (level < maximumResolution) {
+            next.split().foreach(v => {
+              remaining.add(v)
+            })
+          }
         }
-        next.split().foreach(v => {
-          remaining.add(v)
-        })
       }
     }
-    //val cps = Array(new Coordinate(quad.xmin, quad.ymin), new Coordinate(quad.xmin, quad.ymin),
-    //        new Coordinate(quad.xmin, quad.ymax),
-    //        new Coordinate(quad.xmax, quad.ymax),
-    //        new Coordinate(quad.xmax, quad.ymin), new Coordinate(quad.xmin, quad.ymin))
-    //      val line = new LinearRing(cps, pre, 4326)
-    //      val polygon = new Polygon(line, null, pre, 4326)
-    //根据索引和mbr，postion code确定空间区域，和划分策略
-  }
 
-  //  def simRange(searTraj: Trajectory, threshold: Double): Unit = {
-  //  val ranges = new java.util.ArrayList[Long](100)
-  //  val remaining = new java.util.ArrayDeque[XElement](100)
-  //  // initial level
-  //  LevelOneElements.foreach(remaining.add)
-  //  remaining.add(LevelTerminator)
-  //  var level: Short = 1
-  //  while (!remaining.isEmpty) {
-  //    val next = remaining.poll
-  //    if (next.eq(LevelTerminator)) {
-  //      // we've fully processed a level, increment our state
-  //      if (!remaining.isEmpty && level < g) {
-  //        level = (level + 1).toShort
-  //        remaining.add(LevelTerminator)
-  //      }
-  //    } else {
-  //      //checkValue(next, level)
-  //    }
-  //  }
-  //  val buffer = searTraj.buffer(threshold)
-  //  val pre = new PrecisionModel()
-  //  val tBounds = searTraj.getEnvelopeInternal
-  //
-  //  def isContained(quad: XElement): Boolean = {
-  //    if (buffer.getEnvelopeInternal.intersects(quad)) {
-  //      val cps = Array(new Coordinate(quad.xmin, quad.ymin), new Coordinate(quad.xmin, quad.ymin),
-  //        new Coordinate(quad.xmin, quad.ymax),
-  //        new Coordinate(quad.xmax, quad.ymax),
-  //        new Coordinate(quad.xmax, quad.ymin), new Coordinate(quad.xmin, quad.ymin))
-  //      val line = new LinearRing(cps, pre, 4326)
-  //      val polygon = new Polygon(line, null, pre, 4326)
-  //      if (polygon.covers(buffer)) {
-  //        return true
-  //      }
-  //
-  //      if (polygon.intersects(buffer)) {
-  //
-  //      }
-  //    }
-  //    false
-  //  }
-  //
-  //
-  //  def checkValue(quad: XElement, level: Short): Unit = {
-  //    if (isContained(quad)) {
-  //      // whole range matches, happy day
-  //
-  //      if (level < g) {
-  //        quad.children.foreach(remaining.add)
-  //      }
-  //    }
-  //  }
-  //
-  //  //    val startEnv = searTraj.getStartPoint.getEnvelopeInternal
-  //  //    val endEnv = searTraj.getEndPoint.getEnvelopeInternal
-  //  //    searTraj.buffer(threshold)
-  //  //    searTraj.getEnvelopeInternal.expandBy(threshold)
-  //  searTraj.getStartPoint
-  //  //    searTraj.getEndPoint
-  //}
+    ranges.sort(IndexRange.IndexRangeIsOrdered)
 
-  private def sequenceInterval(x: Double, y: Double, length: Short, psc: Long, partial: Boolean): (Long, Long) = {
-    val min = sequenceCode(x, y, length, psc)
-    // if a partial match, we just use the single sequence code as an interval
-    // if a full match, we have to match all sequence codes starting with the single sequence code
-    val max = if (partial) {
-      min
-    } else {
-      // from lemma 3 in the XZ-Ordering paper
-      //min - psc + 3L + (5 * math.pow(4, g - length).toLong - 1)
-      min - psc + (5 * math.pow(4, g - length).toLong - 1)
+    var current = ranges.get(0) // note: should always be at least one range
+    val result = ArrayBuffer.empty[IndexRange]
+    var i = 1
+    while (i < ranges.size()) {
+      val range = ranges.get(i)
+      if (range.lower <= current.upper + 1) {
+        // merge the two ranges
+        current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+      } else {
+        // append the last range and set the current range for future merging
+        result.append(current)
+        current = range
+      }
+      i += 1
     }
-    (min, max)
+    // append the last range - there will always be one left that wasn't added
+    result.append(current)
+    //println("xzplus:" + level + "_" + ranges.size() + "_" + result.size)
+    result.asJava
   }
 }
 
 object XZStarSFC {
-
   // the initial level of quads
-  private val LevelOneElements = XElement(-180.0, -90.0, 180.0, 90.0, 360.0).children
+  private val cache = new java.util.concurrent.ConcurrentHashMap[(Short, Int), XZStarSFC]()
 
-  // indicator that we have searched a full level of the quad/oct tree
-  private val LevelTerminator = XElement(-1.0, -1.0, -1.0, -1.0, 0)
-
-  private val cache = new java.util.concurrent.ConcurrentHashMap[Short, XZStarSFC]()
-
-  def apply(g: Short): XZStarSFC = {
-    var sfc = cache.get(g)
+  def apply(g: Short, beta: Int): XZStarSFC = {
+    var sfc = cache.get((g, beta))
     if (sfc == null) {
-      sfc = new XZStarSFC(g, (-180.0, 180.0), (-90.0, 90.0))
-      cache.put(g, sfc)
+      sfc = new XZStarSFC(g, (-180.0, 180.0), (-90.0, 90.0), beta)
+      cache.put((g, beta), sfc)
     }
     sfc
   }
-
-  /**
-   * Region being queried. Bounds are normalized to [0-1].
-   *
-   * @param xmin x lower bound in [0-1]
-   * @param ymin y lower bound in [0-1]
-   * @param xmax x upper bound in [0-1], must be >= xmin
-   * @param ymax y upper bound in [0-1], must be >= ymin
-   */
-  private case class QueryWindow(xmin: Double, ymin: Double, xmax: Double, ymax: Double)
-
-  /**
-   * An extended Z curve element. Bounds refer to the non-extended z element for simplicity of calculation.
-   *
-   * An extended Z element refers to a normal Z curve element that has it's upper bounds expanded by double it's
-   * width/height. By convention, an element is always square.
-   *
-   * @param xmin   x lower bound in [0-1]
-   * @param ymin   y lower bound in [0-1]
-   * @param xmax   x upper bound in [0-1], must be >= xmin
-   * @param ymax   y upper bound in [0-1], must be >= ymin
-   * @param length length of the non-extended side (note: by convention width should be equal to height)
-   */
-  private case class XElement(xmin: Double, ymin: Double, xmax: Double, ymax: Double, length: Double) extends Envelope(xmin, xmax, ymin, ymax) {
-
-    // extended x and y bounds
-    lazy val xext = xmax + length
-    lazy val yext = ymax + length
-
-    def isContained(window: QueryWindow): Boolean =
-      window.xmin <= xmin && window.ymin <= ymin && window.xmax >= xext && window.ymax >= yext
-
-    def overlaps(window: QueryWindow): Boolean =
-      window.xmax >= xmin && window.ymax >= ymin && window.xmin <= xext && window.ymin <= yext
-
-    def children: Seq[XElement] = {
-      val xCenter = (xmin + xmax) / 2.0
-      val yCenter = (ymin + ymax) / 2.0
-      val len = length / 2.0
-      val c0 = copy(xmax = xCenter, ymax = yCenter, length = len)
-      val c1 = copy(xmin = xCenter, ymax = yCenter, length = len)
-      val c2 = copy(xmax = xCenter, ymin = yCenter, length = len)
-      val c3 = copy(xmin = xCenter, ymin = yCenter, length = len)
-      Seq(c0, c1, c2, c3)
-    }
-  }
-
 }
