@@ -1,8 +1,7 @@
 package com.just.ksim.entity;
 
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPoint;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 
 /**
  * @author : hehuajun3
@@ -10,13 +9,20 @@ import org.locationtech.jts.geom.PrecisionModel;
  * @date : Created in 2021-02-20 18:37
  * @modified by :
  **/
-public class Trajectory extends MultiPoint {
+public class Trajectory {
 
     private String id;
 
-    public Trajectory(String id, Point[] points, PrecisionModel precisionModel, int SRID) {
-        super(points, precisionModel, SRID);
+    private MultiPoint multiPoint;
+
+//    public Trajectory(String id, Point[] points, PrecisionModel precisionModel, int SRID) {
+//        super(points, precisionModel, SRID);
+//        this.id = id;
+//    }
+
+    public Trajectory(String id, MultiPoint multiPoint) {
         this.id = id;
+        this.multiPoint = multiPoint;
     }
 //
 //    public Trajectory(String id, CoordinateSequence points, GeometryFactory factory) {
@@ -29,8 +35,24 @@ public class Trajectory extends MultiPoint {
         return id;
     }
 
+    public MultiPoint getMultiPoint() {
+        return multiPoint;
+    }
+
+    public Geometry getGeometryN(int i) {
+        return this.multiPoint.getGeometryN(i);
+    }
+
+    public int getNumGeometries() {
+        return this.multiPoint.getNumGeometries();
+    }
+
+    public String toText() {
+        return this.multiPoint.toText();
+    }
+
     @Override
     public String toString() {
-        return id + "-" + toText();
+        return id + "-" + this.multiPoint.toText();
     }
 }

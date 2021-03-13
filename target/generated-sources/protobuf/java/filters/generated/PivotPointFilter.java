@@ -85,6 +85,16 @@ public final class PivotPointFilter {
      */
     com.google.protobuf.ByteString
         getPivotsBytes(int index);
+
+    // required bool returnSim = 6;
+    /**
+     * <code>required bool returnSim = 6;</code>
+     */
+    boolean hasReturnSim();
+    /**
+     * <code>required bool returnSim = 6;</code>
+     */
+    boolean getReturnSim();
   }
   /**
    * Protobuf type {@code PivotsFilter2}
@@ -163,6 +173,11 @@ public final class PivotPointFilter {
                 mutable_bitField0_ |= 0x00000010;
               }
               pivots_.add(input.readBytes());
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000010;
+              returnSim_ = input.readBool();
               break;
             }
           }
@@ -383,12 +398,29 @@ public final class PivotPointFilter {
       return pivots_.getByteString(index);
     }
 
+    // required bool returnSim = 6;
+    public static final int RETURNSIM_FIELD_NUMBER = 6;
+    private boolean returnSim_;
+    /**
+     * <code>required bool returnSim = 6;</code>
+     */
+    public boolean hasReturnSim() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>required bool returnSim = 6;</code>
+     */
+    public boolean getReturnSim() {
+      return returnSim_;
+    }
+
     private void initFields() {
       spoint_ = "";
       epoint_ = "";
       threshold_ = 0D;
       traj_ = "";
       pivots_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      returnSim_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -408,6 +440,10 @@ public final class PivotPointFilter {
         return false;
       }
       if (!hasTraj()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasReturnSim()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -432,6 +468,9 @@ public final class PivotPointFilter {
       }
       for (int i = 0; i < pivots_.size(); i++) {
         output.writeBytes(5, pivots_.getByteString(i));
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(6, returnSim_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -466,6 +505,10 @@ public final class PivotPointFilter {
         }
         size += dataSize;
         size += 1 * getPivotsList().size();
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, returnSim_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -511,6 +554,11 @@ public final class PivotPointFilter {
       }
       result = result && getPivotsList()
           .equals(other.getPivotsList());
+      result = result && (hasReturnSim() == other.hasReturnSim());
+      if (hasReturnSim()) {
+        result = result && (getReturnSim()
+            == other.getReturnSim());
+      }
       result = result &&
           getUnknownFields().equals(other.getUnknownFields());
       return result;
@@ -544,6 +592,10 @@ public final class PivotPointFilter {
       if (getPivotsCount() > 0) {
         hash = (37 * hash) + PIVOTS_FIELD_NUMBER;
         hash = (53 * hash) + getPivotsList().hashCode();
+      }
+      if (hasReturnSim()) {
+        hash = (37 * hash) + RETURNSIM_FIELD_NUMBER;
+        hash = (53 * hash) + hashBoolean(getReturnSim());
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -664,6 +716,8 @@ public final class PivotPointFilter {
         bitField0_ = (bitField0_ & ~0x00000008);
         pivots_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000010);
+        returnSim_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -714,6 +768,10 @@ public final class PivotPointFilter {
           bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.pivots_ = pivots_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.returnSim_ = returnSim_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -758,6 +816,9 @@ public final class PivotPointFilter {
           }
           onChanged();
         }
+        if (other.hasReturnSim()) {
+          setReturnSim(other.getReturnSim());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -776,6 +837,10 @@ public final class PivotPointFilter {
           return false;
         }
         if (!hasTraj()) {
+          
+          return false;
+        }
+        if (!hasReturnSim()) {
           
           return false;
         }
@@ -1149,6 +1214,39 @@ public final class PivotPointFilter {
         return this;
       }
 
+      // required bool returnSim = 6;
+      private boolean returnSim_ ;
+      /**
+       * <code>required bool returnSim = 6;</code>
+       */
+      public boolean hasReturnSim() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>required bool returnSim = 6;</code>
+       */
+      public boolean getReturnSim() {
+        return returnSim_;
+      }
+      /**
+       * <code>required bool returnSim = 6;</code>
+       */
+      public Builder setReturnSim(boolean value) {
+        bitField0_ |= 0x00000020;
+        returnSim_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required bool returnSim = 6;</code>
+       */
+      public Builder clearReturnSim() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        returnSim_ = false;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:PivotsFilter2)
     }
 
@@ -1174,11 +1272,11 @@ public final class PivotPointFilter {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026PivotPointFilter.proto\"`\n\rPivotsFilter" +
+      "\n\026PivotPointFilter.proto\"s\n\rPivotsFilter" +
       "2\022\016\n\006spoint\030\001 \002(\t\022\016\n\006epoint\030\002 \002(\t\022\021\n\tthr" +
       "eshold\030\003 \002(\001\022\014\n\004traj\030\004 \002(\t\022\016\n\006pivots\030\005 \003" +
-      "(\tB-\n\021filters.generatedB\020PivotPointFilte" +
-      "rH\001\210\001\001\240\001\001"
+      "(\t\022\021\n\treturnSim\030\006 \002(\010B-\n\021filters.generat" +
+      "edB\020PivotPointFilterH\001\210\001\001\240\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1190,7 +1288,7 @@ public final class PivotPointFilter {
           internal_static_PivotsFilter2_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_PivotsFilter2_descriptor,
-              new java.lang.String[] { "Spoint", "Epoint", "Threshold", "Traj", "Pivots", });
+              new java.lang.String[] { "Spoint", "Epoint", "Threshold", "Traj", "Pivots", "ReturnSim", });
           return null;
         }
       };

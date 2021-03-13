@@ -10,4 +10,5 @@ message PivotsFilter2 {
     required double threshold = 3;
     required string traj = 4;
     repeated string pivots = 5;
+    required bool returnSim = 6;
 }

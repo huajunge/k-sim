@@ -36,16 +36,13 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       if (predicate(nxmin, nxmax) && predicate(nymin, nymax)) l1 + 1 else l1
     }
     val w = math.pow(0.5, length)
-    //val x = math.floor(nxmin / w) * w * xSize + xLo
-    //val y = math.floor(nymin / w) * w * ySize + yLo
+
     val x = math.floor(nxmin / w) * w
     val y = math.floor(nymin / w) * w
     val xWidth = w * xSize
     val yWidth = w * ySize
     val sc = sequenceCode(nxmin, nymin, length, posCode)
-    //val boud = new Envelope(x, x + xWidth, y, y + yWidth)
-    //Element(x, x + xWidth, y, y + yWidth, xWidth * 2, yWidth * 2, length)
-    //x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo
+
     (sc, length, xWidth, yWidth, Element(x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo, xWidth * 2, yWidth * 2, length - 1))
   }
 
@@ -72,12 +69,8 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     val x = math.floor(nxmin / w) * w
     val y = math.floor(nymin / w) * w
 
-    val xWidth = w * xSize + xLo
-    val yWidth = w * ySize + yLo
     val pc = signature(x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo, geometry)
-    //val posCode = positionCode(geometry, length, w, x, y)
-    //println(pc)
-    //println(s"$pc,$x,$y,$length")
+
     sequenceCode(nxmin, nymin, length, pc)
   }
 
@@ -90,10 +83,9 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
         new Coordinate(xmax, ymin), new Coordinate(xmin, ymin))
       val line = new LinearRing(cps, pre, 4326)
       val polygon = new Polygon(line, null, pre, 4326)
-      //polygon.getEnvelopeInternal.intersects(traj.getEnvelopeInternal)
-      //traj.intersects(polygon)
-      for(i <- 0 until traj.getNumGeometries) {
-        if(polygon.contains(traj.getGeometryN(i))){
+
+      for (i <- 0 until traj.getNumGeometries) {
+        if (polygon.contains(traj.getGeometryN(i))) {
           return true
         }
       }
@@ -304,7 +296,6 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     //被包含
     def intersected(traj: Envelope, threshold: Double): Boolean = {
       val copyEE = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
-      //val copyEE = new Envelope(xmin, xmax, ymin, ymax)
       copyEE.expandBy(threshold)
       copyEE.contains(traj)
     }
@@ -331,42 +322,25 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       val yCenter = this.ymax
       val ymax = yeMax
       val xmax = xeMax
-      //      val c0 = copy(xmax = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
-      //      val c1 = copy(xmin = xCenter, ymax = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
-      //      val c2 = copy(xmax = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
-      //      val c3 = copy(xmin = xCenter, ymin = yCenter, xLength = xlen, yLength = ylen, level = level + 1)
+
       val c0 = copy(xmin, ymin, xCenter, yCenter, xlen, ylen, level + 1)
       val c1 = copy(xCenter, ymin, xmax, yCenter, xlen, ylen, level + 1)
       val c2 = copy(xmin, yCenter, xCenter, ymax, xlen, ylen, level + 1)
       val c3 = copy(xCenter, yCenter, xmax, ymax, xlen, ylen, level + 1)
       var outPositions = 0
-      //      if (!c0.intersectElement(buffer)) {
-      //        outPositions |= 1
-      //      }
-      //      if (!c1.intersectElement(buffer)) {
-      //        outPositions |= 1 << 1
-      //      }
-      //      if (!c2.intersectElement(buffer)) {
-      //        outPositions |= 1 << 2
-      //      }
-      //      if (!c3.intersectElement(buffer)) {
-      //        outPositions |= 1 << 3
-      //      }
-      //println(s"${c0.dis(traj)},${c1.dis(traj)},${c2.dis(traj)},${c3.dis(traj)}")
-      if (c0.dis(traj) > threshold) {
+
+      if (c0.dis(traj.getMultiPoint) > threshold) {
         outPositions |= 1
       }
-      if (c1.dis(traj) > threshold) {
+      if (c1.dis(traj.getMultiPoint) > threshold) {
         outPositions |= 1 << 1
       }
-      if (c2.dis(traj) > threshold) {
+      if (c2.dis(traj.getMultiPoint) > threshold) {
         outPositions |= 1 << 2
       }
-      if (c3.dis(traj) > threshold) {
+      if (c3.dis(traj.getMultiPoint) > threshold) {
         outPositions |= 1 << 3
       }
-      //println("out:" + outPositions)
-
       val center = new Coordinate(xCenter, yCenter)
       val upperCenter = new Coordinate(xCenter, ymax)
       val lowerCenter = new Coordinate(xCenter, ymin)
@@ -377,10 +351,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       val upperLeft = new Coordinate(xmin, ymax)
       val upperRight = new Coordinate(xmax, ymax)
       val lowerRight = new Coordinate(xmax, ymin)
-      //      val cps = Array(new Coordinate(el.getMinX, el.getMinY), new Coordinate(el.getMinX, el.getMinY),
-      //        new Coordinate(el.getMinX, el.getMaxY),
-      //        new Coordinate(el.getMaxX, el.getMaxY),
-      //        new Coordinate(el.getMaxX, el.getMinY), new Coordinate(el.getMinX, el.getMinY))
+
       val results = new java.util.ArrayList[Long](8)
 
       def check(coordinats: Array[Coordinate]): Boolean = {
@@ -394,15 +365,11 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
             }
           }
           return true
-//          if (polygon.buffer(threshold).contains(traj)) {
-//            return true
-//          }
         }
         false
       }
 
       for (i <- 0L to 7L) {
-        //val sig = psMaximum(positionIndex(i.toInt))
         val sig = positionIndex(i.toInt)
         if (!((sig.toInt & outPositions) > 0)) {
           if (sig == 15) {
@@ -450,39 +417,71 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
   //enlarged element生成position code, position codes的过滤
   //
   def simRange(searTraj: Trajectory, threshold: Double): java.util.List[IndexRange] = {
-    val ranges = new java.util.ArrayList[IndexRange](100)
-    val boundary1 = searTraj.getEnvelopeInternal
-    val boundaryEnv = searTraj.getEnvelopeInternal
+    val ranges = disRanges(searTraj, threshold)
+    var current = ranges.get(0) // note: should always be at least one range
+    val result = ArrayBuffer.empty[IndexRange]
+    var i = 1
+    while (i < ranges.size()) {
+      val range = ranges.get(i)
+      if (range.lower <= current.upper + 1) {
+        current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+      } else {
+        result.append(current)
+        current = range
+      }
+      i += 1
+    }
+    result.append(current)
+    result.asJava
+  }
 
-    boundary1.expandBy(threshold)
+  def kNNRanges(searTraj: Trajectory, dis: Double, queried: java.util.ArrayList[IndexRange]): java.util.List[IndexRange] = {
+    val ranges = disRanges(searTraj, dis)
+    ranges.removeAll(queried)
+    queried.addAll(ranges)
+    if (ranges.isEmpty) {
+      return ranges
+    }
+    var current = ranges.get(0) // note: should always be at least one range
+    val result = ArrayBuffer.empty[IndexRange]
+    var i = 1
+    while (i < ranges.size()) {
+      val range = ranges.get(i)
+      if (range.lower <= current.upper + 1) {
+        current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+      } else {
+        result.append(current)
+        current = range
+      }
+      i += 1
+    }
+    result.append(current)
+    result.asJava
+  }
+
+  def disRanges(searTraj: Trajectory, dis: Double): java.util.List[IndexRange] = {
+    val ranges = new java.util.ArrayList[IndexRange](100)
+    val boundary1 = searTraj.getMultiPoint.getEnvelopeInternal
+    val boundaryEnv = searTraj.getMultiPoint.getEnvelopeInternal
+
+    boundary1.expandBy(dis)
     //val buffer = searTraj.buffer(threshold)
     val remaining = new java.util.ArrayDeque[Element](20)
     val minimumResolution = indexSpace(boundary1, 0L)
-    //这里的level减了1
     minimumResolution._5.split().foreach(v => {
       remaining.add(v)
     })
     val levelStop = Element(-1, -1, -1, -1, -1, -1, 0)
     remaining.add(levelStop)
-    //maximum resolution
     var maximumResolution = minimumResolution._2
-    //    var currentSize = Math.max(minimumResolution._3 * 2, minimumResolution._4 * 2)
-    //    val maxHandW = Math.max(boundaryEnv.getWidth, boundaryEnv.getHeight)
-    //    while ((maxHandW - currentSize) / 2.0 < threshold && maximumResolution < g) {
-    //      maximumResolution += 1
-    //      currentSize /= 2
-    //    }
-
     var currXS = minimumResolution._3 * 2
     var currYS = minimumResolution._4 * 2
-    while ((boundaryEnv.getWidth - currXS) / 2.0 < threshold && (boundaryEnv.getHeight - currYS) / 2.0 < threshold && maximumResolution < g) {
+    while ((boundaryEnv.getWidth - currXS) / 2.0 < dis && (boundaryEnv.getHeight - currYS) / 2.0 < dis && maximumResolution < g) {
       maximumResolution += 1
       currXS /= 2.0
       currYS /= 2.0
     }
 
-    //println("maximumResolution")
-    //println(maximumResolution)
     val spoint = searTraj.getGeometryN(0)
     val epoint = searTraj.getGeometryN(searTraj.getNumGeometries - 1)
     var level = minimumResolution._2
@@ -492,14 +491,8 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
         remaining.add(levelStop)
         level = level + 1
       } else {
-        //if (next.intersectEE(buffer) && next.intersected(boundaryEnv, threshold)) {
-        //val candidates = next.checkPositionCodes(searTraj, buffer, threshold)
-        if (next.intersected(boundaryEnv, threshold)) {
-          //var startTime = System.currentTimeMillis()
-          //println(s"${next.xmin},${next.ymin},${next.level}")
-          val candidates = next.checkPositionCodes(searTraj, null, threshold, spoint, epoint)
-          //var endTime = System.currentTimeMillis()
-          //println(s"checkPositionCodes:${endTime - startTime}")
+        if (next.intersected(boundaryEnv, dis)) {
+          val candidates = next.checkPositionCodes(searTraj, null, dis, spoint, epoint)
           if (null != candidates) {
             ranges.addAll(candidates)
           }
@@ -511,28 +504,100 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
         }
       }
     }
-
     ranges.sort(IndexRange.IndexRangeIsOrdered)
+    ranges
+    //    queried.asScala.foreach(qr => {
+    //      ranges.remove(qr)
+    //    })
+  }
 
-    var current = ranges.get(0) // note: should always be at least one range
-    val result = ArrayBuffer.empty[IndexRange]
-    var i = 1
-    while (i < ranges.size()) {
-      val range = ranges.get(i)
-      if (range.lower <= current.upper + 1) {
-        // merge the two ranges
-        current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
-      } else {
-        // append the last range and set the current range for future merging
-        result.append(current)
-        current = range
-      }
-      i += 1
+  def indexSpace2(env: Envelope, posCode: Long): (Long, Int, Double, Double, Double, Double, Double, Double, Double, Double) = {
+    val mbr = env
+    val (nxmin, nymin, nxmax, nymax) = normalize(mbr.getMinX, mbr.getMinY, mbr.getMaxX, mbr.getMaxY, false)
+    val maxDim = math.max(nxmax - nxmin, nymax - nymin)
+    val l1 = math.floor(math.log(maxDim) / XZSFC.LogPointFive).toInt
+
+    // the length will either be (l1) or (l1 + 1)
+    val length = if (l1 >= g) {
+      g
+    } else {
+      val w2 = math.pow(0.5, l1 + 1) // width of an element at resolution l2 (l1 + 1)
+
+      // predicate for checking how many axis the polygon intersects
+      // math.floor(min / w2) * w2 == start of cell containing min
+      def predicate(min: Double, max: Double): Boolean = max <= (math.floor(min / w2) * w2) + (2 * w2)
+
+      if (predicate(nxmin, nxmax) && predicate(nymin, nymax)) l1 + 1 else l1
     }
-    // append the last range - there will always be one left that wasn't added
-    result.append(current)
-    //println("xzplus:" + level + "_" + ranges.size() + "_" + result.size)
-    result.asJava
+    val w = math.pow(0.5, length)
+
+    val x = math.floor(nxmin / w) * w
+    val y = math.floor(nymin / w) * w
+    val xWidth = w * xSize
+    val yWidth = w * ySize
+    val sc = sequenceCode(nxmin, nymin, length, posCode)
+    val xTrue = x * xSize + xLo
+    val yTrue = y * ySize + yLo
+    val xMaxTrue = (x + w) * xSize + xLo
+    val yMaxTrue = (y + w) * ySize + yLo
+    val xCen = (xTrue + xMaxTrue) / 2.0
+    val yCen = (yTrue + yMaxTrue) / 2.0
+    (sc, length, xWidth, yWidth, xTrue, yTrue, xMaxTrue, yMaxTrue, xCen, yCen)
+  }
+
+  def rangesForKnn(searTraj: Trajectory, dis: Double, root: ElementKNN): java.util.List[IndexRange] = {
+    val ranges = new java.util.ArrayList[IndexRange](100)
+    val boundary1 = searTraj.getMultiPoint.getEnvelopeInternal
+    val boundaryEnv = searTraj.getMultiPoint.getEnvelopeInternal
+
+    boundary1.expandBy(dis)
+    //val buffer = searTraj.buffer(threshold)
+    val remaining = new java.util.ArrayDeque[ElementKNN](20)
+    val minimumResolution = indexSpace2(boundary1, 0L)
+
+    val levelStop = new ElementKNN(-1, -1, -1, -1, -1, -1, pre, 0)
+    remaining.add(root.search(root, minimumResolution._9, minimumResolution._10, minimumResolution._2))
+    remaining.add(root.search(root, minimumResolution._9 + minimumResolution._3, minimumResolution._10, minimumResolution._2))
+    remaining.add(root.search(root, minimumResolution._9, minimumResolution._10 + minimumResolution._4, minimumResolution._2))
+    remaining.add(root.search(root, minimumResolution._9 + minimumResolution._3, minimumResolution._10 + minimumResolution._4, minimumResolution._2))
+    remaining.add(levelStop)
+    var maximumResolution = minimumResolution._2
+    var currXS = minimumResolution._3 * 2
+    var currYS = minimumResolution._4 * 2
+    while ((boundaryEnv.getWidth - currXS) / 2.0 < dis && (boundaryEnv.getHeight - currYS) / 2.0 < dis && maximumResolution < g) {
+      maximumResolution += 1
+      currXS /= 2.0
+      currYS /= 2.0
+    }
+
+    val spoint = searTraj.getGeometryN(0)
+    val epoint = searTraj.getGeometryN(searTraj.getNumGeometries - 1)
+    var level = minimumResolution._2
+    while (!remaining.isEmpty) {
+      val next = remaining.poll
+      if (next == levelStop && !remaining.isEmpty && level < maximumResolution) {
+        remaining.add(levelStop)
+        level = level + 1
+      } else {
+        if (next.neededToCheck(boundaryEnv, dis)) {
+          val candidates = next.checkPositionCode(searTraj, dis, spoint, epoint)
+          if (null != candidates) {
+            ranges.addAll(candidates)
+          }
+          if (level < maximumResolution) {
+            //next.getChildren.asScala
+            next.getChildren.asScala.foreach(v => {
+              remaining.add(v)
+            })
+          }
+        }
+      }
+    }
+    ranges.sort(IndexRange.IndexRangeIsOrdered)
+    ranges
+    //    queried.asScala.foreach(qr => {
+    //      ranges.remove(qr)
+    //    })
   }
 }
 
