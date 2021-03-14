@@ -100,38 +100,6 @@ public class Client {
         return trajectories;
     }
 
-    public void knnQuery(Trajectory traj, int k) throws IOException {
-        final ArrayList<IndexRange> queied = new ArrayList<>();
-        double threshold;
-        double interval = 0.002;
-        AtomicInteger currentSize = new AtomicInteger();
-        List<Filter> filter = new ArrayList<>(2);
-        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
-        filter.add(new CalculateSimilarity(traj.toText()));
-        for (int iter = 0; iter < MAX_ITERTOR; iter++) {
-            threshold = interval * (double) iter;
-            long time = System.currentTimeMillis();
-            List<IndexRange> ranges = sfc.kNNRanges(traj, threshold, queied);
-            System.out.println("iter:" + iter + ",threshold:" + threshold + ",ranges time:" + (System.currentTimeMillis() - time) + ",size" + ranges.size() + ",queried size" + queied.size());
-            time = System.currentTimeMillis();
-            query(ranges, hTable, filter, res -> {
-                currentSize.getAndIncrement();
-                //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
-                //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID))));
-            });
-            //System.out.println("query:" + (System.currentTimeMillis()  - time));
-            time = System.currentTimeMillis();
-            if (currentSize.get() >= k) {
-                Filter filter2 = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null, true);
-                List<IndexRange> ranges2 = sfc.kNNRanges(traj, threshold, queied);
-                query(ranges2, hTable, Collections.singletonList(filter2), res -> {
-                    currentSize.getAndIncrement();
-                });
-                break;
-            }
-        }
-    }
-
     public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery2(Trajectory traj, int k) throws IOException {
         double threshold;
         double interval = 0.002;

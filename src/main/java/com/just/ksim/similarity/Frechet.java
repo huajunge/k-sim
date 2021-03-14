@@ -3,9 +3,7 @@ package com.just.ksim.similarity;
 import org.locationtech.jts.geom.Geometry;
 import util.NumberUtil;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -76,9 +74,5 @@ public class Frechet {
         }
         //return minDis[n - 1][m - 1];
         return minDisArray.get(n - 1).get(m - 1);
-    }
-
-    public static boolean judgeDistance(Geometry search, Geometry queried, double threshold) {
-        return calulateDistance(search, queried) <= threshold;
     }
 }
