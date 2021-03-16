@@ -8,7 +8,7 @@ import java.util
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), beta: Int) {
+class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), beta: Int) extends Serializable {
   private val xLo = xBounds._1
   private val xHi = xBounds._2
   private val yLo = yBounds._1
@@ -47,6 +47,10 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
   }
 
   def index(geometry: Geometry, lenient: Boolean = false): Long = {
+    index2(geometry, lenient)._1
+  }
+
+  def index2(geometry: Geometry, lenient: Boolean = false): (Long, Long) = {
     //geometry.getBoundary
     val mbr = geometry.getEnvelopeInternal
     val (nxmin, nymin, nxmax, nymax) = normalize(mbr.getMinX, mbr.getMinY, mbr.getMaxX, mbr.getMaxY, lenient)
@@ -71,13 +75,13 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
 
     val pc = signature(x * xSize + xLo, y * ySize + yLo, (x + 2 * w) * xSize + xLo, (y + 2 * w) * ySize + yLo, geometry)
 
-    sequenceCode(nxmin, nymin, length, pc)
+    (sequenceCode(nxmin, nymin, length, pc), pc)
   }
 
   case class Element2(xmin: Double, ymin: Double, xmax: Double, ymax: Double, level: Int, code: Long) {
 
     def overlaps(traj: Geometry): Boolean = {
-      val cps = Array(new Coordinate(xmin, ymin), new Coordinate(xmin, ymin),
+      val cps = Array(new Coordinate(xmin, ymin),
         new Coordinate(xmin, ymax),
         new Coordinate(xmax, ymax),
         new Coordinate(xmax, ymin), new Coordinate(xmin, ymin))
@@ -85,7 +89,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       val polygon = new Polygon(line, null, pre, 4326)
 
       for (i <- 0 until traj.getNumGeometries) {
-        if (polygon.contains(traj.getGeometryN(i))) {
+        if (polygon.intersects(traj.getGeometryN(i))) {
           return true
         }
       }
@@ -104,8 +108,8 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
   }
 
   //val ps = Array(0, 0, 0, 1, 0, 2, 0, 3, 0, 0, 0, 5, 0, 6, 7, 4)
-  val psMaximum = Array(0, 8, 0, 1, 0, 2, 0, 3, 0, 0, 0, 5, 0, 6, 7, 4)
-  val positionIndex = Array(3, 5, 7, 15, 11, 13, 14, 1)
+  val psMaximum = Array(0, 10, 0, 1, 0, 2, 9, 3, 0, 8, 0, 5, 0, 6, 7, 4)
+  val positionIndex = Array(3, 5, 7, 15, 11, 13, 14, 9, 6, 1)
 
   def signature(x1: Double, y1: Double, x2: Double, y2: Double, traj: Geometry): Long = {
     val remaining = new java.util.ArrayDeque[Element2](Math.pow(4, beta).toInt)
@@ -145,7 +149,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     var cs = 0L
 
     def IS(i: Int): Long = {
-      (31L * math.pow(4, g - i).toLong - 7L) / 3L
+      (39L * math.pow(4, g - i).toLong - 9L) / 3L
     }
 
     var i = 1
@@ -153,14 +157,14 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       val xCenter = (xmin + xmax) / 2.0
       val yCenter = (ymin + ymax) / 2.0
       (x < xCenter, y < yCenter) match {
-        case (true, true) => cs += 7L; xmax = xCenter; ymax = yCenter
-        case (false, true) => cs += 7L + 1L * IS(i); xmin = xCenter; ymax = yCenter
-        case (true, false) => cs += 7L + 2L * IS(i); xmax = xCenter; ymin = yCenter
-        case (false, false) => cs += 7L + 3L * IS(i); xmin = xCenter; ymin = yCenter
+        case (true, true) => cs += 9L; xmax = xCenter; ymax = yCenter
+        case (false, true) => cs += 9L + 1L * IS(i); xmin = xCenter; ymax = yCenter
+        case (true, false) => cs += 9L + 2L * IS(i); xmax = xCenter; ymin = yCenter
+        case (false, false) => cs += 9L + 3L * IS(i); xmin = xCenter; ymin = yCenter
       }
       i += 1
     }
-    cs - 7L + posCode
+    cs - 10L + posCode
   }
 
   /**
@@ -369,7 +373,12 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
         false
       }
 
-      for (i <- 0L to 7L) {
+      var pSize = 9L
+      if (level < g) {
+        pSize = 8L
+      }
+
+      for (i <- 0L to pSize) {
         val sig = positionIndex(i.toInt)
         if (!((sig.toInt & outPositions) > 0)) {
           if (sig == 15) {
@@ -383,8 +392,12 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
                 cps = Array(lowerLeft, centerLeft, centerRight, lowerRight, lowerLeft)
               case 5 =>
                 cps = Array(lowerLeft, upperLeft, upperCenter, lowerCenter, lowerLeft)
+              case 6 =>
+                cps = Array(centerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerCenter, center, centerLeft)
               case 7 =>
                 cps = Array(lowerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerLeft)
+              case 9 =>
+                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, centerRight, center, lowerCenter, lowerLeft)
               case 11 =>
                 cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, lowerRight, lowerLeft)
               case 13 =>
@@ -402,6 +415,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
           }
         }
       }
+
       val nxmin = (xmin - xLo) / xSize
       val nymin = (ymin - yLo) / ySize
       val sc = sequenceCode(nxmin, nymin, level, 0L)
@@ -418,6 +432,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
   //
   def simRange(searTraj: Trajectory, threshold: Double): java.util.List[IndexRange] = {
     val ranges = disRanges(searTraj, threshold)
+
     var current = ranges.get(0) // note: should always be at least one range
     val result = ArrayBuffer.empty[IndexRange]
     var i = 1
@@ -493,7 +508,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       } else {
         if (next.intersected(boundaryEnv, dis)) {
           val candidates = next.checkPositionCodes(searTraj, null, dis, spoint, epoint)
-          if (null != candidates) {
+          if (null != candidates && candidates.size() > 0) {
             ranges.addAll(candidates)
           }
           if (level < maximumResolution) {
@@ -564,6 +579,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     var maximumResolution = minimumResolution._2
     var currXS = minimumResolution._3 * 2
     var currYS = minimumResolution._4 * 2
+    //优化
     while ((boundaryEnv.getWidth - currXS) / 2.0 < dis && (boundaryEnv.getHeight - currYS) / 2.0 < dis && maximumResolution < g) {
       maximumResolution += 1
       currXS /= 2.0
@@ -601,7 +617,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
   }
 }
 
-object XZStarSFC {
+object XZStarSFC extends Serializable {
   // the initial level of quads
   private val cache = new java.util.concurrent.ConcurrentHashMap[(Short, Int), XZStarSFC]()
 

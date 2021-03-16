@@ -13,6 +13,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
 import util.WKTUtils;
 
+import java.math.BigDecimal;
+
 import static util.Constants.GEOM;
 
 /**
@@ -44,9 +46,10 @@ public class CalculateSimilarity extends FilterBase {
             if (null != geom) {
                 Geometry trajGeo = WKTUtils.read(this.traj);
                 assert trajGeo != null;
-                double threshold = Frechet.calulateDistance(trajGeo, geom);
+                BigDecimal threshold = BigDecimal.valueOf(Frechet.calulateDistance(trajGeo, geom));
+                //BigDecimal d1 = new BigDecimal(threshold);
                 return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + threshold));
+                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + threshold.toString()));
             }
         }
         return v;

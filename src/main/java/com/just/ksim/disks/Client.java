@@ -25,6 +25,7 @@ import scala.Tuple2;
 import util.WKTUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -87,11 +88,31 @@ public class Client {
         hTable.put(getPut(traj));
     }
 
+    public List<Trajectory> limit(int n) throws IOException {
+        Scan scan = new Scan();
+        scan.setMaxResultSize(n);
+        scan.setLimit(n);
+        ResultScanner resultScanner = hTable.getScanner(scan);
+        List<Trajectory> trajectories = new ArrayList<>();
+//        val trajectories: util.List[Trajectory] = new util.ArrayList[Trajectory]
+        for (Result res : resultScanner) {
+            Geometry geo = WKTUtils.read(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
+            String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+            trajectories.add(new Trajectory(id, (MultiPoint) geo));
+        }
+        return trajectories;
+    }
+
     public List<Trajectory> simQuery(Trajectory traj, double threshold) throws IOException {
         List<Filter> filter = new ArrayList<>(2);
         filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
         List<Trajectory> trajectories = new ArrayList<>();
-        query(sfc.simRange(traj, threshold), this.hTable, filter, res -> {
+        //final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        //List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
+        List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        query(ranges, this.hTable, filter, res -> {
             Geometry geo = WKTUtils.read(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
             String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
             trajectories.add(new Trajectory(id, (MultiPoint) geo));
@@ -102,25 +123,21 @@ public class Client {
 
     public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery2(Trajectory traj, int k) throws IOException {
         double threshold;
-        double interval = 0.002;
+        double interval = 0.001;
         AtomicInteger currentSize = new AtomicInteger();
-        List<Filter> filter = new ArrayList<>(2);
+        List<Filter> filter = new ArrayList<>(1);
         //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
         filter.add(new CalculateSimilarity(traj.toText()));
         final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
-        MinMaxPriorityQueue<Tuple2<Trajectory, Double>> tmpResult = MinMaxPriorityQueue.orderedBy(new Comparator<Tuple2<Trajectory, Double>>() {
-            @Override
-            public int compare(Tuple2<Trajectory, Double> o1, Tuple2<Trajectory, Double> o2) {
-                return Double.compare(o1._2, o2._2);
-            }
-        }).maximumSize(k).create();
+        MinMaxPriorityQueue<Tuple2<Trajectory, Double>> tmpResult = MinMaxPriorityQueue.orderedBy((Comparator<Tuple2<Trajectory, Double>>) (o1, o2) -> Double.compare(o1._2, o2._2)).maximumSize(k).create();
 
-        for (int iter = 0; iter < MAX_ITERTOR; iter++) {
+        for (int iter = 0; iter <= MAX_ITERTOR; iter++) {
             threshold = interval * (double) iter;
             //long time = System.currentTimeMillis();
             List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
             //System.out.println("iter:" + iter + ",threshold:" + threshold + ",ranges time:" + (System.currentTimeMillis() - time) + ",size" + ranges.size());
             List<Tuple2<Trajectory, Double>> tmpTrajs = new ArrayList<>();
+
             query(ranges, hTable, filter, res -> {
                 currentSize.getAndIncrement();
                 //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
@@ -128,7 +145,9 @@ public class Client {
                 String[] values = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))).split("-");
                 Geometry geo = WKTUtils.read(values[0]);
                 String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
-                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), Double.valueOf(values[1])));
+                //System.out.println(id);
+                BigDecimal d = new BigDecimal(values[1]);
+                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
             });
             if (!tmpTrajs.isEmpty()) {
                 tmpResult.addAll(tmpTrajs);
@@ -136,9 +155,10 @@ public class Client {
             //System.out.println("query:" + (System.currentTimeMillis()  - time));
             if (currentSize.get() >= k) {
                 List<Tuple2<Trajectory, Double>> tmpTrajs2 = new ArrayList<>();
-                threshold = tmpResult.peek()._2;
+                threshold = tmpResult.peekLast()._2;
                 Filter filter2 = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null, true);
                 List<IndexRange> ranges2 = sfc.rangesForKnn(traj, threshold, root);
+
                 query(ranges2, hTable, Collections.singletonList(filter2), res -> {
                     currentSize.getAndIncrement();
                     String[] values = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))).split("-");

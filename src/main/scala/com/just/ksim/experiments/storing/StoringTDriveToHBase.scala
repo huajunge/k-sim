@@ -1,20 +1,25 @@
 package com.just.ksim.experiments.storing
 
-import org.apache.hadoop.hbase.client.{ConnectionFactory, Put}
+import com.just.ksim.entity.Trajectory
+import org.apache.hadoop.hbase.client.ConnectionFactory
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapred.TableOutputFormat
-import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.{SparkConf, SparkContext}
+import org.locationtech.jts.geom.MultiPoint
 import util.Constants.DEFAULT_CF
+import util.{PutUtils, WKTUtils}
 
-object StoringTDrive {
+object StoringTDriveToHBase {
   def main(args: Array[String]): Unit = {
     val hbaseConf = HBaseConfiguration.create()
     val connection = ConnectionFactory.createConnection(hbaseConf)
     val admin = connection.getAdmin
-    val tableName = "test_tdrive"
+    val tableName = "tdrive4"
+    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment2"
+    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
+    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out\\part-00000"
     val table = new HTableDescriptor(TableName.valueOf(tableName))
     if (!admin.tableExists(table.getTableName)) {
       val table = new HTableDescriptor(TableName.valueOf(tableName))
@@ -26,35 +31,17 @@ object StoringTDrive {
       admin.createTable(table)
     }
     val conf = new SparkConf().setMaster("local[*]").setAppName("StoringTDrive")
-
     val context = new SparkContext(conf)
-    //hbaseConf.set(TableOutputFormat.OUTPUT_TABLE, "test_table")
-    //IMPORTANT: must set the attribute to solve the problem (can't create path from null string )
-    //hbaseConf.set("mapreduce.output.fileoutputformat.outputdir", "/tmp1")
-
     val job = new JobConf(hbaseConf)
     job.setOutputFormat(classOf[TableOutputFormat])
     job.set(TableOutputFormat.OUTPUT_TABLE, tableName)
-    //job.setOutputFormatClass(classOf[TableOutputFormat[ImmutableBytesWritable]])
-    //job.setOutputKeyClass(classOf[ImmutableBytesWritable])
-    //job.setOutputValueClass(classOf[Put])
 
-    try {
-      val rdd = context.makeRDD(1 to 100000)
-      context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\tmp")
-      // column family
-      val family = Bytes.toBytes(DEFAULT_CF)
-      // column counter --> ctr
-      val column = Bytes.toBytes("ctr")
-
-      rdd.map(value => {
-        var put = new Put(Bytes.toBytes(value))
-        put.addImmutable(family, column, Bytes.toBytes(value))
-        (new ImmutableBytesWritable(), put)
-      })
-        .saveAsHadoopDataset(job)
-    } finally {
-      context.stop()
-    }
+    val putUtils = new PutUtils(16.toShort)
+    val shard = 4.toShort
+    context.textFile(trajPath).map(tra => {
+      val t = tra.split("-")
+      val put = putUtils.getPut(new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shard)
+      (new ImmutableBytesWritable(), put)
+    }).saveAsHadoopDataset(job)
   }
 }

@@ -39,7 +39,7 @@ object ReadTrajectory {
       val traj = new Trajectory(tid, new MultiPoint(ps, pre, 4326))
       trajs.add(traj)
       trajMap.put((traj.getId, sfc.index(traj.getMultiPoint)), traj)
-      //client.insert(traj)
+      client.insert(traj)
       //println()
       //val sc = sfc.index(traj)
       //println(traj.getId + "," + sc.toString)

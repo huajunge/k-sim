@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Geometry;
 import util.WKTUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static util.Constants.*;
@@ -34,7 +35,7 @@ public class PivotsFilter extends FilterBase {
     private boolean returnSim;
     private Geometry spointGeo;
     private Geometry epointGeo;
-    private double currentThreshold = 0.0;
+    private BigDecimal currentThreshold = null;
 
     public PivotsFilter(String spoint, String epoint, double threshold, String traj, List<String> pivots, boolean returnSim) {
         this.spoint = spoint;
@@ -86,7 +87,7 @@ public class PivotsFilter extends FilterBase {
                     assert trajGeo != null;
                     double th = Frechet.calulateDistance(trajGeo, geom);
                     this.filterRow = th > threshold;
-                    this.currentThreshold = th;
+                    this.currentThreshold = BigDecimal.valueOf(th);
                 }
                 this.checkedAllPoint = true;
             }
@@ -99,11 +100,10 @@ public class PivotsFilter extends FilterBase {
         //System.out.println(Bytes.toString(v.getQualifierArray()));
         //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
         //v.getv
-        if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM)) {
+        if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM) && null != this.currentThreshold) {
             //System.out.println("-------");
             return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold));
-
+                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold.toString()));
         }
         return v;
     }

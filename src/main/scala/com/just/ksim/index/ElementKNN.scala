@@ -16,9 +16,9 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
   private val disOfFourSubElements = new java.util.ArrayList[Double](4)
   val xLength = xmax - xmin
   val yLength = ymax - ymin
-  val psMaximum = Array(0, 8, 0, 1, 0, 2, 0, 3, 0, 0, 0, 5, 0, 6, 7, 4)
-  val positionIndex = Array(3, 5, 7, 15, 11, 13, 14, 1)
-  val positionDisMap = new util.HashMap[Long, Double]()
+  val psMaximum = Array(0, 10, 0, 1, 0, 2, 9, 3, 0, 8, 0, 5, 0, 6, 7, 4)
+  val positionIndex = Array(3, 5, 7, 15, 11, 13, 14, 9, 6, 1)
+  val positionDisMap = new util.HashMap[Long, (Double, Int)]()
   val children = new java.util.ArrayList[ElementKNN](4)
 
   //  def getLevel(): Int = {
@@ -26,9 +26,6 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
   //  }
 
   def neededToCheck(traj: Envelope, threshold: Double): Boolean = {
-    if ((addedPositionCodes == 0x7F && level < g) || (addedPositionCodes == 0xFF && level == g)) {
-      return false
-    }
     if (checked) {
       //println("checked:"+checked)
       return checked
@@ -43,15 +40,15 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     if (children.isEmpty) {
       val xCenter = (xmax + xmin) / 2.0
       val yCenter = (ymax + ymin) / 2.0
-      children.add(new ElementKNN(xmin, ymin, xCenter, yCenter, level + 1, g, pre, elementCode + 7L))
-      children.add(new ElementKNN(xCenter, ymin, xmax, yCenter, level + 1, g, pre, elementCode + 7L + 1L * IS(level + 1)))
-      children.add(new ElementKNN(xmin, yCenter, xCenter, ymax, level + 1, g, pre, elementCode + 7L + 2L * IS(level + 1)))
-      children.add(new ElementKNN(xCenter, yCenter, xmax, ymax, level + 1, g, pre, elementCode + 7L + 3L * IS(level + 1)))
+      children.add(new ElementKNN(xmin, ymin, xCenter, yCenter, level + 1, g, pre, elementCode + 9L))
+      children.add(new ElementKNN(xCenter, ymin, xmax, yCenter, level + 1, g, pre, elementCode + 9L + 1L * IS(level + 1)))
+      children.add(new ElementKNN(xmin, yCenter, xCenter, ymax, level + 1, g, pre, elementCode + 9L + 2L * IS(level + 1)))
+      children.add(new ElementKNN(xCenter, yCenter, xmax, ymax, level + 1, g, pre, elementCode + 9L + 3L * IS(level + 1)))
     }
   }
 
   def IS(i: Int): Long = {
-    (31L * math.pow(4, g - i).toLong - 7L) / 3L
+    (39L * math.pow(4, g - i).toLong - 9L) / 3L
   }
 
   def search(root: ElementKNN, x: Double, y: Double, l: Int): ElementKNN = {
@@ -79,6 +76,10 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
   }
 
   def checkPositionCode(traj: Trajectory, threshold: Double, spoint: Geometry, epoint: Geometry): util.List[IndexRange] = {
+
+    if ((addedPositionCodes == 0x1FF && level < g) || (addedPositionCodes == 0x3FF && level == g)) {
+      return new java.util.ArrayList[IndexRange]
+    }
     val xeMax = this.xmax + xLength
     val yeMax = this.ymax + xLength
     val xCenter = this.xmax
@@ -134,25 +135,21 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     val upperLeft = new Coordinate(xmin, ymax)
     val upperRight = new Coordinate(xmax, ymax)
     val lowerRight = new Coordinate(xmax, ymin)
-
     val results = new java.util.ArrayList[Long](8)
-    var pSize = 7L
+    var pSize = 9L
     if (level < g) {
-      pSize = 6L
+      pSize = 8L
     }
     for (i <- 0L to pSize) {
       val sig = positionIndex(i.toInt)
       if (!((sig.toInt & outPositions) > 0) && ((addedPositionCodes & (1 << i.toInt)) == 0)) {
         var check = true
         if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
-          check = positionDisMap.get(i) < threshold
+          check = positionDisMap.get(i)._1 <= threshold
         }
+
         if (check) {
-          if (sig == 15) {
-            results.add(i + 1L)
-            positionDisMap.put(i, 0.0)
-            checkedPositionCodes |= (1 << i.toInt)
-          } else {
+          {
             var cps = new Array[Coordinate](4)
             sig match {
               case 1 =>
@@ -161,23 +158,36 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
                 cps = Array(lowerLeft, centerLeft, centerRight, lowerRight, lowerLeft)
               case 5 =>
                 cps = Array(lowerLeft, upperLeft, upperCenter, lowerCenter, lowerLeft)
+              case 6 =>
+                cps = Array(centerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerCenter, center, centerLeft)
               case 7 =>
                 cps = Array(lowerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerLeft)
+              case 9 =>
+                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, centerRight, center, lowerCenter, lowerLeft)
               case 11 =>
                 cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, lowerRight, lowerLeft)
               case 13 =>
                 cps = Array(lowerLeft, upperLeft, upperRight, centerRight, center, lowerCenter, lowerLeft)
               case 14 =>
                 cps = Array(centerLeft, upperLeft, upperRight, lowerRight, lowerCenter, center, centerLeft)
+              case 15 =>
+                cps = Array(lowerLeft, upperLeft, upperRight, lowerRight, lowerLeft)
             }
 
             //var st = System.currentTimeMillis()
-            val dis = disOfPosAndTraj(cps, threshold)
-            positionDisMap.put(i, dis._1)
+            var dis = (0.0, true, 1)
+            var disTmp = 0.0
+            if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
+              dis = disOfPosAndTraj(cps, threshold, positionDisMap.get(i)._2)
+              disTmp = positionDisMap.get(i)._1
+            } else {
+              dis = disOfPosAndTraj(cps, threshold, 1)
+            }
+            positionDisMap.put(i, (Math.max(dis._1, disTmp), dis._3))
             checkedPositionCodes |= (1 << i.toInt)
 
             if (dis._2) {
-              addedPositionCodes |= (1 << i.toInt)
+              this.addedPositionCodes |= (1 << i.toInt)
               results.add(i + 1L)
               //println(s"$sig,${i + 1L}")
             }
@@ -188,30 +198,45 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       }
     }
 
-    def disOfPosAndTraj(coordinats: Array[Coordinate], threshold: Double): (Double, Boolean) = {
+    def disOfPosAndTraj(coordinats: Array[Coordinate], threshold: Double, startIndex: Int): (Double, Boolean, Int) = {
       val line = new LinearRing(coordinats, pre, 4326)
       val polygon = new Polygon(line, null, pre, 4326)
       var maxDis = 0.0
       val sDis = polygon.distance(spoint)
       val eDis = polygon.distance(epoint)
       maxDis = Math.max(sDis, eDis)
+      var index = startIndex
       if (sDis <= threshold && eDis <= threshold) {
-        for (i <- 1 until traj.getNumGeometries - 1) {
+        for (i <- startIndex until traj.getNumGeometries - 1) {
+          index = i
           val dis = polygon.distance(traj.getGeometryN(i))
           if (maxDis < dis) {
             maxDis = dis
           }
           if (dis > threshold) {
-            return (maxDis, false)
+            return (maxDis, false, index)
           }
         }
-        return (maxDis, true)
+        return (maxDis, true, index)
       }
-      (maxDis, false)
+
+      //      for (i <- 0 until traj.getNumGeometries) {
+      //        val dis = polygon.distance(traj.getGeometryN(i))
+      //        if (maxDis < dis) {
+      //          maxDis = dis
+      //        }
+      //      }
+      //      if (maxDis > threshold) {
+      //        return (maxDis, false)
+      //      }else {
+      //        return (maxDis, true)
+      //      }
+
+      (maxDis, false, index)
     }
 
     results.asScala.map(v =>
-      IndexRange(v + elementCode - 7L, v + elementCode - 7L, contained = false)
+      IndexRange(v + elementCode - 10L, v + elementCode - 10L, contained = false)
     ).asJava
   }
 

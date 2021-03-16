@@ -2,6 +2,11 @@ package com.just.ksim.entity;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.io.WKTWriter;
+
+import java.util.List;
 
 /**
  * @author : hehuajun3
@@ -23,6 +28,11 @@ public class Trajectory {
     public Trajectory(String id, MultiPoint multiPoint) {
         this.id = id;
         this.multiPoint = multiPoint;
+    }
+
+    public Trajectory(String id, List<Point> pointList) {
+        this.id = id;
+        this.multiPoint = new MultiPoint(pointList.toArray(new Point[0]), new PrecisionModel(), 4326);
     }
 //
 //    public Trajectory(String id, CoordinateSequence points, GeometryFactory factory) {
@@ -53,6 +63,8 @@ public class Trajectory {
 
     @Override
     public String toString() {
-        return id + "-" + this.multiPoint.toText();
+        WKTWriter writer = new WKTWriter(3);
+        //writer.write(this.multiPoint);
+        return id + "-" + writer.write(this.multiPoint);
     }
 }
