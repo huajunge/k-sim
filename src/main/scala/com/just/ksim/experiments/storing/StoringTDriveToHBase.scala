@@ -16,9 +16,9 @@ object StoringTDriveToHBase {
     val hbaseConf = HBaseConfiguration.create()
     val connection = ConnectionFactory.createConnection(hbaseConf)
     val admin = connection.getAdmin
-    val tableName = "tdrive4"
-    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment2"
-    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
+    val tableName = "tdrive_all_0"
+    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
+    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
     //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out\\part-00000"
     val table = new HTableDescriptor(TableName.valueOf(tableName))
     if (!admin.tableExists(table.getTableName)) {
@@ -38,7 +38,7 @@ object StoringTDriveToHBase {
 
     val putUtils = new PutUtils(16.toShort)
     val shard = 4.toShort
-    context.textFile(trajPath).map(tra => {
+    context.textFile(trajPath,10).map(tra => {
       val t = tra.split("-")
       val put = putUtils.getPut(new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shard)
       (new ImmutableBytesWritable(), put)

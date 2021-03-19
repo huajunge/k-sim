@@ -47,10 +47,15 @@ object Statistic {
         } else {
           null
         }
-      }).filter(t => null != t && t.getNumGeometries > 10)
+      }).filter(t => null != t && t.getNumGeometries >= 4)
         .map(t => {
-          sfc.index2(t.getMultiPoint)._2
-        })
+          try {
+            sfc.index2(t.getMultiPoint)._3
+          }catch {
+            case _: Exception => null
+            case _ => null
+          }
+        }).filter(t => null != t)
         .countByValue()) {
         println(s"${elem._1},${elem._2}")
       }

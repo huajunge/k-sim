@@ -6,7 +6,9 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.io.WKTWriter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : hehuajun3
@@ -66,5 +68,10 @@ public class Trajectory {
         WKTWriter writer = new WKTWriter(3);
         //writer.write(this.multiPoint);
         return id + "-" + writer.write(this.multiPoint);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, multiPoint);
     }
 }

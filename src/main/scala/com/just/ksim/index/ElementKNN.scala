@@ -27,7 +27,6 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
 
   def neededToCheck(traj: Envelope, threshold: Double): Boolean = {
     if (checked) {
-      //println("checked:"+checked)
       return checked
     }
     val enlElement = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
@@ -204,6 +203,7 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       var maxDis = 0.0
       val sDis = polygon.distance(spoint)
       val eDis = polygon.distance(epoint)
+
       maxDis = Math.max(sDis, eDis)
       var index = startIndex
       if (sDis <= threshold && eDis <= threshold) {
@@ -235,13 +235,15 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       (maxDis, false, index)
     }
 
-    results.asScala.map(v =>
+    results.asScala.map(v => {
+      //println(s"$level,$v,$elementCode")
       IndexRange(v + elementCode - 10L, v + elementCode - 10L, contained = false)
+    }
     ).asJava
   }
 
   def dis(env: Envelope, geo: Geometry): Double = {
-    val cps = Array(new Coordinate(env.getMinX, env.getMinY), new Coordinate(env.getMinX, env.getMinY),
+    val cps = Array(new Coordinate(env.getMinX, env.getMinY),
       new Coordinate(env.getMinX, env.getMaxY),
       new Coordinate(env.getMaxX, env.getMaxY),
       new Coordinate(env.getMaxX, env.getMinY), new Coordinate(env.getMinX, env.getMinY))

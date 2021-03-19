@@ -2,50 +2,29 @@ package com.just.ksim.experiments.storing
 
 import com.just.ksim.entity.Trajectory
 import com.just.ksim.preprocess.HeuristicFilterAndSegment
-import org.apache.hadoop.hbase.client.ConnectionFactory
-import org.apache.hadoop.hbase.mapred.TableOutputFormat
-import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
-import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.{SparkConf, SparkContext}
 import org.locationtech.jts.geom.{Coordinate, MultiPoint, Point, PrecisionModel}
-import util.Constants.DEFAULT_CF
 
 import java.sql.Timestamp
 import scala.collection.JavaConverters._
 
 object SegmentingTDrive {
   def main(args: Array[String]): Unit = {
-    val hbaseConf = HBaseConfiguration.create()
-    val connection = ConnectionFactory.createConnection(hbaseConf)
-    val admin = connection.getAdmin
-    val tableName = "test_tdrive"
-    val table = new HTableDescriptor(TableName.valueOf(tableName))
-    if (!admin.tableExists(table.getTableName)) {
-      val table = new HTableDescriptor(TableName.valueOf(tableName))
-      if (admin.tableExists(table.getTableName)) {
-        admin.disableTable(table.getTableName)
-        admin.deleteTable(table.getTableName)
-      }
-      table.addFamily(new HColumnDescriptor(DEFAULT_CF))
-      admin.createTable(table)
-    }
-    val conf = new SparkConf().setMaster("local[*]").setAppName("StoringTDrive")
+
+    val conf = new SparkConf().setMaster("local[*]").setAppName("SegmentTDrive")
     val context = new SparkContext(conf)
     //hbaseConf.set(TableOutputFormat.OUTPUT_TABLE, "test_table")
     //IMPORTANT: must set the attribute to solve the problem (can't create path from null string )
     //hbaseConf.set("mapreduce.output.fileoutputformat.outputdir", "/tmp1")
 
-    val job = new JobConf(hbaseConf)
-    job.setOutputFormat(classOf[TableOutputFormat])
-    job.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
     val segment = new HeuristicFilterAndSegment(20, 11 * 60)
     try {
       val pre = new PrecisionModel()
-      val rdd = context.makeRDD(1 to 100000)
       // val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\tmp")
-      val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\taxi_log_2008_by_id")
-      val outPath = "D:\\工作文档\\data\\T-drive\\release\\segment2"
+      val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\taxi_log_2008_by_id",20)
+      val outPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
+      val minSize = 0
       rawRDD.flatMap(v => {
         val nameFriIndex = v._1.lastIndexOf("/")
         val nameLastIndex = v._1.lastIndexOf(".")
@@ -70,7 +49,7 @@ object SegmentingTDrive {
         } else {
           null
         }
-      }).filter(t => null != t && t.getNumGeometries >= 10).saveAsTextFile(outPath)
+      }).filter(t => null != t && t.getNumGeometries >= minSize).saveAsTextFile(outPath)
       // column family
       //      val family = Bytes.toBytes(DEFAULT_CF)
       //      // column counter --> ctr

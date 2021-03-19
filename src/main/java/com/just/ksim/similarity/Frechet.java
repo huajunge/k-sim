@@ -20,11 +20,11 @@ public class Frechet {
         minDis[0][0] = search.getGeometryN(0).distance(queried.getGeometryN(0));
 
         for (int i = 1; i < n; i++) {
-            minDis[i][0] = Double.max(minDis[i][0], search.getGeometryN(i).distance(queried.getGeometryN(0)));
+            minDis[i][0] = Double.max(minDis[i-1][0], search.getGeometryN(i).distance(queried.getGeometryN(0)));
         }
 
         for (int j = 1; j < m; j++) {
-            minDis[0][j] = Double.max(minDis[0][j], search.getGeometryN(0).distance(queried.getGeometryN(j)));
+            minDis[0][j] = Double.max(minDis[0][j-1], search.getGeometryN(0).distance(queried.getGeometryN(j)));
         }
 
         for (int i = 1; i < n; i++) {
