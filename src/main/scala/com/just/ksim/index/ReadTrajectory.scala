@@ -52,7 +52,7 @@ object ReadTrajectory {
     println(s"${System.currentTimeMillis() - st},${simTrajs.size()}")
 
     st = System.currentTimeMillis()
-    val result = client.knnQuery2(trajs.get(0), 5)
+    val result = client.knnQuery(trajs.get(0), 5)
     println(s"${System.currentTimeMillis() - st},${result.size()}")
     //    trajMap.entrySet().forEach(new Consumer[java.util.Map.Entry[(String, Long), Trajectory]] {
     //      protected override def accept(t: java.util.Map.Entry[(String, Long), Trajectory]): Unit = {

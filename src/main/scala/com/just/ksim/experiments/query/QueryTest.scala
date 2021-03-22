@@ -19,7 +19,7 @@ object QueryTest {
     val tableName2 = "tdrive_all_0"
     val client = new Client(tableName2)
     val client2 = new Client(tableName)
-    val trajectories = client2.limit(50)
+    val trajectories = client2.limit(30)
     val sfc = XZStarSFC.apply(16.toShort, 1)
     val threshold = 0.02
 //    trajectories.asScala.foreach(t => {
@@ -59,25 +59,25 @@ object QueryTest {
     println(s"${tt.max},${tt.min},${sum / tt.size},${tt(24)}")
     timeStatistic.clear()
     //val f = new Frechet()
-//    for (elem <- trajectories.asScala) {
-//      //          if (elem.getId.equals("15_1202017525")) {
-//      //            val time = System.currentTimeMillis()
-//      //            val result = client.knnQuery2(elem, 50)
-//      //            for (elem2 <- result.asScala) {
-//      //              //println(Frechet.calulateDistance(elem.getMultiPoint,elem2._1.getMultiPoint))
-//      //              //println(elem2._2)
-//      //            }
-//      //            println(s"knn-${elem.getId},${result.size()},${elem.getNumGeometries},${System.currentTimeMillis() - time},${result.peekLast()._2}")
-//      //          }
-//      val time = System.currentTimeMillis()
-//      val result = client.knnQuery2(elem, 250)
-//      val tmpT = System.currentTimeMillis() - time
-//      timeStatistic.add(tmpT)
-//      println(s"${elem.getId}-knn,${result.size()},${elem.getNumGeometries},${tmpT},${result.pollLast()._2}")
-//    }
-//    tt = timeStatistic.asScala.sorted
-//    sum = tt.sum
-//    println(s"${tt.max},${tt.min},${sum / tt.size},${tt(24)}")
+    for (elem <- trajectories.asScala) {
+      //          if (elem.getId.equals("15_1202017525")) {
+      //            val time = System.currentTimeMillis()
+      //            val result = client.knnQuery2(elem, 50)
+      //            for (elem2 <- result.asScala) {
+      //              //println(Frechet.calulateDistance(elem.getMultiPoint,elem2._1.getMultiPoint))
+      //              //println(elem2._2)
+      //            }
+      //            println(s"knn-${elem.getId},${result.size()},${elem.getNumGeometries},${System.currentTimeMillis() - time},${result.peekLast()._2}")
+      //          }
+      val time = System.currentTimeMillis()
+      val result = client.knnQuery(elem, 250)
+      val tmpT = System.currentTimeMillis() - time
+      timeStatistic.add(tmpT)
+      println(s"${elem.getId}-knn,${result.size()},${elem.getNumGeometries},${tmpT},${result.pollLast()._2}")
+    }
+    tt = timeStatistic.asScala.sorted
+    sum = tt.sum
+    println(s"${tt.max},${tt.min},${sum / tt.size},${tt(24)}")
     client.close()
   }
 }
