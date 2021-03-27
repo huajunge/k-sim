@@ -57,7 +57,6 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
         new Coordinate(xmax, ymin), new Coordinate(xmin, ymin))
       val line = new LinearRing(cps, pre, 4326)
       val polygon = new Polygon(line, null, pre, 4326)
-
       for (i <- 0 until traj.getNumGeometries) {
         if (polygon.intersects(traj.getGeometryN(i))) {
           return true

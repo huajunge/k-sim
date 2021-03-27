@@ -139,7 +139,7 @@ public class Client {
             //System.out.println("iter:" + iter + ",threshold:" + threshold + ",ranges time:" + (System.currentTimeMillis() - time) + ",size" + ranges.size());
             List<Tuple2<Trajectory, Double>> tmpTrajs = new ArrayList<>();
             // System.out.println(ranges.size());
-            if(currentSize.get() >= k) {
+            if (currentSize.get() >= k) {
                 double maxThreshold = tmpResult.peekLast()._2;
                 Filter filterThreshold = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), null, true);
                 filter.clear();
@@ -154,8 +154,12 @@ public class Client {
                 Geometry geo = WKTUtils.read(values[0]);
                 String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
                 //System.out.println(id);
-                BigDecimal d = new BigDecimal(values[1]);
-                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
+                if (values.length == 2) {
+                    BigDecimal d = new BigDecimal(values[1]);
+                    tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
+                }
+//                BigDecimal d = new BigDecimal(values[1]);
+//                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
             });
 
             if (!tmpTrajs.isEmpty()) {
@@ -203,7 +207,7 @@ public class Client {
             List<Tuple2<Trajectory, Double>> tmpTrajs2 = new ArrayList<>();
             double maxThreshold = tmpResult.peekLast()._2;
             if (maxThreshold > interval * iter) {
-                System.out.println(iter +","+maxThreshold);
+                System.out.println(iter + "," + maxThreshold);
                 Filter filter2 = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), null, true);
                 List<IndexRange> ranges2 = sfc.rangesForKnn(traj, maxThreshold, root);
                 //System.out.println("ranges2:"+ranges2.size() );
@@ -263,11 +267,13 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assert resultScanner != null;
-        for (Result res : resultScanner) {
-            process.process(res);
+        //assert resultScanner != null;
+        if(null != resultScanner) {
+            for (Result res : resultScanner) {
+                process.process(res);
+            }
+            resultScanner.close();
         }
-        resultScanner.close();
     }
 
     public Put getPut(Trajectory traj) {
