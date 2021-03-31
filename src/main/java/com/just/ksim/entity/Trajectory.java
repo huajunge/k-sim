@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.io.WKTWriter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +17,7 @@ import java.util.Objects;
  * @date : Created in 2021-02-20 18:37
  * @modified by :
  **/
-public class Trajectory {
+public class Trajectory implements Serializable {
 
     private String id;
 
@@ -30,6 +31,10 @@ public class Trajectory {
     public Trajectory(String id, MultiPoint multiPoint) {
         this.id = id;
         this.multiPoint = multiPoint;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Trajectory(String id, List<Point> pointList) {

@@ -1,6 +1,8 @@
 package com.just.ksim.experiments.storing
 
 import com.just.ksim.entity.Trajectory
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.Path
 import org.apache.hadoop.hbase.client.ConnectionFactory
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapred.TableOutputFormat
@@ -16,8 +18,12 @@ object StoringTDriveToHBase {
     val hbaseConf = HBaseConfiguration.create()
     val connection = ConnectionFactory.createConnection(hbaseConf)
     val admin = connection.getAdmin
-    val tableName = "tdrive_throughput"
-    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
+    val trajPath = args(0)
+    val tableName = args(1)
+    val countPath = args(2)
+    val shards = args(3).toShort
+    //    val tableName = "tdrive_throughput"
+    //    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
     //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
     //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out\\part-00000"
     val table = new HTableDescriptor(TableName.valueOf(tableName))
@@ -30,18 +36,44 @@ object StoringTDriveToHBase {
       table.addFamily(new HColumnDescriptor(DEFAULT_CF))
       admin.createTable(table)
     }
-    val conf = new SparkConf().setMaster("local[*]").setAppName("StoringTDrive")
+    val conf = new SparkConf()
+      //.setMaster("local[*]")
+      .setAppName("StoringTDrive")
     val context = new SparkContext(conf)
     val job = new JobConf(hbaseConf)
     job.setOutputFormat(classOf[TableOutputFormat])
     job.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
     val putUtils = new PutUtils(16.toShort)
-    val shard = 4.toShort
-    context.textFile(trajPath, 10).map(tra => {
+    //val shard = 4.toShort
+    val time = System.currentTimeMillis()
+    val tmp = context.textFile(trajPath, 20).map(tra => {
       val t = tra.split("-")
-      val put = putUtils.getPut(new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shard)
-      (new ImmutableBytesWritable(), put)
-    }).saveAsHadoopDataset(job)
+      putUtils.getPut(new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shards)
+    })
+    val count = tmp.count()
+    val indexingTime = System.currentTimeMillis() - time
+    val path = new Path(countPath)
+    val fs = path.getFileSystem(new Configuration())
+    if (!fs.exists(path)) {
+      val outputStream = fs.create(path)
+      outputStream.writeBytes(count.toString)
+      outputStream.writeBytes("\t")
+      outputStream.writeBytes(indexingTime.toString)
+      outputStream.flush()
+      outputStream.flush()
+      outputStream.close()
+    } else {
+      val outputStream = fs.append(path)
+      outputStream.writeBytes(count.toString)
+      outputStream.writeBytes("\t")
+      outputStream.writeBytes(indexingTime.toString)
+      outputStream.flush()
+      outputStream.flush()
+      outputStream.close()
+    }
+    fs.close()
+    tmp.map(put => (new ImmutableBytesWritable(), put)
+    ).saveAsHadoopDataset(job)
   }
 }

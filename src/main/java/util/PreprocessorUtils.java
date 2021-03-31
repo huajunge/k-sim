@@ -20,10 +20,10 @@ public class PreprocessorUtils {
      * @return Trajectory
      */
     public static Trajectory formNewTrajectory(String rawTrajectoryID, List<Point> cleanedPtList) {
-        if (cleanedPtList.size() > 1) {
+        if (cleanedPtList.size() > 0) {
             long timeHash = (long) (cleanedPtList.get(0).getCoordinate().getZ() / 1000);
             return new Trajectory(rawTrajectoryID + "_" + timeHash, cleanedPtList);
-        } else {
+        }  else {
             return null;
         }
     }

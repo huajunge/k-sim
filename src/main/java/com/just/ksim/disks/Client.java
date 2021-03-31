@@ -3,6 +3,7 @@ package com.just.ksim.disks;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.just.ksim.entity.Trajectory;
 import com.just.ksim.filter.CalculateSimilarity;
+import com.just.ksim.filter.CountFilter;
 import com.just.ksim.filter.PivotsFilter;
 import com.just.ksim.index.ElementKNN;
 import com.just.ksim.index.XZStarSFC;
@@ -15,6 +16,7 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.FirstKeyOnlyFilter;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
@@ -50,7 +52,7 @@ public class Client {
     private String tableName;
     private static int MAX_ITERTOR = 100;
     private Connection connection;
-    private static Short shard = 4;
+    private Short shard = 4;
 //    public Client(short g) {
 //        this.g = g;
 //        this.sfc = XZStarSFC.apply(g, beta);
@@ -58,6 +60,12 @@ public class Client {
 
     public Client(String tableName) throws IOException {
         this(tableName, DEFALUT_G);
+    }
+
+    public Client(short g, String tableName, Short shard) {
+        this.g = g;
+        this.tableName = tableName;
+        this.shard = shard;
     }
 
     public Client(String tableName, Short precise) throws IOException {
@@ -91,7 +99,7 @@ public class Client {
     public List<Trajectory> limit(int n) throws IOException {
         Scan scan = new Scan();
         scan.setMaxResultSize(n);
-        scan.setLimit(n);
+        //scan.setLimit(n);
         ResultScanner resultScanner = hTable.getScanner(scan);
         List<Trajectory> trajectories = new ArrayList<>();
 //        val trajectories: util.List[Trajectory] = new util.ArrayList[Trajectory]
@@ -119,6 +127,24 @@ public class Client {
             //System.out.println());
         });
         return trajectories;
+    }
+
+    public int simQueryCount(Trajectory traj, double threshold) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        filter.add(new CountFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
+        filter.add(new FirstKeyOnlyFilter());
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        AtomicInteger integer = new AtomicInteger(0);
+        query(ranges, this.hTable, filter, res -> {
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
     }
 
     public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery(Trajectory traj, int k) throws IOException {

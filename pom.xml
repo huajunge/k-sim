@@ -18,7 +18,7 @@
         <scalalogging.version>3.8.0</scalalogging.version>
         <specs2.version>4.3.2</specs2.version>
         <junit.version>4.12</junit.version>
-        <hbase.version>1.6.0</hbase.version>
+        <hbase.version>1.1.2</hbase.version>
         <grpc.version>1.6.1</grpc.version>
         <protobuf.version>2.5.0</protobuf.version>
         <jts.version>1.16.1</jts.version>
@@ -48,7 +48,7 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
             <version>${hbase.version}</version>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -60,7 +60,7 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
             <version>${hbase.version}</version>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>

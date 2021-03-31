@@ -1,0 +1,5 @@
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT  /experiment/ksim/data/part-00001 ksim_test
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT  /experiment/ksim/data/part-00001 ksim_test 0.005 /experiment/ksim/result/sim_0005
+
+spark-submit --class com.just.ksim.experiments.preprocessing.SegmentingTDrive --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/data/taxi_log_2008_by_id hdfs:///experiment/ksim/cleaned_data/tdrive 20 660 2 1000 false 200

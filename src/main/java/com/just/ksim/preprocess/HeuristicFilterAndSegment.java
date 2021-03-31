@@ -37,7 +37,7 @@ public class HeuristicFilterAndSegment implements Serializable {
                 cleanedPtList.add(curPt);
                 prePt = curPt;
             } else {
-                if (curPt.getCoordinate().getZ() > prePt.getCoordinate().getZ()) {
+                if (curPt.getCoordinate().getZ() >= prePt.getCoordinate().getZ()) {
                     if (PreprocessorUtils.isNormalSpeedPoint(prePt, curPt, maxSpeedMeterPerSecond) && (curPt.getCoordinate().getZ() - prePt.getCoordinate().getZ()) <= maxTimeInterval) {
                         cleanedPtList.add(curPt);
                         prePt = curPt;
