@@ -1,0 +1,95 @@
+dita
+
+//threshold
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_001
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.005 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_005
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.01 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_01
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.015 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_015
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.02 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_02
+
+//lorry
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 0.001 1 hdfs:///experiment/ksim/result/dita/sim/lorry_001
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 0.005 1 hdfs:///experiment/ksim/result/dita/sim/lorry_005
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 0.01 1 hdfs:///experiment/ksim/result/dita/sim/lorry_01
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 0.015 1 hdfs:///experiment/ksim/result/dita/sim/lorry_015
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 0.02 1 hdfs:///experiment/ksim/result/dita/sim/lorry_02
+
+
+//threshold tmp
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tmp_tdrive_001
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.005 1 hdfs:///experiment/ksim/result/dita/sim/tmp_tdrive_005
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.01 1 hdfs:///experiment/ksim/result/dita/sim/tmp_tdrive_01
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.015 1 hdfs:///experiment/ksim/result/dita/sim/tmp_tdrive_015
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.02 1 hdfs:///experiment/ksim/result/dita/sim/tmp_tdrive_02
+
+//lorry
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tmp_lorry_001
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.005 1 hdfs:///experiment/ksim/result/dita/sim/tmp_lorry_005
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.01 1 hdfs:///experiment/ksim/result/dita/sim/tmp_lorry_01
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.015 1 hdfs:///experiment/ksim/result/dita/sim/tmp_lorry_015
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.02 1 hdfs:///experiment/ksim/result/dita/sim/tmp_lorry_02
+
+
+//KNN
+//KNN
+//KNN
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 50 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_001
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 100 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_005
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 150 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_01
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 200 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_015
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 200 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_02
+
+//lorry
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 50 1 hdfs:///experiment/ksim/result/dita/knn/lorry_001
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 100 1 hdfs:///experiment/ksim/result/dita/knn/lorry_005
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 150 1 hdfs:///experiment/ksim/result/dita/knn/lorry_01
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 200 1 hdfs:///experiment/ksim/result/dita/knn/lorry_015
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 250 1 hdfs:///experiment/ksim/result/dita/knn/lorry_02
+
+
+//threshold tmp
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 50 1 hdfs:///experiment/ksim/result/dita/knn/tmp_tdrive_001
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.005 1 hdfs:///experiment/ksim/result/dita/knn/tmp_tdrive_005
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.01 1 hdfs:///experiment/ksim/result/dita/knn/tmp_tdrive_01
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.015 1 hdfs:///experiment/ksim/result/dita/knn/tmp_tdrive_015
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.02 1 hdfs:///experiment/ksim/result/dita/knn/tmp_tdrive_02
+
+//lorry
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.001 1 hdfs:///experiment/ksim/result/dita/knn/tmp_lorry_001
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.005 1 hdfs:///experiment/ksim/result/dita/knn/tmp_lorry_005
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.01 1 hdfs:///experiment/ksim/result/dita/knn/tmp_lorry_01
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.015 1 hdfs:///experiment/ksim/result/dita/knn/tmp_lorry_015
+
+spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.02 1 hdfs:///experiment/ksim/result/dita/knn/tmp_lorry_02
+

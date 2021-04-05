@@ -1,0 +1,56 @@
+dft
+//threshold
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.001 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_001 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.005 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_005 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.01 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_01 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.015 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_015 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.02 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_020 1
+
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 0.001 0 hdfs:///experiment/ksim/result/dft/sim/lorry_001 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 0.005 0 hdfs:///experiment/ksim/result/dft/sim/lorry_005 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 0.01 0 hdfs:///experiment/ksim/result/dft/sim/lorry_01 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 0.015 0 hdfs:///experiment/ksim/result/dft/sim/lorry_015 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 0.02 0 hdfs:///experiment/ksim/result/dft/sim/lorry_020 1
+
+
+//KNN
+//KNN
+//KNN
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 50 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_50 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 100 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_100 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 150 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_150 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 200 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_200 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 250 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_250 1
+
+
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 50 0 hdfs:///experiment/ksim/result/dft/knn/lorry_50 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 100 0 hdfs:///experiment/ksim/result/dft/knn/lorry_100 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 150 0 hdfs:///experiment/ksim/result/dft/knn/lorry_150 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 200 0 hdfs:///experiment/ksim/result/dft/knn/lorry_250 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry_dft 200 0 hdfs:///experiment/ksim/result/dft/knn/lorry_200 1
+
+
+//threshold
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_dft 0.001 0 hdfs:///experiment/ksim/result/dft/sim/tmp_tdrive_001 1
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_dft 50 0 hdfs:///experiment/ksim/result/dft/knn/tmp_tdrive_001 1
+
+

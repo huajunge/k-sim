@@ -137,23 +137,23 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     val upperRight = new Coordinate(xmax, ymax)
     val lowerRight = new Coordinate(xmax, ymin)
     //
-    val thr_center_ll = new Coordinate(xCenter - threshold, yCenter - threshold)
-    val thr_center_rl = new Coordinate(xCenter + threshold, yCenter - threshold)
-    val thr_center_lu = new Coordinate(xCenter - threshold, yCenter + threshold)
-    val thr_center_ru = new Coordinate(xCenter + threshold, yCenter + threshold)
-    val thr_upperCenter_l = new Coordinate(xCenter - threshold, ymax + threshold)
-    val thr_upperCenter_r = new Coordinate(xCenter + threshold, ymax + threshold)
-    val thr_lowerCenter_l = new Coordinate(xCenter - threshold, ymin - threshold)
-    val thr_lowerCenter_r = new Coordinate(xCenter + threshold, ymin - threshold)
-    val thr_centerLeft_l = new Coordinate(xmin - threshold, yCenter - threshold)
-    val thr_centerLeft_u = new Coordinate(xmin - threshold, yCenter + threshold)
-    val thr_centerRight_l = new Coordinate(xmax + threshold, yCenter - threshold)
-    val thr_centerRight_u = new Coordinate(xmax + threshold, yCenter + threshold)
-
-    val thr_lowerLeft = new Coordinate(xmin - threshold, ymin - threshold)
-    val thr_upperLeft = new Coordinate(xmin - threshold, ymax + threshold)
-    val thr_upperRight = new Coordinate(xmax + threshold, ymax + threshold)
-    val thr_lowerRight = new Coordinate(xmax + threshold, ymin - threshold)
+    //    val thr_center_ll = new Coordinate(xCenter - threshold, yCenter - threshold)
+    //    val thr_center_rl = new Coordinate(xCenter + threshold, yCenter - threshold)
+    //    val thr_center_lu = new Coordinate(xCenter - threshold, yCenter + threshold)
+    //    val thr_center_ru = new Coordinate(xCenter + threshold, yCenter + threshold)
+    //    val thr_upperCenter_l = new Coordinate(xCenter - threshold, ymax + threshold)
+    //    val thr_upperCenter_r = new Coordinate(xCenter + threshold, ymax + threshold)
+    //    val thr_lowerCenter_l = new Coordinate(xCenter - threshold, ymin - threshold)
+    //    val thr_lowerCenter_r = new Coordinate(xCenter + threshold, ymin - threshold)
+    //    val thr_centerLeft_l = new Coordinate(xmin - threshold, yCenter - threshold)
+    //    val thr_centerLeft_u = new Coordinate(xmin - threshold, yCenter + threshold)
+    //    val thr_centerRight_l = new Coordinate(xmax + threshold, yCenter - threshold)
+    //    val thr_centerRight_u = new Coordinate(xmax + threshold, yCenter + threshold)
+    //
+    //    val thr_lowerLeft = new Coordinate(xmin - threshold, ymin - threshold)
+    //    val thr_upperLeft = new Coordinate(xmin - threshold, ymax + threshold)
+    //    val thr_upperRight = new Coordinate(xmax + threshold, ymax + threshold)
+    //    val thr_lowerRight = new Coordinate(xmax + threshold, ymin - threshold)
 
     val results = new java.util.ArrayList[Long](8)
     var pSize = 9L
@@ -164,94 +164,94 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       val sig = positionIndex(i.toInt)
       if (!((sig.toInt & outPositions) > 0) && ((addedPositionCodes & (1 << i.toInt)) == 0)) {
         var checked = true
-        if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
-          //check = positionDisMap.get(i)._1 <= threshold
-          checked = !positionDisMap2.get(i)
-        }
-        if (sig == 15 || !checked) {
-          this.addedPositionCodes |= (1 << i.toInt)
-          results.add(i + 1L)
-        }
+        //        if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
+        //          //check = positionDisMap.get(i)._1 <= threshold
+        //          checked = !positionDisMap2.get(i)
+        //        }
+        //        if (sig == 15 || !checked) {
+        //          this.addedPositionCodes |= (1 << i.toInt)
+        //          results.add(i + 1L)
+        //        }
         //if (!checked) {
-//        if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
-//          checked = positionDisMap.get(i)._1 <= threshold
-//        }
+        if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
+          checked = positionDisMap.get(i)._1 <= threshold
+        }
 
         if (checked) {
           {
             var cps = new Array[Coordinate](4)
-            //            sig match {
-            //              case 1 =>
-            //                cps = Array(lowerLeft, centerLeft, center, lowerCenter, lowerLeft)
-            //              case 3 =>
-            //                cps = Array(lowerLeft, centerLeft, centerRight, lowerRight, lowerLeft)
-            //              case 5 =>
-            //                cps = Array(lowerLeft, upperLeft, upperCenter, lowerCenter, lowerLeft)
-            //              case 6 =>
-            //                cps = Array(centerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerCenter, center, centerLeft)
-            //              case 7 =>
-            //                cps = Array(lowerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerLeft)
-            //              case 9 =>
-            //                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, centerRight, center, lowerCenter, lowerLeft)
-            //              case 11 =>
-            //                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, lowerRight, lowerLeft)
-            //              case 13 =>
-            //                cps = Array(lowerLeft, upperLeft, upperRight, centerRight, center, lowerCenter, lowerLeft)
-            //              case 14 =>
-            //                cps = Array(centerLeft, upperLeft, upperRight, lowerRight, lowerCenter, center, centerLeft)
-            //              case 15 =>
-            //                cps = Array(lowerLeft, upperLeft, upperRight, lowerRight, lowerLeft)
-            //            }
             sig match {
               case 1 =>
-                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_ru, thr_lowerCenter_r, thr_lowerLeft)
+                cps = Array(lowerLeft, centerLeft, center, lowerCenter, lowerLeft)
               case 3 =>
-                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_centerRight_u, thr_lowerRight, thr_lowerLeft)
+                cps = Array(lowerLeft, centerLeft, centerRight, lowerRight, lowerLeft)
               case 5 =>
-                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperCenter_r, thr_lowerCenter_r, thr_lowerLeft)
+                cps = Array(lowerLeft, upperLeft, upperCenter, lowerCenter, lowerLeft)
               case 6 =>
-                cps = Array(thr_centerLeft_l, thr_upperLeft, thr_upperCenter_r, thr_center_ru, thr_centerRight_u, thr_lowerRight, thr_lowerCenter_l, thr_center_ll, thr_centerLeft_l)
+                cps = Array(centerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerCenter, center, centerLeft)
               case 7 =>
-                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperCenter_r, thr_center_ru, thr_centerRight_u, thr_lowerRight, thr_lowerLeft)
+                cps = Array(lowerLeft, upperLeft, upperCenter, center, centerRight, lowerRight, lowerLeft)
               case 9 =>
-                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_lu, thr_upperCenter_l, thr_upperRight, thr_centerRight_l, thr_center_rl, thr_lowerCenter_r, thr_lowerLeft)
+                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, centerRight, center, lowerCenter, lowerLeft)
               case 11 =>
-                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_lu, thr_upperCenter_l, thr_upperRight, thr_lowerRight, thr_lowerLeft)
+                cps = Array(lowerLeft, centerLeft, center, upperCenter, upperRight, lowerRight, lowerLeft)
               case 13 =>
-                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperRight, thr_centerRight_l, thr_center_rl, thr_lowerCenter_r, thr_lowerLeft)
+                cps = Array(lowerLeft, upperLeft, upperRight, centerRight, center, lowerCenter, lowerLeft)
               case 14 =>
-                cps = Array(thr_centerLeft_l, thr_upperLeft, thr_upperRight, thr_lowerRight, thr_lowerCenter_l, thr_center_ll, thr_centerLeft_l)
+                cps = Array(centerLeft, upperLeft, upperRight, lowerRight, lowerCenter, center, centerLeft)
               case 15 =>
-                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperRight, thr_lowerRight, thr_lowerLeft)
+                cps = Array(lowerLeft, upperLeft, upperRight, lowerRight, lowerLeft)
             }
+            //            sig match {
+            //              case 1 =>
+            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_ru, thr_lowerCenter_r, thr_lowerLeft)
+            //              case 3 =>
+            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_centerRight_u, thr_lowerRight, thr_lowerLeft)
+            //              case 5 =>
+            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperCenter_r, thr_lowerCenter_r, thr_lowerLeft)
+            //              case 6 =>
+            //                cps = Array(thr_centerLeft_l, thr_upperLeft, thr_upperCenter_r, thr_center_ru, thr_centerRight_u, thr_lowerRight, thr_lowerCenter_l, thr_center_ll, thr_centerLeft_l)
+            //              case 7 =>
+            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperCenter_r, thr_center_ru, thr_centerRight_u, thr_lowerRight, thr_lowerLeft)
+            //              case 9 =>
+            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_lu, thr_upperCenter_l, thr_upperRight, thr_centerRight_l, thr_center_rl, thr_lowerCenter_r, thr_lowerLeft)
+            //              case 11 =>
+            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_lu, thr_upperCenter_l, thr_upperRight, thr_lowerRight, thr_lowerLeft)
+            //              case 13 =>
+            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperRight, thr_centerRight_l, thr_center_rl, thr_lowerCenter_r, thr_lowerLeft)
+            //              case 14 =>
+            //                cps = Array(thr_centerLeft_l, thr_upperLeft, thr_upperRight, thr_lowerRight, thr_lowerCenter_l, thr_center_ll, thr_centerLeft_l)
+            //              case 15 =>
+            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperRight, thr_lowerRight, thr_lowerLeft)
+            //            }
             //var st = System.currentTimeMillis()
             var dis = (0.0, true, 1)
             var disTmp = 0.0
 
-            var contained = true
-            contained = disOfPosAndTraj(cps, threshold, 1)._2
-            positionDisMap2.put(i, contained)
-            if (contained) {
-              this.addedPositionCodes |= (1 << i.toInt)
-              results.add(i + 1L)
-              //println(s"$sig,${i + 1L}")
-            }
-
-            //            if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
-            //              dis = disOfPosAndTraj(cps, threshold, positionDisMap.get(i)._2)
-            //              disTmp = positionDisMap.get(i)._1
-            //              //dis = disOfPosAndTraj(cps, threshold, 0)
-            //            } else {
-            //              dis = disOfPosAndTraj(cps, threshold, 1)
-            //            }
-            //            positionDisMap.put(i, (Math.max(dis._1, disTmp), dis._3))
-            //            checkedPositionCodes |= (1 << i.toInt)
-            //
-            //            if (dis._2) {
+            //            var contained = true
+            //            contained = disOfPosAndTraj(cps, threshold, 1)._2
+            //            positionDisMap2.put(i, contained)
+            //            if (contained) {
             //              this.addedPositionCodes |= (1 << i.toInt)
             //              results.add(i + 1L)
             //              //println(s"$sig,${i + 1L}")
             //            }
+
+            if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
+              dis = disOfPosAndTraj(cps, threshold, positionDisMap.get(i)._2)
+              disTmp = positionDisMap.get(i)._1
+              //dis = disOfPosAndTraj(cps, threshold, 0)
+            } else {
+              dis = disOfPosAndTraj(cps, threshold, 1)
+            }
+            positionDisMap.put(i, (Math.max(dis._1, disTmp), dis._3))
+            checkedPositionCodes |= (1 << i.toInt)
+
+            if (dis._2) {
+              this.addedPositionCodes |= (1 << i.toInt)
+              results.add(i + 1L)
+              //println(s"$sig,${i + 1L}")
+            }
           }
           //var et = System.currentTimeMillis()
           //println(s"checking----:${et-st}")
@@ -262,32 +262,32 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     def disOfPosAndTraj(coordinats: Array[Coordinate], threshold: Double, startIndex: Int): (Double, Boolean, Int) = {
       val line = new LinearRing(coordinats, pre, 4326)
       val polygon = new Polygon(line, null, pre, 4326)
-            if (polygon.contains(traj.getMultiPoint)) {
-              (0.0, true, 0)
-            } else {
-              (0.0, false, 0)
-            }
+      //            if (polygon.contains(traj.getMultiPoint)) {
+      //              (0.0, true, 0)
+      //            } else {
+      //              (0.0, false, 0)
+      //            }
 
-//      var maxDis = 0.0
-      //      val sDis = polygon.distance(spoint)
-      //      val eDis = polygon.distance(epoint)
-      //      maxDis = Math.max(sDis, eDis)
-      //      var index = startIndex
-      //      if (sDis <= threshold && eDis <= threshold) {
-      //        for (i <- startIndex until(traj.getNumGeometries - 1, 1)) {
-      //          index = i
-      //          val dis = polygon.distance(traj.getGeometryN(i))
-      //          if (maxDis < dis) {
-      //            maxDis = dis
-      //          }
-      //          if (dis > threshold) {
-      //            return (maxDis, false, index)
-      //          }
-      //        }
-      //        return (maxDis, true, index)
-      //      }
-      //
-      //      (maxDis, false, index)
+      var maxDis = 0.0
+      val sDis = polygon.distance(spoint)
+      val eDis = polygon.distance(epoint)
+      maxDis = Math.max(sDis, eDis)
+      var index = startIndex
+      if (sDis <= threshold && eDis <= threshold) {
+        for (i <- startIndex until(traj.getNumGeometries - 1, 1)) {
+          index = i
+          val dis = polygon.distance(traj.getGeometryN(i))
+          if (maxDis < dis) {
+            maxDis = dis
+          }
+          if (dis > threshold) {
+            return (maxDis, false, index)
+          }
+        }
+        return (maxDis, true, index)
+      }
+
+      (maxDis, false, index)
     }
 
     results.asScala.map(v => {

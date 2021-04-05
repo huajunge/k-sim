@@ -21,7 +21,7 @@ object QueryTest {
     val client2 = new Client(tableName)
     val trajectories = client2.limit(200)
     val sfc = XZStarSFC.apply(16.toShort, 1)
-    val threshold = 0.001
+    val threshold = 0.4
     //    trajectories.asScala.foreach(t => {
     //      println(t.getId)
     //    })
@@ -59,10 +59,10 @@ object QueryTest {
       //          }
       if (i % interval == 0) {
         val time = System.currentTimeMillis()
-        val result = client.knnQuery(elem, 250)
+        val result = client.knnQuery(elem, 250,0.004)
         val tmpT = System.currentTimeMillis() - time
         timeStatistic.add(tmpT)
-        println(s"${elem.getId}-knn,${result.size()},${elem.getNumGeometries},${tmpT},${result.pollLast()._2}")
+        println(s"${elem.getId}-knn,,${elem.getNumGeometries},${tmpT}")
       }
 
       i += 1

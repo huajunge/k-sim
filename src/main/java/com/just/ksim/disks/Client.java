@@ -62,10 +62,19 @@ public class Client {
         this(tableName, DEFALUT_G);
     }
 
-    public Client(short g, String tableName, Short shard) {
-        this.g = g;
-        this.tableName = tableName;
+    public Client(short precise, String tableName, Short shard) throws IOException {
         this.shard = shard;
+        Configuration conf = HBaseConfiguration.create();
+        this.connection = ConnectionFactory.createConnection(conf);
+        this.admin = connection.getAdmin();
+        this.tableName = tableName;
+        HTableDescriptor table = new HTableDescriptor(TableName.valueOf(tableName));
+        if (!admin.tableExists(table.getTableName())) {
+            create();
+        }
+        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        this.g = precise;
+        this.sfc = XZStarSFC.apply(g, beta);
     }
 
     public Client(String tableName, Short precise) throws IOException {
@@ -147,9 +156,9 @@ public class Client {
         return integer.get();
     }
 
-    public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery(Trajectory traj, int k) throws IOException {
+    public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery(Trajectory traj, int k,Double interval) throws IOException {
         double threshold;
-        double interval = 0.004;
+        //double interval = 0.002;
         AtomicInteger currentSize = new AtomicInteger();
         List<Filter> filter = new ArrayList<>(1);
         //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
@@ -228,30 +237,6 @@ public class Client {
 //                break;
 //            }
             //System.out.println(ranges.size() + "," +currentSize.get()+ "," +tmpResult.peekLast()._2);
-        }
-        if (!tmpResult.isEmpty() && tmpResult.size() == k) {
-            List<Tuple2<Trajectory, Double>> tmpTrajs2 = new ArrayList<>();
-            double maxThreshold = tmpResult.peekLast()._2;
-            if (maxThreshold > interval * iter) {
-                System.out.println(iter + "," + maxThreshold);
-                Filter filter2 = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), null, true);
-                List<IndexRange> ranges2 = sfc.rangesForKnn(traj, maxThreshold, root);
-                //System.out.println("ranges2:"+ranges2.size() );
-
-                query(ranges2, hTable, Collections.singletonList(filter2), res -> {
-                    currentSize.getAndIncrement();
-                    String[] values = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))).split("-");
-                    Geometry geo = WKTUtils.read(values[0]);
-                    String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
-                    //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
-                    if (values.length == 2) {
-                        tmpTrajs2.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), Double.valueOf(values[1])));
-                    }
-                });
-                if (!tmpTrajs2.isEmpty()) {
-                    tmpResult.addAll(tmpTrajs2);
-                }
-            }
         }
         return tmpResult;
     }

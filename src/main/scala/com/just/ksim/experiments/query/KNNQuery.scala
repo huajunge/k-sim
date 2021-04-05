@@ -24,6 +24,7 @@ object KNNQuery {
     val k = args(2).toInt
     val outPath = args(3)
     val shard = args(4).toShort
+    val interval = args(5).toShort
     val client = new Client(16, trajPath, shard)
     val conf = new SparkConf()
       //.setMaster("local[*]")
@@ -36,10 +37,10 @@ object KNNQuery {
       .map(getTrajectory)
       .collect()
     sc.stop()
-    Thread.sleep(1000)
+    Thread.sleep(2000)
     for (elem <- queryTrajs) {
       val time = System.currentTimeMillis()
-      client.knnQuery(elem, k)
+      client.knnQuery(elem, k, interval)
       val tmp = System.currentTimeMillis() - time
       timeStatistic.add(System.currentTimeMillis() - time)
       println(s"${elem.getId}-s,$tmp")
@@ -48,9 +49,9 @@ object KNNQuery {
     val csvLine = new StringBuilder
     var tmpResult = timeStatistic.asScala.sorted
     var sum = tmpResult.sum
-    csvLine.append(s"$trajPath\tqueryTime\t$k\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2)}")
+    csvLine.append(s"$trajPath\tqueryTime\t$k\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
 
-    val path = new Path(outPath + "/statistics_knn")
+    val path = new Path(outPath)
     val fs = path.getFileSystem(new Configuration())
     if (!fs.exists(path)) {
       val outputStream = fs.create(path)

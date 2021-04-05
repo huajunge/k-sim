@@ -38,7 +38,7 @@ object SimilarityQuery {
       .textFile(queryTrajFilePath)
       .map(getTrajectory)
       .collect()
-
+    Thread.sleep(2000)
     for (elem <- queryTrajs) {
       val time = System.currentTimeMillis()
       client.simQuery(elem, threshold)
@@ -52,13 +52,13 @@ object SimilarityQuery {
     val csvLine = new StringBuilder
     var tmpResult = timeStatistic.asScala.sorted
     var sum = tmpResult.sum
-    csvLine.append(s"$trajPath\tqueryTime\t$threshold\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2)}")
+    csvLine.append(s"$trajPath\tqueryTime\t$threshold\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
 
     tmpResult = count.asScala.sorted
     sum = tmpResult.sum
-    csvLine.append("\n").append(s"$trajPath\tnumber\t$threshold\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2)}")
+    csvLine.append("\n").append(s"$trajPath\tnumber\t$threshold\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
 
-    val path = new Path(outPath + "/statistics_similarity")
+    val path = new Path(outPath)
     val fs = path.getFileSystem(new Configuration())
     if (!fs.exists(path)) {
       val outputStream = fs.create(path)
