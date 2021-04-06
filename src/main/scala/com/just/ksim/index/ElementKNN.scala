@@ -273,14 +273,15 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       val eDis = polygon.distance(epoint)
       maxDis = Math.max(sDis, eDis)
       var index = startIndex
+      val step = 4
       if (sDis <= threshold && eDis <= threshold) {
-        for (i <- startIndex until(traj.getNumGeometries - 1, 1)) {
+        for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
           index = i
           val dis = polygon.distance(traj.getGeometryN(i))
           if (maxDis < dis) {
             maxDis = dis
           }
-          if (dis > threshold) {
+          if (maxDis > threshold) {
             return (maxDis, false, index)
           }
         }

@@ -108,7 +108,7 @@ public class Client {
     public List<Trajectory> limit(int n) throws IOException {
         Scan scan = new Scan();
         scan.setMaxResultSize(n);
-        //scan.setLimit(n);
+        scan.setLimit(n);
         ResultScanner resultScanner = hTable.getScanner(scan);
         List<Trajectory> trajectories = new ArrayList<>();
 //        val trajectories: util.List[Trajectory] = new util.ArrayList[Trajectory]

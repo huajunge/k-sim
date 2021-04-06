@@ -9,15 +9,15 @@ spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master ya
 spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 0.02 hdfs:///experiment/ksim/result/disks/new/sim020 4
 
 
-spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 50 hdfs:///experiment/ksim/result/disks/new/knn50 4
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 50 hdfs:///experiment/ksim/result/disks/new_004/knn50 4 0.004
 
-spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 100 hdfs:///experiment/ksim/result/disks/new/knn100 4
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 100 hdfs:///experiment/ksim/result/disks/new_004/knn100 4 0.004
 
-spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 150 hdfs:///experiment/ksim/result/disks/new/knn150 4
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 150 hdfs:///experiment/ksim/result/disks/new_004/knn150 4 0.004
 
-spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 200 hdfs:///experiment/ksim/result/disks/new/knn200 4
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 200 hdfs:///experiment/ksim/result/disks/new_004/knn200 4 0.004
 
-spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-dis.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 250 hdfs:///experiment/ksim/result/disks/new/knn250-dis 4
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q ksim_tdrive 250 hdfs:///experiment/ksim/result/disks/new_004/knn250-dis 4 0.004
 
 spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_001
 

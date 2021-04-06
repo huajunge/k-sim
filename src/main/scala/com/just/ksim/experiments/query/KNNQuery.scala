@@ -24,7 +24,7 @@ object KNNQuery {
     val k = args(2).toInt
     val outPath = args(3)
     val shard = args(4).toShort
-    val interval = args(5).toShort
+    val interval = args(5).toDouble
     val client = new Client(16, trajPath, shard)
     val conf = new SparkConf()
       //.setMaster("local[*]")
