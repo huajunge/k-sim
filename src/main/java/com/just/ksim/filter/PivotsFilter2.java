@@ -25,7 +25,7 @@ import static util.Constants.*;
  * @date : Created in 2021-03-10 11:04
  * @modified by :
  **/
-public class PivotsFilter extends FilterBase {
+public class PivotsFilter2 extends FilterBase {
     private String spoint;
     private String epoint;
     private double threshold;
@@ -38,13 +38,12 @@ public class PivotsFilter extends FilterBase {
     private Geometry spointGeo;
     private Geometry epointGeo;
     private Geometry trajGeo;
-    private Geometry otherTrajGeo;
     private Geometry mbrGeo;
     private Geometry othterMbrGeo;
     private String[] indexes;
     private BigDecimal currentThreshold = null;
 
-    public PivotsFilter(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs, boolean returnSim) {
+    public PivotsFilter2(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs, boolean returnSim) {
         this.spoint = spoint;
         this.epoint = epoint;
         this.threshold = threshold;
@@ -60,11 +59,11 @@ public class PivotsFilter extends FilterBase {
         this.returnSim = returnSim;
     }
 
-    public PivotsFilter(String spoint, String epoint, double threshold, String traj, List<Integer> pivots) {
+    public PivotsFilter2(String spoint, String epoint, double threshold, String traj, List<Integer> pivots) {
         this(spoint, epoint, threshold, traj, pivots, null, false);
     }
 
-    public PivotsFilter(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs) {
+    public PivotsFilter2(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs) {
         this(spoint, epoint, threshold, traj, pivots, mbrs, false);
     }
 
@@ -80,40 +79,9 @@ public class PivotsFilter extends FilterBase {
     }
 
     @Override
-    public void filterRowCells(List<Cell> ignored) throws IOException {
-        if (null != otherTrajGeo) {
-            //Geometry trajGeo = WKTUtils.read(this.traj);
-            if (null != this.indexes && null != this.othterMbrGeo) {
-                System.out.println("5");
-                for (int i = 0; i < this.indexes.length; i++) {
-                    if (otherTrajGeo.getGeometryN(Integer.parseInt(this.indexes[i])).distance(this.mbrGeo) > threshold) {
-                        this.filterRow = true;
-                        break;
-                    }
-                }
-                for (int i = 0; i < this.pivots.size() && !this.filterRow; i++) {
-                    if (trajGeo.getGeometryN(pivots.get(i)).distance(this.othterMbrGeo) > threshold) {
-                        this.filterRow = true;
-                        break;
-                    }
-                }
-            }
-            if (!this.filterRow) {
-                System.out.println("6");
-                assert trajGeo != null;
-                double th = Frechet.calulateDistance(trajGeo, otherTrajGeo);
-                this.filterRow = th > threshold;
-                this.currentThreshold = BigDecimal.valueOf(th);
-            }
-        }
-    }
-
-    @Override
     public ReturnCode filterKeyValue(Cell v) throws IOException {
-        System.out.println("-----");
         if (!this.checkedAllPoint && !this.filterRow) {
             if (Bytes.toString(v.getQualifier()).equals(START_POINT)) {
-                System.out.println("1");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
                 if (null != geom) {
                     if (geom.distance(this.spointGeo) > this.threshold) {
@@ -121,7 +89,6 @@ public class PivotsFilter extends FilterBase {
                     }
                 }
             } else if (Bytes.toString(v.getQualifier()).equals(END_POINT)) {
-                System.out.println("2");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
                 if (null != geom) {
                     if (geom.distance(this.epointGeo) > this.threshold) {
@@ -129,7 +96,6 @@ public class PivotsFilter extends FilterBase {
                     }
                 }
             } else if (Bytes.toString(v.getQualifier()).equals(PIVOT)) {
-                System.out.println("3");
                 String[] p = Bytes.toString(v.getValue()).split("--");
                 Geometry geom = WKTUtils.read(p[0]);
                 this.othterMbrGeo = geom;
@@ -151,8 +117,30 @@ public class PivotsFilter extends FilterBase {
                 indexes = p[1].split(",");
             } else if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
-                System.out.println("4");
-                otherTrajGeo = geom;
+                if (null != geom) {
+                    //Geometry trajGeo = WKTUtils.read(this.traj);
+//                    if (null != this.indexes && null != this.othterMbrGeo) {
+//                        for (int i = 0; i < this.indexes.length; i++) {
+//                            if (geom.getGeometryN(Integer.parseInt(this.indexes[i])).distance(this.mbrGeo) > threshold) {
+//                                this.filterRow = true;
+//                                break;
+//                            }
+//                        }
+//                        for (int i = 0; i < this.pivots.size() && !this.filterRow; i++) {
+//                            if (trajGeo.getGeometryN(pivots.get(i)).distance(this.othterMbrGeo) > threshold) {
+//                                this.filterRow = true;
+//                                break;
+//                            }
+//                        }
+//                    }
+                    if (!this.filterRow) {
+                        assert trajGeo != null;
+                        double th = Frechet.calulateDistance(trajGeo, geom);
+                        this.filterRow = th > threshold;
+                        this.currentThreshold = BigDecimal.valueOf(th);
+                    }
+                }
+                this.checkedAllPoint = true;
             }
         }
         return ReturnCode.INCLUDE;
@@ -201,6 +189,6 @@ public class PivotsFilter extends FilterBase {
         } catch (InvalidProtocolBufferException e) {
             throw new DeserializationException(e);
         }
-        return new PivotsFilter(proto.getSpoint(), proto.getEpoint(), proto.getThreshold(), proto.getTraj(), proto.getPivotsList(), proto.getMbrs(), proto.getReturnSim());
+        return new PivotsFilter2(proto.getSpoint(), proto.getEpoint(), proto.getThreshold(), proto.getTraj(), proto.getPivotsList(), proto.getMbrs(), proto.getReturnSim());
     }
 }

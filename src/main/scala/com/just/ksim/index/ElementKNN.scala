@@ -268,24 +268,12 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       //            }
 
       var maxDis = 0.0
-      //      val sDis = polygon.distance(spoint)
-      //      val eDis = polygon.distance(epoint)
-      //      maxDis = Math.max(sDis, eDis)
+
       var index = startIndex
+
+
       val step = 1
-      //      if (sDis <= threshold && eDis <= threshold) {
-      //        for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
-      //          index = i
-      //          val dis = polygon.distance(traj.getGeometryN(i))
-      //          if (maxDis < dis) {
-      //            maxDis = dis
-      //          }
-      //          if (maxDis > threshold) {
-      //            return (maxDis, false, index)
-      //          }
-      //        }
-      //        return (maxDis, true, index)
-      //      }
+      //traj.getDPFeature.getMBRs.intersects()
       val pivot = traj.getDPFeature.getIndexes
       for (i <- startIndex until(pivot.size() - 1, step)) {
         index = i
@@ -297,6 +285,7 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
           return (maxDis, false, index)
         }
       }
+ //     val step = 10
 //      traj.getDPFeature.getPviot
 //      for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
 //        index = i

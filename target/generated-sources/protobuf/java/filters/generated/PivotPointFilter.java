@@ -80,17 +80,17 @@ public final class PivotPointFilter {
      */
     int getPivots(int index);
 
-    // required string mbrs = 6;
+    // optional string mbrs = 6;
     /**
-     * <code>required string mbrs = 6;</code>
+     * <code>optional string mbrs = 6;</code>
      */
     boolean hasMbrs();
     /**
-     * <code>required string mbrs = 6;</code>
+     * <code>optional string mbrs = 6;</code>
      */
     java.lang.String getMbrs();
     /**
-     * <code>required string mbrs = 6;</code>
+     * <code>optional string mbrs = 6;</code>
      */
     com.google.protobuf.ByteString
         getMbrsBytes();
@@ -418,17 +418,17 @@ public final class PivotPointFilter {
       return pivots_.get(index);
     }
 
-    // required string mbrs = 6;
+    // optional string mbrs = 6;
     public static final int MBRS_FIELD_NUMBER = 6;
     private java.lang.Object mbrs_;
     /**
-     * <code>required string mbrs = 6;</code>
+     * <code>optional string mbrs = 6;</code>
      */
     public boolean hasMbrs() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>required string mbrs = 6;</code>
+     * <code>optional string mbrs = 6;</code>
      */
     public java.lang.String getMbrs() {
       java.lang.Object ref = mbrs_;
@@ -445,7 +445,7 @@ public final class PivotPointFilter {
       }
     }
     /**
-     * <code>required string mbrs = 6;</code>
+     * <code>optional string mbrs = 6;</code>
      */
     public com.google.protobuf.ByteString
         getMbrsBytes() {
@@ -504,10 +504,6 @@ public final class PivotPointFilter {
         return false;
       }
       if (!hasTraj()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasMbrs()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -934,10 +930,6 @@ public final class PivotPointFilter {
           
           return false;
         }
-        if (!hasMbrs()) {
-          
-          return false;
-        }
         if (!hasReturnSim()) {
           
           return false;
@@ -1285,16 +1277,16 @@ public final class PivotPointFilter {
         return this;
       }
 
-      // required string mbrs = 6;
+      // optional string mbrs = 6;
       private java.lang.Object mbrs_ = "";
       /**
-       * <code>required string mbrs = 6;</code>
+       * <code>optional string mbrs = 6;</code>
        */
       public boolean hasMbrs() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>required string mbrs = 6;</code>
+       * <code>optional string mbrs = 6;</code>
        */
       public java.lang.String getMbrs() {
         java.lang.Object ref = mbrs_;
@@ -1308,7 +1300,7 @@ public final class PivotPointFilter {
         }
       }
       /**
-       * <code>required string mbrs = 6;</code>
+       * <code>optional string mbrs = 6;</code>
        */
       public com.google.protobuf.ByteString
           getMbrsBytes() {
@@ -1324,7 +1316,7 @@ public final class PivotPointFilter {
         }
       }
       /**
-       * <code>required string mbrs = 6;</code>
+       * <code>optional string mbrs = 6;</code>
        */
       public Builder setMbrs(
           java.lang.String value) {
@@ -1337,7 +1329,7 @@ public final class PivotPointFilter {
         return this;
       }
       /**
-       * <code>required string mbrs = 6;</code>
+       * <code>optional string mbrs = 6;</code>
        */
       public Builder clearMbrs() {
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -1346,7 +1338,7 @@ public final class PivotPointFilter {
         return this;
       }
       /**
-       * <code>required string mbrs = 6;</code>
+       * <code>optional string mbrs = 6;</code>
        */
       public Builder setMbrsBytes(
           com.google.protobuf.ByteString value) {
@@ -1420,7 +1412,7 @@ public final class PivotPointFilter {
       "\n\026PivotPointFilter.proto\"\201\001\n\rPivotsFilte" +
       "r2\022\016\n\006spoint\030\001 \002(\t\022\016\n\006epoint\030\002 \002(\t\022\021\n\tth" +
       "reshold\030\003 \002(\001\022\014\n\004traj\030\004 \002(\t\022\016\n\006pivots\030\005 " +
-      "\003(\005\022\014\n\004mbrs\030\006 \002(\t\022\021\n\treturnSim\030\007 \002(\010B-\n\021" +
+      "\003(\005\022\014\n\004mbrs\030\006 \001(\t\022\021\n\treturnSim\030\007 \002(\010B-\n\021" +
       "filters.generatedB\020PivotPointFilterH\001\210\001\001" +
       "\240\001\001"
     };

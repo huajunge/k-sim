@@ -86,7 +86,7 @@ public class Trajectory implements Serializable {
     }
 
     public class DPFeature implements Serializable {
-        private double precision = 0.02;
+        private double precision = 0.005;
         private List<Tuple2<Polygon, List<Geometry>>> pivot;
         private MultiPolygon polygons;
         private Set<Integer> indexes = new HashSet<>(2);

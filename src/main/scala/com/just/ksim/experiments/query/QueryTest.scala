@@ -19,9 +19,9 @@ object QueryTest {
     val tableName2 = "tdrive_pivot_test"
     val client = new Client(tableName2)
     val client2 = new Client(tableName)
-    val trajectories = client2.limit(200)
+    val trajectories = client2.limit(100)
     val sfc = XZStarSFC.apply(16.toShort, 1)
-    val threshold = 0.4
+    val threshold = 0.02
     //    trajectories.asScala.foreach(t => {
     //      println(t.getId)
     //    })
@@ -42,7 +42,7 @@ object QueryTest {
     //ss.asScala.sorted
     var tt = timeStatistic.asScala.sorted
     var sum = tt.sum
-    println(s"${tt.max},${tt.min},${sum / tt.size},${tt(24)}")
+    println(s"${tt.max},${tt.min},${sum / tt.size},${tt(12)}")
     timeStatistic.clear()
     //val f = new Frechet()
     var i = 0
@@ -59,7 +59,7 @@ object QueryTest {
       //          }
       if (i % interval == 0) {
         val time = System.currentTimeMillis()
-        val result = client.knnQuery(elem, 250,0.004)
+        val result = client.knnQuery(elem, 250,0.003)
         val tmpT = System.currentTimeMillis() - time
         timeStatistic.add(tmpT)
         println(s"${elem.getId}-knn,,${elem.getNumGeometries},${tmpT}")
@@ -69,7 +69,7 @@ object QueryTest {
     }
     tt = timeStatistic.asScala.sorted
     sum = tt.sum
-    println(s"${tt.max},${tt.min},${sum / tt.size},${tt(24)}")
+    println(s"${tt.max},${tt.min},${sum / tt.size},${tt(12)}")
     client.close()
   }
 }
