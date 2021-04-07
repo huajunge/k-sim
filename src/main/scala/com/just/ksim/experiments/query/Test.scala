@@ -13,25 +13,30 @@ object Test {
     val tableName = "tdrive_tmp"
     //val client = new Client(tableName2)
     val client = new Client(tableName)
-    val trajectories = client.limit(10)
+    val trajectories = client.limit(100)
     for (elem <- trajectories.asScala) {
       elem.getId
     }
     for (elem <- trajectories.asScala) {
       val time = System.currentTimeMillis()
-      val ps = elem.getDPFeature.getPviot
-      val size = elem.getDPFeature.getPviot.size()
+      val ps = elem.getDPFeature.getPivot
+      val size = elem.getDPFeature.getPivot.size()
       val tt = System.currentTimeMillis() - time
       //val ranges: util.List[IndexRange] = sfc.rangesForKnn(elem, 0.4, root)
       //println(s"${elem.getId},${elem.getNumGeometries},${System.currentTimeMillis() - time}")
       println(s"${tt},${elem.getId},${elem.getNumGeometries},${size},${ps}")
+      println(s"${elem.getMultiPoint.toText}")
+      for (elem <- ps.asScala) {
+        println(elem._1)
+      }
+      //println(s"${ps.asScala.map(v => v._1)}")
       var sum = 0
       var max = 0.0
       for (i <- 0 until elem.getNumGeometries) {
         var minDis = 4444444.0
         var tag = true
         for (pv <- ps.asScala) {
-          if (null != pv._1 && pv._1.intersects(elem.getGeometryN(i)) && tag) {
+          if (null != pv._1 && (pv._1.intersects(elem.getGeometryN(i))|| pv._1.contains(elem.getGeometryN(i)))&& tag) {
             sum += 1
             tag = false
           }
@@ -42,7 +47,10 @@ object Test {
             }
           }
         }
-        if(max < minDis) {
+        if (tag) {
+          //println(i)
+        }
+        if (max < minDis) {
           max = minDis
         }
       }

@@ -9,6 +9,7 @@ message PivotsFilter2 {
     required string epoint = 2;
     required double threshold = 3;
     required string traj = 4;
-    repeated string pivots = 5;
-    required bool returnSim = 6;
+    repeated int32 pivots = 5;
+    required string mbrs = 6;
+    required bool returnSim = 7;
 }

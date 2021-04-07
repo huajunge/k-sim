@@ -66,33 +66,42 @@ public final class PivotPointFilter {
     com.google.protobuf.ByteString
         getTrajBytes();
 
-    // repeated string pivots = 5;
+    // repeated int32 pivots = 5;
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>repeated int32 pivots = 5;</code>
      */
-    java.util.List<java.lang.String>
-    getPivotsList();
+    java.util.List<java.lang.Integer> getPivotsList();
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>repeated int32 pivots = 5;</code>
      */
     int getPivotsCount();
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>repeated int32 pivots = 5;</code>
      */
-    java.lang.String getPivots(int index);
+    int getPivots(int index);
+
+    // required string mbrs = 6;
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>required string mbrs = 6;</code>
+     */
+    boolean hasMbrs();
+    /**
+     * <code>required string mbrs = 6;</code>
+     */
+    java.lang.String getMbrs();
+    /**
+     * <code>required string mbrs = 6;</code>
      */
     com.google.protobuf.ByteString
-        getPivotsBytes(int index);
+        getMbrsBytes();
 
-    // required bool returnSim = 6;
+    // required bool returnSim = 7;
     /**
-     * <code>required bool returnSim = 6;</code>
+     * <code>required bool returnSim = 7;</code>
      */
     boolean hasReturnSim();
     /**
-     * <code>required bool returnSim = 6;</code>
+     * <code>required bool returnSim = 7;</code>
      */
     boolean getReturnSim();
   }
@@ -167,16 +176,34 @@ public final class PivotPointFilter {
               traj_ = input.readBytes();
               break;
             }
-            case 42: {
+            case 40: {
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-                pivots_ = new com.google.protobuf.LazyStringArrayList();
+                pivots_ = new java.util.ArrayList<java.lang.Integer>();
                 mutable_bitField0_ |= 0x00000010;
               }
-              pivots_.add(input.readBytes());
+              pivots_.add(input.readInt32());
               break;
             }
-            case 48: {
+            case 42: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
+                pivots_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000010;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                pivots_.add(input.readInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 50: {
               bitField0_ |= 0x00000010;
+              mbrs_ = input.readBytes();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000020;
               returnSim_ = input.readBool();
               break;
             }
@@ -189,7 +216,7 @@ public final class PivotPointFilter {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-          pivots_ = new com.google.protobuf.UnmodifiableLazyStringList(pivots_);
+          pivots_ = java.util.Collections.unmodifiableList(pivots_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -368,47 +395,83 @@ public final class PivotPointFilter {
       }
     }
 
-    // repeated string pivots = 5;
+    // repeated int32 pivots = 5;
     public static final int PIVOTS_FIELD_NUMBER = 5;
-    private com.google.protobuf.LazyStringList pivots_;
+    private java.util.List<java.lang.Integer> pivots_;
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>repeated int32 pivots = 5;</code>
      */
-    public java.util.List<java.lang.String>
+    public java.util.List<java.lang.Integer>
         getPivotsList() {
       return pivots_;
     }
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>repeated int32 pivots = 5;</code>
      */
     public int getPivotsCount() {
       return pivots_.size();
     }
     /**
-     * <code>repeated string pivots = 5;</code>
+     * <code>repeated int32 pivots = 5;</code>
      */
-    public java.lang.String getPivots(int index) {
+    public int getPivots(int index) {
       return pivots_.get(index);
     }
-    /**
-     * <code>repeated string pivots = 5;</code>
-     */
-    public com.google.protobuf.ByteString
-        getPivotsBytes(int index) {
-      return pivots_.getByteString(index);
-    }
 
-    // required bool returnSim = 6;
-    public static final int RETURNSIM_FIELD_NUMBER = 6;
-    private boolean returnSim_;
+    // required string mbrs = 6;
+    public static final int MBRS_FIELD_NUMBER = 6;
+    private java.lang.Object mbrs_;
     /**
-     * <code>required bool returnSim = 6;</code>
+     * <code>required string mbrs = 6;</code>
      */
-    public boolean hasReturnSim() {
+    public boolean hasMbrs() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>required bool returnSim = 6;</code>
+     * <code>required string mbrs = 6;</code>
+     */
+    public java.lang.String getMbrs() {
+      java.lang.Object ref = mbrs_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          mbrs_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string mbrs = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMbrsBytes() {
+      java.lang.Object ref = mbrs_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        mbrs_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // required bool returnSim = 7;
+    public static final int RETURNSIM_FIELD_NUMBER = 7;
+    private boolean returnSim_;
+    /**
+     * <code>required bool returnSim = 7;</code>
+     */
+    public boolean hasReturnSim() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>required bool returnSim = 7;</code>
      */
     public boolean getReturnSim() {
       return returnSim_;
@@ -419,7 +482,8 @@ public final class PivotPointFilter {
       epoint_ = "";
       threshold_ = 0D;
       traj_ = "";
-      pivots_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      pivots_ = java.util.Collections.emptyList();
+      mbrs_ = "";
       returnSim_ = false;
     }
     private byte memoizedIsInitialized = -1;
@@ -440,6 +504,10 @@ public final class PivotPointFilter {
         return false;
       }
       if (!hasTraj()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasMbrs()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -467,10 +535,13 @@ public final class PivotPointFilter {
         output.writeBytes(4, getTrajBytes());
       }
       for (int i = 0; i < pivots_.size(); i++) {
-        output.writeBytes(5, pivots_.getByteString(i));
+        output.writeInt32(5, pivots_.get(i));
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBool(6, returnSim_);
+        output.writeBytes(6, getMbrsBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBool(7, returnSim_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -501,14 +572,18 @@ public final class PivotPointFilter {
         int dataSize = 0;
         for (int i = 0; i < pivots_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(pivots_.getByteString(i));
+            .computeInt32SizeNoTag(pivots_.get(i));
         }
         size += dataSize;
         size += 1 * getPivotsList().size();
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(6, returnSim_);
+          .computeBytesSize(6, getMbrsBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(7, returnSim_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -554,6 +629,11 @@ public final class PivotPointFilter {
       }
       result = result && getPivotsList()
           .equals(other.getPivotsList());
+      result = result && (hasMbrs() == other.hasMbrs());
+      if (hasMbrs()) {
+        result = result && getMbrs()
+            .equals(other.getMbrs());
+      }
       result = result && (hasReturnSim() == other.hasReturnSim());
       if (hasReturnSim()) {
         result = result && (getReturnSim()
@@ -592,6 +672,10 @@ public final class PivotPointFilter {
       if (getPivotsCount() > 0) {
         hash = (37 * hash) + PIVOTS_FIELD_NUMBER;
         hash = (53 * hash) + getPivotsList().hashCode();
+      }
+      if (hasMbrs()) {
+        hash = (37 * hash) + MBRS_FIELD_NUMBER;
+        hash = (53 * hash) + getMbrs().hashCode();
       }
       if (hasReturnSim()) {
         hash = (37 * hash) + RETURNSIM_FIELD_NUMBER;
@@ -714,10 +798,12 @@ public final class PivotPointFilter {
         bitField0_ = (bitField0_ & ~0x00000004);
         traj_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
-        pivots_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        pivots_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
-        returnSim_ = false;
+        mbrs_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
+        returnSim_ = false;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -763,13 +849,16 @@ public final class PivotPointFilter {
         }
         result.traj_ = traj_;
         if (((bitField0_ & 0x00000010) == 0x00000010)) {
-          pivots_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              pivots_);
+          pivots_ = java.util.Collections.unmodifiableList(pivots_);
           bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.pivots_ = pivots_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000010;
+        }
+        result.mbrs_ = mbrs_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000020;
         }
         result.returnSim_ = returnSim_;
         result.bitField0_ = to_bitField0_;
@@ -816,6 +905,11 @@ public final class PivotPointFilter {
           }
           onChanged();
         }
+        if (other.hasMbrs()) {
+          bitField0_ |= 0x00000020;
+          mbrs_ = other.mbrs_;
+          onChanged();
+        }
         if (other.hasReturnSim()) {
           setReturnSim(other.getReturnSim());
         }
@@ -837,6 +931,10 @@ public final class PivotPointFilter {
           return false;
         }
         if (!hasTraj()) {
+          
+          return false;
+        }
+        if (!hasMbrs()) {
           
           return false;
         }
@@ -1121,127 +1219,174 @@ public final class PivotPointFilter {
         return this;
       }
 
-      // repeated string pivots = 5;
-      private com.google.protobuf.LazyStringList pivots_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      // repeated int32 pivots = 5;
+      private java.util.List<java.lang.Integer> pivots_ = java.util.Collections.emptyList();
       private void ensurePivotsIsMutable() {
         if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-          pivots_ = new com.google.protobuf.LazyStringArrayList(pivots_);
+          pivots_ = new java.util.ArrayList<java.lang.Integer>(pivots_);
           bitField0_ |= 0x00000010;
          }
       }
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
-      public java.util.List<java.lang.String>
+      public java.util.List<java.lang.Integer>
           getPivotsList() {
         return java.util.Collections.unmodifiableList(pivots_);
       }
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
       public int getPivotsCount() {
         return pivots_.size();
       }
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
-      public java.lang.String getPivots(int index) {
+      public int getPivots(int index) {
         return pivots_.get(index);
       }
       /**
-       * <code>repeated string pivots = 5;</code>
-       */
-      public com.google.protobuf.ByteString
-          getPivotsBytes(int index) {
-        return pivots_.getByteString(index);
-      }
-      /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
       public Builder setPivots(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensurePivotsIsMutable();
+          int index, int value) {
+        ensurePivotsIsMutable();
         pivots_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
-      public Builder addPivots(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensurePivotsIsMutable();
+      public Builder addPivots(int value) {
+        ensurePivotsIsMutable();
         pivots_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
       public Builder addAllPivots(
-          java.lang.Iterable<java.lang.String> values) {
+          java.lang.Iterable<? extends java.lang.Integer> values) {
         ensurePivotsIsMutable();
         super.addAll(values, pivots_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>repeated int32 pivots = 5;</code>
        */
       public Builder clearPivots() {
-        pivots_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        pivots_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
+
+      // required string mbrs = 6;
+      private java.lang.Object mbrs_ = "";
       /**
-       * <code>repeated string pivots = 5;</code>
+       * <code>required string mbrs = 6;</code>
        */
-      public Builder addPivotsBytes(
+      public boolean hasMbrs() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>required string mbrs = 6;</code>
+       */
+      public java.lang.String getMbrs() {
+        java.lang.Object ref = mbrs_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          mbrs_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string mbrs = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMbrsBytes() {
+        java.lang.Object ref = mbrs_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          mbrs_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string mbrs = 6;</code>
+       */
+      public Builder setMbrs(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        mbrs_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string mbrs = 6;</code>
+       */
+      public Builder clearMbrs() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        mbrs_ = getDefaultInstance().getMbrs();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string mbrs = 6;</code>
+       */
+      public Builder setMbrsBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensurePivotsIsMutable();
-        pivots_.add(value);
+  bitField0_ |= 0x00000020;
+        mbrs_ = value;
         onChanged();
         return this;
       }
 
-      // required bool returnSim = 6;
+      // required bool returnSim = 7;
       private boolean returnSim_ ;
       /**
-       * <code>required bool returnSim = 6;</code>
+       * <code>required bool returnSim = 7;</code>
        */
       public boolean hasReturnSim() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>required bool returnSim = 6;</code>
+       * <code>required bool returnSim = 7;</code>
        */
       public boolean getReturnSim() {
         return returnSim_;
       }
       /**
-       * <code>required bool returnSim = 6;</code>
+       * <code>required bool returnSim = 7;</code>
        */
       public Builder setReturnSim(boolean value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         returnSim_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required bool returnSim = 6;</code>
+       * <code>required bool returnSim = 7;</code>
        */
       public Builder clearReturnSim() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         returnSim_ = false;
         onChanged();
         return this;
@@ -1272,11 +1417,12 @@ public final class PivotPointFilter {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026PivotPointFilter.proto\"s\n\rPivotsFilter" +
-      "2\022\016\n\006spoint\030\001 \002(\t\022\016\n\006epoint\030\002 \002(\t\022\021\n\tthr" +
-      "eshold\030\003 \002(\001\022\014\n\004traj\030\004 \002(\t\022\016\n\006pivots\030\005 \003" +
-      "(\t\022\021\n\treturnSim\030\006 \002(\010B-\n\021filters.generat" +
-      "edB\020PivotPointFilterH\001\210\001\001\240\001\001"
+      "\n\026PivotPointFilter.proto\"\201\001\n\rPivotsFilte" +
+      "r2\022\016\n\006spoint\030\001 \002(\t\022\016\n\006epoint\030\002 \002(\t\022\021\n\tth" +
+      "reshold\030\003 \002(\001\022\014\n\004traj\030\004 \002(\t\022\016\n\006pivots\030\005 " +
+      "\003(\005\022\014\n\004mbrs\030\006 \002(\t\022\021\n\treturnSim\030\007 \002(\010B-\n\021" +
+      "filters.generatedB\020PivotPointFilterH\001\210\001\001" +
+      "\240\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1288,7 +1434,7 @@ public final class PivotPointFilter {
           internal_static_PivotsFilter2_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_PivotsFilter2_descriptor,
-              new java.lang.String[] { "Spoint", "Epoint", "Threshold", "Traj", "Pivots", "ReturnSim", });
+              new java.lang.String[] { "Spoint", "Epoint", "Threshold", "Traj", "Pivots", "Mbrs", "ReturnSim", });
           return null;
         }
       };

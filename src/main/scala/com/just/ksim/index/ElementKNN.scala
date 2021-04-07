@@ -236,13 +236,12 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
             //              results.add(i + 1L)
             //              //println(s"$sig,${i + 1L}")
             //            }
-
             if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
               dis = disOfPosAndTraj(cps, threshold, positionDisMap.get(i)._2)
               disTmp = positionDisMap.get(i)._1
               //dis = disOfPosAndTraj(cps, threshold, 0)
             } else {
-              dis = disOfPosAndTraj(cps, threshold, 1)
+              dis = disOfPosAndTraj(cps, threshold, 0)
             }
             positionDisMap.put(i, (Math.max(dis._1, disTmp), dis._3))
             checkedPositionCodes |= (1 << i.toInt)
@@ -269,26 +268,49 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       //            }
 
       var maxDis = 0.0
-      val sDis = polygon.distance(spoint)
-      val eDis = polygon.distance(epoint)
-      maxDis = Math.max(sDis, eDis)
+      //      val sDis = polygon.distance(spoint)
+      //      val eDis = polygon.distance(epoint)
+      //      maxDis = Math.max(sDis, eDis)
       var index = startIndex
-      val step = 4
-      if (sDis <= threshold && eDis <= threshold) {
-        for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
-          index = i
-          val dis = polygon.distance(traj.getGeometryN(i))
-          if (maxDis < dis) {
-            maxDis = dis
-          }
-          if (maxDis > threshold) {
-            return (maxDis, false, index)
-          }
+      val step = 1
+      //      if (sDis <= threshold && eDis <= threshold) {
+      //        for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
+      //          index = i
+      //          val dis = polygon.distance(traj.getGeometryN(i))
+      //          if (maxDis < dis) {
+      //            maxDis = dis
+      //          }
+      //          if (maxDis > threshold) {
+      //            return (maxDis, false, index)
+      //          }
+      //        }
+      //        return (maxDis, true, index)
+      //      }
+      val pivot = traj.getDPFeature.getIndexes
+      for (i <- startIndex until(pivot.size() - 1, step)) {
+        index = i
+        val dis = polygon.distance(traj.getGeometryN(pivot.get(i)))
+        if (maxDis < dis) {
+          maxDis = dis
         }
-        return (maxDis, true, index)
+        if (maxDis > threshold) {
+          return (maxDis, false, index)
+        }
       }
+//      traj.getDPFeature.getPviot
+//      for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
+//        index = i
+//        val dis = polygon.distance(traj.getGeometryN(i))
+//        if (maxDis < dis) {
+//          maxDis = dis
+//        }
+//        if (maxDis > threshold) {
+//          return (maxDis, false, index)
+//        }
+//      }
+//      return (maxDis, true, index)
 
-      (maxDis, false, index)
+      (maxDis, true, index)
     }
 
     results.asScala.map(v => {

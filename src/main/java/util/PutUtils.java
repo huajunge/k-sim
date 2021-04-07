@@ -39,9 +39,14 @@ public class PutUtils implements Serializable {
         System.arraycopy(Bytes.toBytes(id), 0, bytes, 9, id.length());
         Put put = new Put(bytes);
         put.addColumn(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID), Bytes.toBytes(id));
-        put.addColumn(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM), Bytes.toBytes(traj.toText()));
+        StringBuilder indexString = new StringBuilder();
+        for (Integer integer : traj.getDPFeature().getIndexes()) {
+            indexString.append(integer).append(",");
+        }
+        put.addColumn(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(PIVOT), Bytes.toBytes(traj.getDPFeature().getMBRs().toText() + "--" + indexString.toString()));
         put.addColumn(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(START_POINT), Bytes.toBytes(traj.getGeometryN(0).toText()));
         put.addColumn(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(END_POINT), Bytes.toBytes(traj.getGeometryN(traj.getNumGeometries() - 1).toText()));
+        put.addColumn(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM), Bytes.toBytes(traj.toText()));
         return put;
     }
 

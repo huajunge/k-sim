@@ -16,7 +16,7 @@ object QueryTest {
 
   def main(args: Array[String]): Unit = {
     val tableName = "tdrive_tmp"
-    val tableName2 = "tdrive_all_0"
+    val tableName2 = "tdrive_pivot_test"
     val client = new Client(tableName2)
     val client2 = new Client(tableName)
     val trajectories = client2.limit(200)

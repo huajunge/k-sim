@@ -29,7 +29,6 @@ import util.WKTUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -122,7 +121,7 @@ public class Client {
 
     public List<Trajectory> simQuery(Trajectory traj, double threshold) throws IOException {
         List<Filter> filter = new ArrayList<>(2);
-        filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
+        filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(),traj.getDPFeature().getMBRs().toText(),false));
         List<Trajectory> trajectories = new ArrayList<>();
         final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
         List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
@@ -156,7 +155,7 @@ public class Client {
         return integer.get();
     }
 
-    public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery(Trajectory traj, int k,Double interval) throws IOException {
+    public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery(Trajectory traj, int k, Double interval) throws IOException {
         double threshold;
         //double interval = 0.002;
         AtomicInteger currentSize = new AtomicInteger();
@@ -176,7 +175,7 @@ public class Client {
             // System.out.println(ranges.size());
             if (currentSize.get() >= k) {
                 double maxThreshold = tmpResult.peekLast()._2;
-                Filter filterThreshold = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), null, true);
+                Filter filterThreshold = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), traj.getDPFeature().getIndexes(),traj.getDPFeature().getMBRs().toText(),true);
                 filter.clear();
                 //filter.add(new CalculateSimilarity(traj.toText()));
                 filter.add(filterThreshold);
@@ -279,7 +278,7 @@ public class Client {
             e.printStackTrace();
         }
         //assert resultScanner != null;
-        if(null != resultScanner) {
+        if (null != resultScanner) {
             for (Result res : resultScanner) {
                 process.process(res);
             }
