@@ -4,7 +4,7 @@ import com.just.ksim.entity.Trajectory
 import com.just.ksim.index.XZStarSFC
 import org.apache.spark.{SparkConf, SparkContext}
 import org.locationtech.jts.geom.{Envelope, MultiPoint}
-import util.WKTUtils
+import utils.WKTUtils
 
 object Selectivity {
   def main(args: Array[String]): Unit = {

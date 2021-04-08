@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;

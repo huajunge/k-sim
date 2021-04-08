@@ -25,9 +25,9 @@ object Test {
       //val ranges: util.List[IndexRange] = sfc.rangesForKnn(elem, 0.4, root)
       //println(s"${elem.getId},${elem.getNumGeometries},${System.currentTimeMillis() - time}")
       println(s"${tt},${elem.getId},${elem.getNumGeometries},${size},${ps}")
-      println(s"${elem.getMultiPoint.toText}")
+      //println(s"${elem.getMultiPoint.toText}")
       for (elem <- ps.asScala) {
-        println(elem._1)
+        //println(elem._1)
       }
       //println(s"${ps.asScala.map(v => v._1)}")
       var sum = 0

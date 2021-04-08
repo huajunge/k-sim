@@ -3,13 +3,17 @@ package com.just.ksim.disks;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.just.ksim.entity.Trajectory;
 import com.just.ksim.filter.CalculateSimilarity;
-import com.just.ksim.filter.CountFilter;
-import com.just.ksim.filter.PivotsFilter;
+import com.just.ksim.filter.SimilarityFilter;
+import com.just.ksim.filter.SimilarityFilterCount;
+import com.just.ksim.filter.TrajWithPivotsFilter;
 import com.just.ksim.index.ElementKNN;
 import com.just.ksim.index.XZStarSFC;
 import com.just.ksim.utils.ByteArrays;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
@@ -21,7 +25,7 @@ import org.locationtech.jts.geom.MultiPoint;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.sfcurve.IndexRange;
 import scala.Tuple2;
-import util.WKTUtils;
+import utils.WKTUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -30,7 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static util.Constants.*;
+import static utils.Constants.*;
 
 /**
  * @author : hehuajun3
@@ -118,7 +122,9 @@ public class Client {
 
     public List<Trajectory> simQuery(Trajectory traj, double threshold) throws IOException {
         List<Filter> filter = new ArrayList<>(2);
-        filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(),traj.getDPFeature().getMBRs().toText(),false));
+        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
+        filter.add(new TrajWithPivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
+        //filter.add(new SimilarityFilter(traj.toText(), threshold));
         List<Trajectory> trajectories = new ArrayList<>();
         final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
         List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
@@ -126,12 +132,10 @@ public class Client {
 
         //sfc.simRange(traj, threshold)
         query(ranges, this.hTable, filter, res -> {
-            Geometry geo = WKTUtils.read(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
+            String v = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))).split("--")[0];
+            Geometry geo = WKTUtils.read(v);
             String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
             trajectories.add(new Trajectory(id, (MultiPoint) geo));
-            for (Cell cell : res.listCells()) {
-                System.out.println(Bytes.toString(cell.getValue()));
-            }
             //System.out.println());
         });
         return trajectories;
@@ -139,7 +143,7 @@ public class Client {
 
     public int simQueryCount(Trajectory traj, double threshold) throws IOException {
         List<Filter> filter = new ArrayList<>(2);
-        filter.add(new CountFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
+        filter.add(new SimilarityFilterCount(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText()));
         filter.add(new FirstKeyOnlyFilter());
         List<Trajectory> trajectories = new ArrayList<>();
         final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
@@ -175,10 +179,11 @@ public class Client {
             // System.out.println(ranges.size());
             if (currentSize.get() >= k) {
                 double maxThreshold = tmpResult.peekLast()._2;
-                Filter filterThreshold = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), traj.getDPFeature().getIndexes(),traj.getDPFeature().getMBRs().toText(),true);
+                Filter filterThreshold = new TrajWithPivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), true);
                 filter.clear();
                 //filter.add(new CalculateSimilarity(traj.toText()));
                 filter.add(filterThreshold);
+                //filter.add(new SimilarityFilter(traj.toText(), maxThreshold, true));
             }
             query(ranges, hTable, filter, res -> {
                 currentSize.getAndIncrement();

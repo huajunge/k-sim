@@ -2,19 +2,14 @@ package com.just.ksim.coprocessor;
 
 // cc CustomFilterExample Example using a custom filter
 
-import com.just.ksim.filter.CustomFilter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.filter.Filter;
-import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.util.Bytes;
-import util.HBaseHelper;
+import utils.HBaseHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FilterExample2 {
 

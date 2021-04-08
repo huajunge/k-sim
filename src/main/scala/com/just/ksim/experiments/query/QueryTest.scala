@@ -16,10 +16,10 @@ object QueryTest {
 
   def main(args: Array[String]): Unit = {
     val tableName = "tdrive_tmp"
-    val tableName2 = "tdrive_pivot_test"
+    val tableName2 = "tdrive_pivot_test2"
     val client = new Client(tableName2)
     val client2 = new Client(tableName)
-    val trajectories = client2.limit(100)
+    val trajectories = client2.limit(200)
     val sfc = XZStarSFC.apply(16.toShort, 1)
     val threshold = 0.02
     //    trajectories.asScala.foreach(t => {
@@ -29,7 +29,7 @@ object QueryTest {
     var ii = 0
     val interval = 4
     for (elem <- trajectories.asScala) {
-      if (ii % interval == 0) {
+      if (ii % interval == 0 && elem.getNumGeometries > 5) {
         val time = System.currentTimeMillis()
         val r = client.simQuery(elem, threshold)
         val timeTmp = System.currentTimeMillis() - time
@@ -59,7 +59,7 @@ object QueryTest {
       //          }
       if (i % interval == 0) {
         val time = System.currentTimeMillis()
-        val result = client.knnQuery(elem, 250,0.003)
+        //val result = client.knnQuery(elem, 250,0.003)
         val tmpT = System.currentTimeMillis() - time
         timeStatistic.add(tmpT)
         println(s"${elem.getId}-knn,,${elem.getNumGeometries},${tmpT}")

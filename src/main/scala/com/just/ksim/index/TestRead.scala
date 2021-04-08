@@ -1,6 +1,6 @@
 package com.just.ksim.index
 
-import util.WKTUtils
+import utils.WKTUtils
 
 import scala.io.Source
 

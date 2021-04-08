@@ -1,22 +1,19 @@
 package com.just.ksim.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.just.ksim.similarity.Frechet;
 import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterBase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
-import util.WKTUtils;
+import utils.WKTUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static util.Constants.*;
+import static utils.Constants.*;
 
 /**
  * @author : hehuajun3

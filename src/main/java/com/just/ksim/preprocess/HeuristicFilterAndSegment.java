@@ -2,7 +2,7 @@ package com.just.ksim.preprocess;
 
 import com.just.ksim.entity.Trajectory;
 import org.locationtech.jts.geom.Point;
-import util.PreprocessorUtils;
+import utils.PreprocessorUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;

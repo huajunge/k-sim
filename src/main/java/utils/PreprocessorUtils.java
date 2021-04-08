@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 import com.just.ksim.entity.Trajectory;
 import org.locationtech.jts.geom.Point;

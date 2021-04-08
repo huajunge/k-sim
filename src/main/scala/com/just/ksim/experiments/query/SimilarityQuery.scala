@@ -6,7 +6,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.spark.{SparkConf, SparkContext}
 import org.locationtech.jts.geom.MultiPoint
-import util.WKTUtils
+import utils.WKTUtils
 
 import java.util
 import scala.collection.JavaConverters._

@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;

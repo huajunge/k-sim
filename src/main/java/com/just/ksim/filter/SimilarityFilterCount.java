@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static utils.Constants.*;
+import static utils.Constants.GEOM;
 
 /**
  * @author : hehuajun3
@@ -25,7 +26,7 @@ import static utils.Constants.*;
  * @date : Created in 2021-03-10 11:04
  * @modified by :
  **/
-public class PivotsFilter2 extends FilterBase {
+public class SimilarityFilterCount extends FilterBase {
     private String spoint;
     private String epoint;
     private double threshold;
@@ -33,17 +34,16 @@ public class PivotsFilter2 extends FilterBase {
     private String mbrs;
     private String traj;
     private boolean filterRow = false;
-    private boolean checkedAllPoint = false;
     private boolean returnSim;
     private Geometry spointGeo;
     private Geometry epointGeo;
     private Geometry trajGeo;
     private Geometry mbrGeo;
-    private Geometry othterMbrGeo;
-    private String[] indexes;
+    private String currentGeom;
     private BigDecimal currentThreshold = null;
+    private int size = 0;
 
-    public PivotsFilter2(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs, boolean returnSim) {
+    public SimilarityFilterCount(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs, boolean returnSim) {
         this.spoint = spoint;
         this.epoint = epoint;
         this.threshold = threshold;
@@ -59,18 +59,20 @@ public class PivotsFilter2 extends FilterBase {
         this.returnSim = returnSim;
     }
 
-    public PivotsFilter2(String spoint, String epoint, double threshold, String traj, List<Integer> pivots) {
+    public SimilarityFilterCount(String spoint, String epoint, double threshold, String traj, List<Integer> pivots) {
         this(spoint, epoint, threshold, traj, pivots, null, false);
     }
 
-    public PivotsFilter2(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs) {
+    public SimilarityFilterCount(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs) {
         this(spoint, epoint, threshold, traj, pivots, mbrs, false);
     }
 
     @Override
     public void reset() {
         this.filterRow = false;
-        this.checkedAllPoint = false;
+        this.currentGeom = null;
+        this.currentThreshold = null;
+        this.size = 0;
     }
 
     @Override
@@ -79,9 +81,11 @@ public class PivotsFilter2 extends FilterBase {
     }
 
     @Override
-    public ReturnCode filterKeyValue(Cell v) throws IOException {
-        if (!this.checkedAllPoint && !this.filterRow) {
+    public ReturnCode filterKeyValue(Cell v) {
+        //System.out.println("-----");
+        if (!this.filterRow) {
             if (Bytes.toString(v.getQualifier()).equals(START_POINT)) {
+                //System.out.println("1");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
                 if (null != geom) {
                     if (geom.distance(this.spointGeo) > this.threshold) {
@@ -89,58 +93,55 @@ public class PivotsFilter2 extends FilterBase {
                     }
                 }
             } else if (Bytes.toString(v.getQualifier()).equals(END_POINT)) {
+                //System.out.println("2");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
                 if (null != geom) {
                     if (geom.distance(this.epointGeo) > this.threshold) {
                         this.filterRow = true;
                     }
                 }
-            } else if (Bytes.toString(v.getQualifier()).equals(PIVOT)) {
+            } else if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
+                //System.out.println("3");
                 String[] p = Bytes.toString(v.getValue()).split("--");
-                Geometry geom = WKTUtils.read(p[0]);
-                this.othterMbrGeo = geom;
+                //Geometry geom = WKTUtils.read(p[0]);
+                Geometry othterMbrGeo = WKTUtils.read(p[1]);
                 if (null != this.mbrGeo) {
-                    for (int i = 0; i < Objects.requireNonNull(geom).getNumGeometries(); i++) {
-                        if (geom.getGeometryN(i).distance(this.mbrGeo) > threshold) {
+                    for (int i = 0; i < Objects.requireNonNull(othterMbrGeo).getNumGeometries(); i++) {
+                        if (othterMbrGeo.getGeometryN(i).distance(this.mbrGeo) > threshold) {
                             this.filterRow = true;
                             break;
                         }
                     }
                     for (int i = 0; i < Objects.requireNonNull(this.mbrGeo).getNumGeometries() && !this.filterRow; i++) {
-                        if (this.mbrGeo.getGeometryN(i).distance(geom) > threshold) {
+                        if (this.mbrGeo.getGeometryN(i).distance(othterMbrGeo) > threshold) {
                             this.filterRow = true;
                             break;
                         }
                     }
                 }
                 //Geometry geom = WKTUtils.read(p[0]);
-                indexes = p[1].split(",");
-            } else if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
-                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
-                if (null != geom) {
-                    //Geometry trajGeo = WKTUtils.read(this.traj);
-//                    if (null != this.indexes && null != this.othterMbrGeo) {
-//                        for (int i = 0; i < this.indexes.length; i++) {
-//                            if (geom.getGeometryN(Integer.parseInt(this.indexes[i])).distance(this.mbrGeo) > threshold) {
-//                                this.filterRow = true;
-//                                break;
-//                            }
-//                        }
-//                        for (int i = 0; i < this.pivots.size() && !this.filterRow; i++) {
-//                            if (trajGeo.getGeometryN(pivots.get(i)).distance(this.othterMbrGeo) > threshold) {
-//                                this.filterRow = true;
-//                                break;
-//                            }
-//                        }
-//                    }
-                    if (!this.filterRow) {
-                        assert trajGeo != null;
-                        double th = Frechet.calulateDistance(trajGeo, geom);
-                        this.filterRow = th > threshold;
-                        this.currentThreshold = BigDecimal.valueOf(th);
+                if (!filterRow) {
+                    String[] indexes = p[2].split(",");
+                    Geometry otherTrajGeo = WKTUtils.read(p[0]);
+                    if (null != othterMbrGeo) {
+                        //System.out.println("5");
+                        for (String index : indexes) {
+                            if (null != index && !index.equals("") && !index.equals("$s")) {
+                                assert otherTrajGeo != null;
+                                if (otherTrajGeo.getGeometryN(Integer.parseInt(index)).distance(this.mbrGeo) > threshold) {
+                                    this.filterRow = true;
+                                    break;
+                                }
+                            }
+                        }
+                        for (int i = 0; i < this.pivots.size() && !this.filterRow; i++) {
+                            if (trajGeo.getGeometryN(pivots.get(i)).distance(othterMbrGeo) > threshold) {
+                                this.filterRow = true;
+                                break;
+                            }
+                        }
                     }
                 }
-                this.checkedAllPoint = true;
             }
         }
         return ReturnCode.INCLUDE;
@@ -148,13 +149,10 @@ public class PivotsFilter2 extends FilterBase {
 
     @Override
     public Cell transformCell(Cell v) {
-        //System.out.println(Bytes.toString(v.getQualifierArray()));
-        //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
-        //v.getv
         if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM) && null != this.currentThreshold) {
             //System.out.println("-------");
             return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold.toString()));
+                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(this.currentGeom + "-" + this.currentThreshold.toString()));
         }
         return v;
     }
@@ -189,6 +187,6 @@ public class PivotsFilter2 extends FilterBase {
         } catch (InvalidProtocolBufferException e) {
             throw new DeserializationException(e);
         }
-        return new PivotsFilter2(proto.getSpoint(), proto.getEpoint(), proto.getThreshold(), proto.getTraj(), proto.getPivotsList(), proto.getMbrs(), proto.getReturnSim());
+        return new SimilarityFilterCount(proto.getSpoint(), proto.getEpoint(), proto.getThreshold(), proto.getTraj(), proto.getPivotsList(), proto.getMbrs(), proto.getReturnSim());
     }
 }

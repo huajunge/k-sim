@@ -3,21 +3,19 @@ package com.just.ksim.filter;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.just.ksim.similarity.Frechet;
 import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterBase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
-import util.WKTUtils;
+import utils.WKTUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
-import static util.Constants.*;
+import static utils.Constants.*;
 
 /**
  * @author : hehuajun3
@@ -33,7 +31,6 @@ public class PivotsFilter extends FilterBase {
     private String mbrs;
     private String traj;
     private boolean filterRow = false;
-    private boolean checkedAllPoint = false;
     private boolean returnSim;
     private Geometry spointGeo;
     private Geometry epointGeo;
@@ -71,7 +68,9 @@ public class PivotsFilter extends FilterBase {
     @Override
     public void reset() {
         this.filterRow = false;
-        this.checkedAllPoint = false;
+        this.othterMbrGeo = null;
+        this.otherTrajGeo = null;
+        this.indexes = null;
     }
 
     @Override
@@ -81,14 +80,17 @@ public class PivotsFilter extends FilterBase {
 
     @Override
     public void filterRowCells(List<Cell> ignored) throws IOException {
-        if (null != otherTrajGeo) {
+        if (null != otherTrajGeo && !this.filterRow) {
             //Geometry trajGeo = WKTUtils.read(this.traj);
             if (null != this.indexes && null != this.othterMbrGeo) {
                 System.out.println("5");
                 for (int i = 0; i < this.indexes.length; i++) {
-                    if (otherTrajGeo.getGeometryN(Integer.parseInt(this.indexes[i])).distance(this.mbrGeo) > threshold) {
-                        this.filterRow = true;
-                        break;
+                    String index = this.indexes[i];
+                    if (null != index && !index.equals("")) {
+                        if (otherTrajGeo.getGeometryN(Integer.parseInt(index)).distance(this.mbrGeo) > threshold) {
+                            this.filterRow = true;
+                            break;
+                        }
                     }
                 }
                 for (int i = 0; i < this.pivots.size() && !this.filterRow; i++) {
@@ -111,7 +113,7 @@ public class PivotsFilter extends FilterBase {
     @Override
     public ReturnCode filterKeyValue(Cell v) throws IOException {
         System.out.println("-----");
-        if (!this.checkedAllPoint && !this.filterRow) {
+        if (!this.filterRow) {
             if (Bytes.toString(v.getQualifier()).equals(START_POINT)) {
                 System.out.println("1");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
@@ -158,18 +160,18 @@ public class PivotsFilter extends FilterBase {
         return ReturnCode.INCLUDE;
     }
 
-    @Override
-    public Cell transformCell(Cell v) {
-        //System.out.println(Bytes.toString(v.getQualifierArray()));
-        //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
-        //v.getv
-        if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM) && null != this.currentThreshold) {
-            //System.out.println("-------");
-            return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold.toString()));
-        }
-        return v;
-    }
+//    @Override
+//    public Cell transformCell(Cell v) {
+//        //System.out.println(Bytes.toString(v.getQualifierArray()));
+//        //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
+//        //v.getv
+//        if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM) && null != this.currentThreshold) {
+//            //System.out.println("-------");
+//            return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
+//                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold.toString()));
+//        }
+//        return v;
+//    }
 
 
     @Override

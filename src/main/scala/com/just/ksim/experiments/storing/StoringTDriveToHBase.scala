@@ -10,8 +10,8 @@ import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDes
 import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.{SparkConf, SparkContext}
 import org.locationtech.jts.geom.MultiPoint
-import util.Constants.DEFAULT_CF
-import util.{PutUtils, WKTUtils}
+import utils.Constants.DEFAULT_CF
+import utils.{PutUtils, WKTUtils}
 
 object StoringTDriveToHBase {
   def main(args: Array[String]): Unit = {

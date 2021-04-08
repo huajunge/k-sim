@@ -1,7 +1,7 @@
 package com.just.ksim.similarity;
 
 import org.locationtech.jts.geom.Geometry;
-import util.NumberUtil;
+import utils.NumberUtil;
 
 import java.util.ArrayList;
 import java.util.List;

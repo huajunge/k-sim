@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/apache2.0.php.
  ***********************************************************************/
 
-package util;
+package utils;
 
 
 import org.locationtech.jts.geom.Geometry;

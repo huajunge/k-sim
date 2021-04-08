@@ -13,6 +13,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
 import utils.WKTUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import static utils.Constants.GEOM;
@@ -23,15 +24,50 @@ import static utils.Constants.GEOM;
  * @date : Created in 2021-03-10 18:23
  * @modified by :
  **/
-public class CalculateSimilarity extends FilterBase {
+public class SimilarityFilter extends FilterBase {
     private String traj;
+    private double threshold;
+    private boolean filterRow = false;
+    private Geometry trajGeo;
+    private BigDecimal currentThreshold = null;
+    private String tmpGeo = null;
+    private boolean returnSim;
 
-    public CalculateSimilarity(String traj) {
+    public SimilarityFilter(String traj, double threshold, boolean returnSim) {
         this.traj = traj;
+        this.trajGeo = WKTUtils.read(traj);
+        this.threshold = threshold;
+        this.returnSim = returnSim;
+    }
+
+    public SimilarityFilter(String traj, double threshold) {
+        this(traj, threshold, false);
+    }
+
+    @Override
+    public void reset() {
+        this.filterRow = false;
+        this.trajGeo = null;
+        this.tmpGeo = null;
+    }
+
+    @Override
+    public boolean filterRow() throws IOException {
+        return this.filterRow;
     }
 
     @Override
     public ReturnCode filterKeyValue(Cell v) {
+        if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
+            System.out.println("6");
+            this.tmpGeo = Bytes.toString(v.getValue());
+            Geometry otherTrajGeo = WKTUtils.read(tmpGeo);
+            assert trajGeo != null;
+            assert otherTrajGeo != null;
+            double th = Frechet.calulateDistance(trajGeo, otherTrajGeo);
+            this.filterRow = th > this.threshold;
+            this.currentThreshold = BigDecimal.valueOf(th);
+        }
         return ReturnCode.INCLUDE;
     }
 
@@ -40,16 +76,12 @@ public class CalculateSimilarity extends FilterBase {
         //System.out.println(Bytes.toString(v.getQualifierArray()));
         //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
         //v.getv
-        if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
+        if (Bytes.toString(v.getQualifier()).equals(GEOM) && !this.filterRow && this.returnSim) {
             //System.out.println("-------");
-            Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()).split("--")[0]);
-            if (null != geom) {
-                Geometry trajGeo = WKTUtils.read(this.traj);
-                assert trajGeo != null;
-                BigDecimal threshold = BigDecimal.valueOf(Frechet.calulateDistance(trajGeo, geom));
+            if (null != this.tmpGeo && null != this.currentThreshold) {
                 //BigDecimal d1 = new BigDecimal(threshold);
                 return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(geom.toText() + "-" + threshold.toString()));
+                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + currentThreshold.toString()));
             }
         }
         return v;
@@ -60,6 +92,8 @@ public class CalculateSimilarity extends FilterBase {
         Similarity.SimilarityFilter.Builder builder =
                 Similarity.SimilarityFilter.newBuilder();
         builder.setTraj(this.traj);
+        builder.setThreshold(this.threshold);
+        builder.setReturnSim(this.returnSim);
 //        if (value != null) {
 //            builder.setValue(ByteStringer.wrap(value)); // co CustomFilter-6-Write Writes the given value out so it can be sent to the servers.
 //        }
@@ -74,6 +108,6 @@ public class CalculateSimilarity extends FilterBase {
         } catch (InvalidProtocolBufferException e) {
             throw new DeserializationException(e);
         }
-        return new CalculateSimilarity(proto.getTraj());
+        return new SimilarityFilter(proto.getTraj(), proto.getThreshold(), proto.getReturnSim());
     }
 }
