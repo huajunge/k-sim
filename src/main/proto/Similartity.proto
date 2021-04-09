@@ -7,5 +7,6 @@ option optimize_for = SPEED;
 message SimilarityFilter {
     required string traj = 1;
     optional double threshold = 2;
-    optional bool returnSim = 7;
+    optional int32 func = 3;
+    optional bool returnSim = 4;
 }

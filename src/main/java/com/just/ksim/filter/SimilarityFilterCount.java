@@ -1,7 +1,6 @@
 package com.just.ksim.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.just.ksim.similarity.Frechet;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.KeyValue;
@@ -12,13 +11,11 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
 import utils.WKTUtils;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 import static utils.Constants.*;
-import static utils.Constants.GEOM;
 
 /**
  * @author : hehuajun3
@@ -33,6 +30,7 @@ public class SimilarityFilterCount extends FilterBase {
     private List<Integer> pivots;
     private String mbrs;
     private String traj;
+    private int func = 0;
     private boolean filterRow = false;
     private boolean returnSim;
     private Geometry spointGeo;
@@ -40,8 +38,28 @@ public class SimilarityFilterCount extends FilterBase {
     private Geometry trajGeo;
     private Geometry mbrGeo;
     private String currentGeom;
+    private Geometry othterMbrGeo;
+    private Geometry otherTrajGeo;
+    private String[] indexes;
     private BigDecimal currentThreshold = null;
     private int size = 0;
+
+    public SimilarityFilterCount(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs, int func, boolean returnSim) {
+        this.spoint = spoint;
+        this.epoint = epoint;
+        this.threshold = threshold;
+        this.traj = traj;
+        this.trajGeo = WKTUtils.read(traj);
+        if (null != mbrs) {
+            this.mbrGeo = WKTUtils.read(mbrs);
+        }
+        this.pivots = pivots;
+        this.mbrs = mbrs;
+        this.func = func;
+        this.spointGeo = WKTUtils.read(spoint);
+        this.epointGeo = WKTUtils.read(epoint);
+        this.returnSim = returnSim;
+    }
 
     public SimilarityFilterCount(String spoint, String epoint, double threshold, String traj, List<Integer> pivots, String mbrs, boolean returnSim) {
         this.spoint = spoint;
@@ -73,6 +91,9 @@ public class SimilarityFilterCount extends FilterBase {
         this.currentGeom = null;
         this.currentThreshold = null;
         this.size = 0;
+        this.othterMbrGeo = null;
+        this.indexes = null;
+        this.otherTrajGeo = null;
     }
 
     @Override
@@ -84,7 +105,7 @@ public class SimilarityFilterCount extends FilterBase {
     public ReturnCode filterKeyValue(Cell v) {
         //System.out.println("-----");
         if (!this.filterRow) {
-            if (Bytes.toString(v.getQualifier()).equals(START_POINT)) {
+            if (Bytes.toString(v.getQualifier()).equals(START_POINT) && func == 0) {
                 //System.out.println("1");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
                 if (null != geom) {
@@ -92,7 +113,7 @@ public class SimilarityFilterCount extends FilterBase {
                         this.filterRow = true;
                     }
                 }
-            } else if (Bytes.toString(v.getQualifier()).equals(END_POINT)) {
+            } else if (Bytes.toString(v.getQualifier()).equals(END_POINT) && func == 0) {
                 //System.out.println("2");
                 Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
                 if (null != geom) {
@@ -100,34 +121,40 @@ public class SimilarityFilterCount extends FilterBase {
                         this.filterRow = true;
                     }
                 }
-            } else if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
+            } else if (Bytes.toString(v.getQualifier()).equals(PIVOT)) {
                 //System.out.println("3");
                 String[] p = Bytes.toString(v.getValue()).split("--");
-                //Geometry geom = WKTUtils.read(p[0]);
-                Geometry othterMbrGeo = WKTUtils.read(p[1]);
+                Geometry geom = WKTUtils.read(p[0]);
+                this.othterMbrGeo = geom;
                 if (null != this.mbrGeo) {
-                    for (int i = 0; i < Objects.requireNonNull(othterMbrGeo).getNumGeometries(); i++) {
-                        if (othterMbrGeo.getGeometryN(i).distance(this.mbrGeo) > threshold) {
+                    for (int i = 0; i < Objects.requireNonNull(geom).getNumGeometries(); i++) {
+                        if (geom.getGeometryN(i).distance(this.mbrGeo) > threshold) {
                             this.filterRow = true;
                             break;
                         }
                     }
                     for (int i = 0; i < Objects.requireNonNull(this.mbrGeo).getNumGeometries() && !this.filterRow; i++) {
-                        if (this.mbrGeo.getGeometryN(i).distance(othterMbrGeo) > threshold) {
+                        if (this.mbrGeo.getGeometryN(i).distance(geom) > threshold) {
                             this.filterRow = true;
                             break;
                         }
                     }
                 }
                 //Geometry geom = WKTUtils.read(p[0]);
-                if (!filterRow) {
-                    String[] indexes = p[2].split(",");
-                    Geometry otherTrajGeo = WKTUtils.read(p[0]);
-                    if (null != othterMbrGeo) {
+                indexes = p[1].split(",");
+                //System.out.println("mbr time:" + (System.currentTimeMillis() - time));
+            } else if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
+                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+                //System.out.println("4");
+                otherTrajGeo = geom;
+                if (null != otherTrajGeo && !this.filterRow) {
+                    //Geometry trajGeo = WKTUtils.read(this.traj);
+                    long time = System.currentTimeMillis();
+                    if (null != this.indexes && null != this.othterMbrGeo) {
                         //System.out.println("5");
-                        for (String index : indexes) {
+                        for (int i = 0; i < this.indexes.length; i++) {
+                            String index = this.indexes[i];
                             if (null != index && !index.equals("") && !index.equals("$s")) {
-                                assert otherTrajGeo != null;
                                 if (otherTrajGeo.getGeometryN(Integer.parseInt(index)).distance(this.mbrGeo) > threshold) {
                                     this.filterRow = true;
                                     break;
@@ -135,11 +162,12 @@ public class SimilarityFilterCount extends FilterBase {
                             }
                         }
                         for (int i = 0; i < this.pivots.size() && !this.filterRow; i++) {
-                            if (trajGeo.getGeometryN(pivots.get(i)).distance(othterMbrGeo) > threshold) {
+                            if (trajGeo.getGeometryN(pivots.get(i)).distance(this.othterMbrGeo) > threshold) {
                                 this.filterRow = true;
                                 break;
                             }
                         }
+                        //System.out.println("points time:" + (System.currentTimeMillis() - time));
                     }
                 }
             }

@@ -177,6 +177,12 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
           checked = positionDisMap.get(i)._1 <= threshold
         }
 
+        if (sig == 15) {
+          this.addedPositionCodes |= (1 << i.toInt)
+          results.add(i + 1L)
+          checked = false
+        }
+
         if (checked) {
           {
             var cps = new Array[Coordinate](4)
@@ -285,20 +291,19 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
           return (maxDis, false, index)
         }
       }
- //     val step = 10
-//      traj.getDPFeature.getPviot
-//      for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
-//        index = i
-//        val dis = polygon.distance(traj.getGeometryN(i))
-//        if (maxDis < dis) {
-//          maxDis = dis
-//        }
-//        if (maxDis > threshold) {
-//          return (maxDis, false, index)
-//        }
-//      }
-//      return (maxDis, true, index)
-
+      //     val step = 10
+      //      traj.getDPFeature.getPviot
+      //      for (i <- startIndex until(traj.getNumGeometries - 1, step)) {
+      //        index = i
+      //        val dis = polygon.distance(traj.getGeometryN(i))
+      //        if (maxDis < dis) {
+      //          maxDis = dis
+      //        }
+      //        if (maxDis > threshold) {
+      //          return (maxDis, false, index)
+      //        }
+      //      }
+      //      return (maxDis, true, index)
       (maxDis, true, index)
     }
 

@@ -2,6 +2,7 @@ package com.just.ksim.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.just.ksim.similarity.Frechet;
+import com.just.ksim.similarity.Hausdorff;
 import filters.generated.Similarity;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
@@ -25,6 +26,12 @@ import static utils.Constants.GEOM;
  **/
 public class CalculateSimilarity extends FilterBase {
     private String traj;
+    private int func = 0;
+
+    public CalculateSimilarity(String traj, int func) {
+        this.traj = traj;
+        this.func = func;
+    }
 
     public CalculateSimilarity(String traj) {
         this.traj = traj;
@@ -42,14 +49,19 @@ public class CalculateSimilarity extends FilterBase {
         //v.getv
         if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
             //System.out.println("-------");
-            Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()).split("--")[0]);
+            Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
             if (null != geom) {
                 Geometry trajGeo = WKTUtils.read(this.traj);
                 assert trajGeo != null;
-                BigDecimal threshold = BigDecimal.valueOf(Frechet.calulateDistance(trajGeo, geom));
+                BigDecimal threshold = null;
+                if (func == 0) {
+                    threshold = BigDecimal.valueOf(Frechet.calulateDistance(trajGeo, geom));
+                } else if (func == 1) {
+                    threshold = BigDecimal.valueOf(Hausdorff.calulateDistance(trajGeo, geom));
+                }
                 //BigDecimal d1 = new BigDecimal(threshold);
                 return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(geom.toText() + "-" + threshold.toString()));
+                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + threshold.toString()));
             }
         }
         return v;

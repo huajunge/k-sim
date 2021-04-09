@@ -12,7 +12,7 @@ import java.util
 import scala.collection.JavaConverters._
 
 
-object KNNQuery {
+object KNNCountQuery {
   private def getTrajectory(tra: String): Trajectory = {
     val t = tra.split("-")
     new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint])
@@ -32,7 +32,7 @@ object KNNQuery {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     var local = false
     try {
-      local = args(6).toBoolean
+      local = args(5).toBoolean
       if(local) {
         conf.setMaster("local[*]")
       }
@@ -41,6 +41,8 @@ object KNNQuery {
     }
     val sc = new SparkContext(conf)
     val timeStatistic = new util.ArrayList[Long](50)
+    val count = new util.ArrayList[Long](50)
+
     val queryTrajs = sc
       .textFile(queryTrajFilePath)
       .map(getTrajectory)
@@ -52,9 +54,10 @@ object KNNQuery {
       elem.getDPFeature.getIndexes
       elem.getDPFeature.getMBRs
       val time = System.currentTimeMillis()
-      client.knnQuery(elem, k, interval)
+      val size = client.knnQueryCount(elem, k, interval)
       val tmp = System.currentTimeMillis() - time
       timeStatistic.add(System.currentTimeMillis() - time)
+      count.add(size)
       println(s"${elem.getId}-s,$tmp")
     }
     val csvHeader = "dataVolume\ttype\tk\tmax\tmin\taverage\tmedian"
@@ -62,6 +65,10 @@ object KNNQuery {
     var tmpResult = timeStatistic.asScala.sorted
     var sum = tmpResult.sum
     csvLine.append(s"$trajPath\tqueryTime\t$k\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
+
+    tmpResult = count.asScala.sorted
+    sum = tmpResult.sum
+    csvLine.append("\n").append(s"$trajPath\tnumber\t$k\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
 
     val path = new Path(outPath)
     val fs = path.getFileSystem(new Configuration())

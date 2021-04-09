@@ -31,6 +31,15 @@ object SimilarityQuery {
       //.setMaster("local[*]")
       .setAppName("SimilarityQuery")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    var local = false
+    try {
+      local = args(5).toBoolean
+      if(local) {
+        conf.setMaster("local[*]")
+      }
+    } catch {
+      case i: Exception =>
+    }
     val sc = new SparkContext(conf)
     val timeStatistic = new util.ArrayList[Long](50)
     val count = new util.ArrayList[Long](50)
@@ -40,6 +49,9 @@ object SimilarityQuery {
       .collect()
     Thread.sleep(2000)
     for (elem <- queryTrajs) {
+      elem.getDPFeature
+      elem.getDPFeature.getIndexes
+      elem.getDPFeature.getMBRs
       val time = System.currentTimeMillis()
       client.simQuery(elem, threshold)
       val tmp = System.currentTimeMillis() - time
@@ -71,7 +83,8 @@ object SimilarityQuery {
       outputStream.flush()
       outputStream.close()
     } else {
-      val outputStream = fs.append(path)
+      fs.delete(path)
+      val outputStream = fs.create(path)
       outputStream.writeBytes("\n")
       outputStream.writeBytes(csvLine.toString())
       println(csvHeader)

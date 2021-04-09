@@ -10,7 +10,7 @@ object Test {
   def main(args: Array[String]): Unit = {
     val root: ElementKNN = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, 16, new PrecisionModel, 0L)
     val sfc = XZStarSFC(16, 1)
-    val tableName = "tdrive_tmp"
+    val tableName = "tdrive_p"
     //val client = new Client(tableName2)
     val client = new Client(tableName)
     val trajectories = client.limit(100)
