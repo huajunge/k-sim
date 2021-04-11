@@ -33,7 +33,16 @@ object KNNQuery {
     var local = false
     try {
       local = args(6).toBoolean
-      if(local) {
+      if (local) {
+        conf.setMaster("local[*]")
+      }
+    } catch {
+      case i: Exception =>
+    }
+    var func = 0
+    try {
+      func = args(7).toInt
+      if (local) {
         conf.setMaster("local[*]")
       }
     } catch {
@@ -52,7 +61,7 @@ object KNNQuery {
       elem.getDPFeature.getIndexes
       elem.getDPFeature.getMBRs
       val time = System.currentTimeMillis()
-      client.knnQuery(elem, k, interval)
+      client.knnQuery(elem, k, interval, func)
       val tmp = System.currentTimeMillis() - time
       timeStatistic.add(System.currentTimeMillis() - time)
       println(s"${elem.getId}-s,$tmp")

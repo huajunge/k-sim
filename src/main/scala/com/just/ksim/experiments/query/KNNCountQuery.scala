@@ -32,8 +32,17 @@ object KNNCountQuery {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     var local = false
     try {
-      local = args(5).toBoolean
-      if(local) {
+      local = args(6).toBoolean
+      if (local) {
+        conf.setMaster("local[*]")
+      }
+    } catch {
+      case i: Exception =>
+    }
+    var func = 0
+    try {
+      func = args(7).toInt
+      if (local) {
         conf.setMaster("local[*]")
       }
     } catch {
@@ -54,7 +63,7 @@ object KNNCountQuery {
       elem.getDPFeature.getIndexes
       elem.getDPFeature.getMBRs
       val time = System.currentTimeMillis()
-      val size = client.knnQueryCount(elem, k, interval)
+      val size = client.knnQueryCount(elem, k, interval, func)
       val tmp = System.currentTimeMillis() - time
       timeStatistic.add(System.currentTimeMillis() - time)
       count.add(size)

@@ -34,7 +34,16 @@ object SimilarityQuery {
     var local = false
     try {
       local = args(5).toBoolean
-      if(local) {
+      if (local) {
+        conf.setMaster("local[*]")
+      }
+    } catch {
+      case i: Exception =>
+    }
+    var func = 0
+    try {
+      func = args(6).toInt
+      if (local) {
         conf.setMaster("local[*]")
       }
     } catch {
@@ -53,10 +62,10 @@ object SimilarityQuery {
       elem.getDPFeature.getIndexes
       elem.getDPFeature.getMBRs
       val time = System.currentTimeMillis()
-      client.simQuery(elem, threshold)
+      client.simQuery(elem, threshold, func)
       val tmp = System.currentTimeMillis() - time
       timeStatistic.add(tmp)
-      val size = client.simQueryCount(elem, threshold)
+      val size = client.simQueryCount(elem, threshold, func)
       count.add(size)
       //println(s"${elem.getId}-s,$size,$tmp")
     }
