@@ -2,7 +2,7 @@ storing
 
 spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive tdrive_p_16 hdfs:///experiment/ksim/result/disk/tdrive_indexing_pivot02016 16
 
-spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/lorry ksim_lorry hdfs:///experiment/ksim/result/lorry_indexing 4
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/lorry ksim_lorry hdfs:///experiment/ksim/result/lorry/indexing 4
 
 
 spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive ksim_tmp_tdrive hdfs:///experiment/ksim/result/tmp_tdrive_indexing 4

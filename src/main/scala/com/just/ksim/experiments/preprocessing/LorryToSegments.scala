@@ -30,6 +30,7 @@ object LorryToSegments {
     val isQuery = args(6).toBoolean
     val querySize = args(7).toInt
     val mbr = new Envelope(-180.0, 180, -90, 90)
+    val dataVolume = args(8).toInt
 
     //20, 11*60
     val segment = new HeuristicFilterAndSegment(maxSpeedMeterPerSecond, maxTimeInterval)
@@ -56,7 +57,7 @@ object LorryToSegments {
         segment.filter(t).asScala
       }).filter(t => null != t && mbr.contains(t.getMultiPoint.getEnvelopeInternal) && t.getNumGeometries >= minSize && t.getNumGeometries <= maxSize).zipWithIndex()
       if (isQuery) {
-        context.makeRDD(rawRDD.take(querySize).filter(t => t._2  % 5 == 0).flatMap(v => {
+        context.makeRDD(rawRDD.take(querySize).filter(t => t._2 % 5 == 0).flatMap(v => {
           //v._1.setId(v._2.toString)
           val tId = v._2
           var sId = 0
@@ -70,19 +71,23 @@ object LorryToSegments {
         }
         )).saveAsTextFile(outFilePath)
       } else {
-        rawRDD.flatMap(v => {
-          //v._1.setId(v._2.toString)
-          val tId = v._2
-          var sId = 0
-          val segments = new util.ArrayList[String]()
-          for (i <- 0 until v._1.getNumGeometries - 1) {
-            val s = s"$tId,${v._1.getGeometryN(i).getCoordinate.x},${v._1.getGeometryN(i).getCoordinate.y},${v._1.getGeometryN(i + 1).getCoordinate.x},${v._1.getGeometryN(i + 1).getCoordinate.y},$sId"
-            segments.add(s)
-            sId += 1
-          }
-          segments.asScala
+        var size = 0L
+        for (i <- 1 to dataVolume) {
+          val rdd = rawRDD.flatMap(v => {
+            //v._1.setId(v._2.toString)
+            val tId = v._2 + size
+            var sId = 0
+            val segments = new util.ArrayList[String]()
+            for (i <- 0 until v._1.getNumGeometries - 1) {
+              val s = s"$tId,${v._1.getGeometryN(i).getCoordinate.x},${v._1.getGeometryN(i).getCoordinate.y},${v._1.getGeometryN(i + 1).getCoordinate.x},${v._1.getGeometryN(i + 1).getCoordinate.y},$sId"
+              segments.add(s)
+              sId += 1
+            }
+            segments.asScala
+          })
+          size = rdd.count()
+          rdd.saveAsTextFile(outFilePath + "/" + i)
         }
-        ).saveAsTextFile(outFilePath)
       }
 
 

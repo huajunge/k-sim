@@ -34,7 +34,7 @@ public class PivotsFilter extends FilterBase {
     private List<Integer> pivots;
     private String mbrs;
     private String traj;
-    private int func = 0;
+    private int func;
     private boolean filterRow = false;
     private boolean returnSim;
     private Geometry spointGeo;

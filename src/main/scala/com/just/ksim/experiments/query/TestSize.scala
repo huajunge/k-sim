@@ -2,17 +2,14 @@ package com.just.ksim.experiments.query
 
 import com.just.ksim.disks.Client
 import com.just.ksim.entity.Trajectory
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
 import org.apache.spark.{SparkConf, SparkContext}
 import org.locationtech.jts.geom.MultiPoint
 import utils.WKTUtils
 
 import java.util
-import scala.collection.JavaConverters._
 
 
-object KNNCountQuery {
+object TestSize {
   private def getTrajectory(tra: String): Trajectory = {
     val t = tra.split("-")
     new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint])
@@ -26,7 +23,6 @@ object KNNCountQuery {
     val shard = args(4).toShort
     val interval = args(5).toDouble
     val g = args(6).toShort
-
     val client = new Client(g, trajPath, shard)
     val conf = new SparkConf()
       //.setMaster("local[*]")
@@ -52,8 +48,6 @@ object KNNCountQuery {
     }
     val sc = new SparkContext(conf)
     val timeStatistic = new util.ArrayList[Long](50)
-    val count = new util.ArrayList[Long](50)
-
     val queryTrajs = sc
       .textFile(queryTrajFilePath)
       .map(getTrajectory)
@@ -65,46 +59,12 @@ object KNNCountQuery {
       elem.getDPFeature.getIndexes
       elem.getDPFeature.getMBRs
       val time = System.currentTimeMillis()
-      val size = client.knnQueryCount(elem, k, interval, func)
       val tmp = System.currentTimeMillis() - time
       timeStatistic.add(System.currentTimeMillis() - time)
-      count.add(size)
-      println(s"${elem.getId}-s,$tmp")
+      val env = elem.getDPFeature.getMBRs().getEnvelopeInternal
+      println(s"${elem.getId}-s,$tmp,${elem.getNumGeometries},${elem.getDPFeature.getIndexes.size()},${env.getHeight},${env.getWidth}")
     }
-    val csvHeader = "dataVolume\ttype\tk\tmax\tmin\taverage\tmedian"
-    val csvLine = new StringBuilder
-    var tmpResult = timeStatistic.asScala.sorted
-    var sum = tmpResult.sum
-    csvLine.append(s"$trajPath\tqueryTime\t$k\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
 
-    tmpResult = count.asScala.sorted
-    sum = tmpResult.sum
-    csvLine.append("\n").append(s"$trajPath\tnumber\t$k\t${tmpResult.max}\t${tmpResult.min}\t${sum / tmpResult.size}\t${tmpResult(tmpResult.size / 2 - 1)}")
-
-    val path = new Path(outPath)
-    val fs = path.getFileSystem(new Configuration())
-    if (!fs.exists(path)) {
-      val outputStream = fs.create(path)
-      outputStream.writeBytes(csvHeader)
-      outputStream.writeBytes("\n")
-      outputStream.writeBytes(csvLine.toString())
-      println(csvHeader)
-      println(csvLine.toString())
-      outputStream.flush()
-      outputStream.flush()
-      outputStream.close()
-    } else {
-      fs.delete(path)
-      val outputStream = fs.create(path)
-      outputStream.writeBytes("\n")
-      outputStream.writeBytes(csvLine.toString())
-      println(csvHeader)
-      println(csvLine.toString())
-      outputStream.flush()
-      outputStream.flush()
-      outputStream.close()
-    }
-    fs.close()
     sc.stop()
 
     println(s"Query trajectory count: ${queryTrajs.length}")

@@ -1,0 +1,101 @@
+//storing
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive  just_tdrive  hdfs:///experiment/ksim/result/just/indexing
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry  just_lorry  hdfs:///experiment/ksim/result/just/lorry/indexing
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry10  hdfs:///experiment/ksim/result/just/lorry/indexing 1 2
+
+
+tdrive
+//Frechet
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.001 hdfs:///experiment/ksim/result/just/frechet/sim001 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.005 hdfs:///experiment/ksim/result/just/frechet/sim005 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.01 hdfs:///experiment/ksim/result/just/frechet/sim01 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.015 hdfs:///experiment/ksim/result/just/frechet/sim015 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.02 hdfs:///experiment/ksim/result/just/frechet/sim020 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 50 hdfs:///experiment/ksim/result/just/17/frechet/knn50 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 100 hdfs:///experiment/ksim/result/just/17/frechet/knn100 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 150 hdfs:///experiment/ksim/result/just/17/frechet/knn150 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 200 hdfs:///experiment/ksim/result/just/17/frechet/knn200 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 250 hdfs:///experiment/ksim/result/just/17/frechet/knn250 17 false 0
+
+//tdrive
+//Hausdorff
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.001 hdfs:///experiment/ksim/result/just/hasd/sim001 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.005 hdfs:///experiment/ksim/result/just/hasd/sim005 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.01 hdfs:///experiment/ksim/result/just/hasd/sim01 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.015 hdfs:///experiment/ksim/result/just/hasd/sim015 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 0.02 hdfs:///experiment/ksim/result/just/hasd/sim020 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 50 hdfs:///experiment/ksim/result/just/17/hasd/knn50 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 100 hdfs:///experiment/ksim/result/just/17/hasd/knn100 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 150 hdfs:///experiment/ksim/result/just/17/hasd/knn150 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 200 hdfs:///experiment/ksim/result/just/17/hasd/knn200 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive_q  just_tdrive 250 hdfs:///experiment/ksim/result/just/17/hasd/knn250 17 false 1
+
+
+lorry
+//Frechet
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.001 hdfs:///experiment/ksim/result/just/lorry/frechet/sim001 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.005 hdfs:///experiment/ksim/result/just/lorry/frechet/sim005 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.01 hdfs:///experiment/ksim/result/just/lorry/frechet/sim01 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.015 hdfs:///experiment/ksim/result/just/lorry/frechet/sim015 false 0
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.02 hdfs:///experiment/ksim/result/just/lorry/frechet/sim020 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 50 hdfs:///experiment/ksim/result/just/lorry/17/frechet/knn50 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 100 hdfs:///experiment/ksim/result/just/lorry/17/frechet/knn100 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 150 hdfs:///experiment/ksim/result/just/lorry/17/frechet/knn150 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 200 hdfs:///experiment/ksim/result/just/lorry/17/frechet/knn200 17 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 250 hdfs:///experiment/ksim/result/just/lorry/17/frechet/knn250 17 false 0
+
+//lorry
+//Hausdorff
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.001 hdfs:///experiment/ksim/result/just/lorry/hasd/sim001 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.005 hdfs:///experiment/ksim/result/just/lorry/hasd/sim005 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.01 hdfs:///experiment/ksim/result/just/lorry/hasd/sim01 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.015 hdfs:///experiment/ksim/result/just/lorry/hasd/sim015 false 1
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 0.02 hdfs:///experiment/ksim/result/just/lorry/hasd/sim020 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 50 hdfs:///experiment/ksim/result/just/lorry/17/hasd/knn50 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 100 hdfs:///experiment/ksim/result/just/lorry/17/hasd/knn100 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 150 hdfs:///experiment/ksim/result/just/lorry/17/hasd/knn150 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 200 hdfs:///experiment/ksim/result/just/lorry/17/hasd/knn200 17 false 1
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry 250 hdfs:///experiment/ksim/result/just/lorry/17/hasd/knn250 17 false 1
+
+
+
+
+

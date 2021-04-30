@@ -1,6 +1,7 @@
 package com.just.ksim.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.just.ksim.similarity.Hausdorff;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.KeyValue;
@@ -9,6 +10,7 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterBase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
+import scala.Tuple2;
 import utils.WKTUtils;
 
 import java.math.BigDecimal;
@@ -167,6 +169,13 @@ public class SimilarityFilterCount extends FilterBase {
                                 break;
                             }
                         }
+
+                        if (func == 1 && !this.filterRow ) {
+                            Tuple2<Boolean, Double> th = Hausdorff.calulateDistance(trajGeo, otherTrajGeo, threshold);
+                            this.filterRow = !th._1;
+                            //this.currentThreshold = BigDecimal.valueOf(th._2);
+                        }
+
                         //System.out.println("points time:" + (System.currentTimeMillis() - time));
                     }
                 }

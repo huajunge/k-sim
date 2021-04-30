@@ -1,0 +1,10 @@
+spark-submit --class com.just.ksim.experiments.query.SimilarityQueryNoMemory --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_1 0.001  hdfs:///experiment/ksim/result/without_memory/sim_001 8 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQueryNoMemory --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_1 0.005  hdfs:///experiment/ksim/result/without_memory/sim_005 8 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQueryNoMemory --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_1 0.01  hdfs:///experiment/ksim/result/without_memory/sim_01 8 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQueryNoMemory --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_1 0.015  hdfs:///experiment/ksim/result/without_memory/sim_015 8 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQueryNoMemory --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_1 0.02  hdfs:///experiment/ksim/result/without_memory/sim_02 8 16
+
