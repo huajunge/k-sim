@@ -22,7 +22,7 @@ object Statistic {
       val pre = new PrecisionModel()
       val rdd = context.makeRDD(1 to 100000)
       // val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\tmp")
-      val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\taxi_log_2008_by_id",10)
+      val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\taxi_log_2008_by_id", 10)
       for (elem <- rawRDD.flatMap(v => {
         val nameFriIndex = v._1.lastIndexOf("/")
         val nameLastIndex = v._1.lastIndexOf(".")
@@ -51,7 +51,7 @@ object Statistic {
         .map(t => {
           try {
             sfc.index2(t.getMultiPoint)._3
-          }catch {
+          } catch {
             case _: Exception => null
             case _ => null
           }

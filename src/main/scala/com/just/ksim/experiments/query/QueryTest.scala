@@ -15,8 +15,8 @@ object QueryTest {
   }
 
   def main(args: Array[String]): Unit = {
-    val tableName = "tdrive_tmp"
-    val tableName2 = "tdrive_pivot_test2"
+    val tableName = "tdrive_p"
+    val tableName2 = "tdrive_p"
     val client = new Client(tableName2)
     val client2 = new Client(tableName)
     val trajectories = client2.limit(200)
@@ -31,7 +31,7 @@ object QueryTest {
     for (elem <- trajectories.asScala) {
       if (ii % interval == 0 && elem.getNumGeometries > 5) {
         val time = System.currentTimeMillis()
-        val r = client.simQuery(elem, threshold)
+        val r = client.simQuery(elem, threshold, 1)
         val timeTmp = System.currentTimeMillis() - time
         timeStatistic.add(timeTmp)
         println(s"${elem.getId}-s,${r.size()},${timeTmp}")
@@ -48,23 +48,15 @@ object QueryTest {
     var i = 0
 
     for (elem <- trajectories.asScala) {
-      //          if (elem.getId.equals("15_1202017525")) {
-      //            val time = System.currentTimeMillis()
-      //            val result = client.knnQuery2(elem, 50)
-      //            for (elem2 <- result.asScala) {
-      //              //println(Frechet.calulateDistance(elem.getMultiPoint,elem2._1.getMultiPoint))
-      //              //println(elem2._2)
-      //            }
-      //            println(s"knn-${elem.getId},${result.size()},${elem.getNumGeometries},${System.currentTimeMillis() - time},${result.peekLast()._2}")
-      //          }
       if (i % interval == 0) {
+        elem.getDPFeature.getIndexes
+        elem.getDPFeature.getMBRs
         val time = System.currentTimeMillis()
-        //val result = client.knnQuery(elem, 250,0.003)
+        val result = client.knnQuery(elem, 50, 0.002, 0)
         val tmpT = System.currentTimeMillis() - time
         timeStatistic.add(tmpT)
         println(s"${elem.getId}-knn,,${elem.getNumGeometries},${tmpT}")
       }
-
       i += 1
     }
     tt = timeStatistic.asScala.sorted

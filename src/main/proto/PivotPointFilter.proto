@@ -11,5 +11,6 @@ message PivotsFilter2 {
     required string traj = 4;
     repeated int32 pivots = 5;
     optional string mbrs = 6;
-    required bool returnSim = 7;
+    optional int32 func = 7;
+    required bool returnSim = 8;
 }

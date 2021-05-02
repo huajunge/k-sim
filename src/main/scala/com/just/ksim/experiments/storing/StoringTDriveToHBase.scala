@@ -22,6 +22,15 @@ object StoringTDriveToHBase {
     val tableName = args(1)
     val countPath = args(2)
     val shards = args(3).toShort
+    val dataVolume = args(4).toInt
+    val endVolume = args(5).toInt
+    var g = 16.toShort
+
+    try {
+      g =args(6).toShort
+    } catch {
+      case i: Exception =>
+    }
     //    val tableName = "tdrive_throughput"
     //    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
     //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
@@ -44,15 +53,27 @@ object StoringTDriveToHBase {
     job.setOutputFormat(classOf[TableOutputFormat])
     job.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
-    val putUtils = new PutUtils(16.toShort)
+    val putUtils = new PutUtils(g)
+    var count = 0L
+    var indexingTime = 0L
     //val shard = 4.toShort
+    var size = 0L
+    var filePath = trajPath + "/" + dataVolume
+    for (i <- dataVolume + 1 to endVolume) {
+      filePath += "," + trajPath + "/" + i
+    }
     val time = System.currentTimeMillis()
-    val tmp = context.textFile(trajPath, 20).map(tra => {
-      val t = tra.split("-")
-      putUtils.getPut(new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shards)
+    val tmp2 = context.textFile(filePath, 100)
+    val tmp = tmp2.zipWithIndex().map(tra => {
+      val t = tra._1.split("-")
+      val tid = tra._2
+      putUtils.getPut(new Trajectory(tid.toString, WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shards)
     })
-    val count = tmp.count()
-    val indexingTime = System.currentTimeMillis() - time
+    count = tmp.count()
+    //size = count
+    indexingTime = System.currentTimeMillis() - time
+    tmp.map(put => (new ImmutableBytesWritable(), put)).saveAsHadoopDataset(job)
+
     val path = new Path(countPath)
     val fs = path.getFileSystem(new Configuration())
     if (!fs.exists(path)) {
@@ -73,7 +94,6 @@ object StoringTDriveToHBase {
       outputStream.close()
     }
     fs.close()
-    tmp.map(put => (new ImmutableBytesWritable(), put)
-    ).saveAsHadoopDataset(job)
+
   }
 }

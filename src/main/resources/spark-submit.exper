@@ -23,6 +23,11 @@ spark-submit --class com.just.ksim.experiments.preprocessing.LorryToSegments --m
 spark-submit --class com.just.ksim.experiments.preprocessing.LorryToSegments --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/data/lorry hdfs:///experiment/ksim/cleaned_data/lorry_dft_q 20 660 6 1000 true 400
 
 
+spark-submit --class com.just.ksim.experiments.preprocessing.SegmentingLorry --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 10G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/trajectories/Lorry_data_2014_3 hdfs:///experiment/ksim/cleaned_data/lorry10 20 660 6 1000 false 400 10
+
+spark-submit --class com.just.ksim.experiments.preprocessing.LorryToSegments --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 10G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/trajectories/Lorry_data_2014_3 hdfs:///experiment/ksim/cleaned_data/lorry10_dft 20 660 6 1000 false 400 10
+
+
 
 //test
 spark-submit --class com.just.ksim.experiments.preprocessing.SegmentingTDrive --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/data/test_tdrive hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 20 660 6 1000 false 400

@@ -1,0 +1,132 @@
+spark-submit --class com.just.ksim.experiments.preprocessing.SegmentingLorry --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 10G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/trajectories/Lorry_data_2014_3 hdfs:///experiment/ksim/cleaned_data/lorry1 20 660 6 1000 false 400 1
+
+spark-submit --class com.just.ksim.experiments.preprocessing.LorryToSegments --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 10G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/trajectories/Lorry_data_2014_3 hdfs:///experiment/ksim/cleaned_data/lorry10_dft 20 660 6 1000 false 400 10
+
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  /experiment/ksim/cleaned_data/lorry10 lorry_10 hdfs:///experiment/ksim/result/datasize/disks_indexing_10 4 1 2
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_10  hdfs:///experiment/ksim/result/datasize/just_indexing_2 1 2
+
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  /experiment/ksim/cleaned_data/lorry10 lorry_10_2 hdfs:///experiment/ksim/result/datasize/disks_indexing_2 8 1 2
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_10_2  hdfs:///experiment/ksim/result/datasize/just_indexing_2 1 2
+
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  /experiment/ksim/cleaned_data/lorry10 lorry_10_4 hdfs:///experiment/ksim/result/datasize/disks_indexing_4 4 1 4
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_10_4  hdfs:///experiment/ksim/result/datasize/just_indexing_4 1 4
+
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  /experiment/ksim/cleaned_data/lorry10 lorry_10_6 hdfs:///experiment/ksim/result/datasize/disks_indexing_6 8 1 6
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_10_6  hdfs:///experiment/ksim/result/datasize/just_indexing_6 1 6
+
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  /experiment/ksim/cleaned_data/lorry10 lorry_10_8 hdfs:///experiment/ksim/result/datasize/disks_indexing_8 8 1 8
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_10_8  hdfs:///experiment/ksim/result/datasize/just_indexing_8 1 8
+
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  /experiment/ksim/cleaned_data/lorry10 lorry_10 hdfs:///experiment/ksim/result/datasize/disks_indexing_10 8 1 10
+
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_10_10  hdfs:///experiment/ksim/result/datasize/just_indexing_10 1 10
+
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_8 0.015  hdfs:///experiment/ksim/result/datasize/8_disks_sim_015 8 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery  k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_8 0.015  hdfs:///experiment/ksim/result/datasize/8_disks_sim_015 8 16
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry_10_8 0.015 hdfs:///experiment/ksim/result/datasize/8_just_sim_015 false 0
+
+spark-submit --class com.just.ksim.experiments.query.KNNQuery k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_8 150  hdfs:///experiment/ksim/result/datasize/8_disks_knn_150 8 0.002 16
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry_10_8 150 hdfs:///experiment/ksim/result/datasize/8_just_knn_150 17 false 0
+
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_10 0.015  hdfs:///experiment/ksim/result/datasize/10_disks_sim_015 8 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery  k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_10 0.015  hdfs:///experiment/ksim/result/datasize/10_disks_sim_015 8 16
+
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry_10_10 0.015 hdfs:///experiment/ksim/result/datasize/10_just_sim_015 false 0
+
+spark-submit --class com.just.ksim.experiments.query.KNNQuery k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_10 150  hdfs:///experiment/ksim/result/datasize/10_disks_knn_150 8 0.002 16
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry_10_10 150 hdfs:///experiment/ksim/result/datasize/10_just_knn_150 17 false 0
+
+
+
+//disks
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10 0.015  hdfs:///experiment/ksim/result/datasize/2_disks_sim_015 4 16
+
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10 150  hdfs:///experiment/ksim/result/datasize/2_disks_knn_150 4 0.002 16
+
+spark-submit --class com.just.ksim.experiments.query.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10 150  hdfs:///experiment/ksim/result/datasize/2_disks_knn_150_count 4 0.002 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_4 0.015  hdfs:///experiment/ksim/result/datasize/4_disks_sim_015 4 16
+
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_4 150  hdfs:///experiment/ksim/result/datasize/4_disks_knn_150 4 0.002 16
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_10_6 0.015  hdfs:///experiment/ksim/result/datasize/6_disks_sim_015 8 16
+
+
+
+//just
+spark-submit --class com.urbancomputing.just.io.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry10 0.015 hdfs:///experiment/ksim/result/datasize/2_just_sim_015 false 0
+
+spark-submit --class com.urbancomputing.just.io.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry_q  just_lorry10 150 hdfs:///experiment/ksim/result/datasize/2_just_knn_150_count 17 false 0
+
+//dita
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 0.015 1 hdfs:///experiment/ksim/result/datasize/2_dita_sim_015 100 2
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 150 1 hdfs:///experiment/ksim/result/datasize/2_dita_knn_150 100 2
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 0.015 1 hdfs:///experiment/ksim/result/datasize/4_dita_sim_015 100 4
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 150 1 hdfs:///experiment/ksim/result/datasize/4_dita_knn_150 100 4
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 0.015 1 hdfs:///experiment/ksim/result/datasize/6_dita_sim_015 100 6
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 150 1 hdfs:///experiment/ksim/result/datasize/6_dita_knn_150 100 6
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 0.015 1 hdfs:///experiment/ksim/result/datasize/8_dita_sim_015 100 8
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 150 1 hdfs:///experiment/ksim/result/datasize/8_dita_knn_150 100 8
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 0.015 1 hdfs:///experiment/ksim/result/datasize/10_dita_sim_015 100 10
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 150 1 hdfs:///experiment/ksim/result/datasize/10_dita_knn_150 100 10
+
+
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 50 1 hdfs:///experiment/ksim/result/dtw/knn_50 100 1 2
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 100 1 hdfs:///experiment/ksim/result/dtw/knn_100 100 1 2
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 150 1 hdfs:///experiment/ksim/result/dtw/knn_150 100 1 2
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 200 1 hdfs:///experiment/ksim/result/dtw/knn_200 100 1 2
+
+spark-submit --class tsinghua.dita.KnnQueryCountApp --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 250 1 hdfs:///experiment/ksim/result/dtw/knn_250 100 1 2
+
+
+//dft
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry10_dft 0.015 0 hdfs:///experiment/ksim/result/datasize/2_dft_sim_015 1 2
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry10_dft 0.015 0 hdfs:///experiment/ksim/result/datasize/4_dft_sim_015 1 4
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry10_dft 0.015 0 hdfs:///experiment/ksim/result/datasize/6_dft_sim_015 1 6
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingCountSolution --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry10_dft 150 0 hdfs:///experiment/ksim/result/datasize/2_dft_knn_150 1 2
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingCountSolution --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry10_dft 150 0 hdfs:///experiment/ksim/result/datasize/4_dft_knn_150 1 4
+
+spark-submit --class edu.utah.cs.trajectory.DualIndexingCountSolution --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar.0  hdfs:///experiment/ksim/cleaned_data/lorry_dft_q hdfs:///experiment/ksim/cleaned_data/lorry10_dft 150 0 hdfs:///experiment/ksim/result/datasize/6_dft_knn_150 1 6
+
+
+hdfs dfs -cat /experiment/ksim/result/datasize/2_disks_knn_150_count
+
+hdfs dfs -cat /experiment/ksim/result/datasize/8_disks_sim_015
+
+
+hdfs dfs -cat /experiment/ksim/result/datasize/8_disks_knn_150
+
+
+hdfs dfs -cat /experiment/ksim/result/datasize/8_just_sim_015
+
+
+hdfs dfs -cat /experiment/ksim/result/datasize/8_just_knn_150
+

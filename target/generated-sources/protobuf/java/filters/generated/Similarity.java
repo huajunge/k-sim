@@ -36,13 +36,23 @@ public final class Similarity {
      */
     double getThreshold();
 
-    // optional bool returnSim = 7;
+    // optional int32 func = 3;
     /**
-     * <code>optional bool returnSim = 7;</code>
+     * <code>optional int32 func = 3;</code>
+     */
+    boolean hasFunc();
+    /**
+     * <code>optional int32 func = 3;</code>
+     */
+    int getFunc();
+
+    // optional bool returnSim = 4;
+    /**
+     * <code>optional bool returnSim = 4;</code>
      */
     boolean hasReturnSim();
     /**
-     * <code>optional bool returnSim = 7;</code>
+     * <code>optional bool returnSim = 4;</code>
      */
     boolean getReturnSim();
   }
@@ -107,8 +117,13 @@ public final class Similarity {
               threshold_ = input.readDouble();
               break;
             }
-            case 56: {
+            case 24: {
               bitField0_ |= 0x00000004;
+              func_ = input.readInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
               returnSim_ = input.readBool();
               break;
             }
@@ -211,17 +226,33 @@ public final class Similarity {
       return threshold_;
     }
 
-    // optional bool returnSim = 7;
-    public static final int RETURNSIM_FIELD_NUMBER = 7;
-    private boolean returnSim_;
+    // optional int32 func = 3;
+    public static final int FUNC_FIELD_NUMBER = 3;
+    private int func_;
     /**
-     * <code>optional bool returnSim = 7;</code>
+     * <code>optional int32 func = 3;</code>
      */
-    public boolean hasReturnSim() {
+    public boolean hasFunc() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional bool returnSim = 7;</code>
+     * <code>optional int32 func = 3;</code>
+     */
+    public int getFunc() {
+      return func_;
+    }
+
+    // optional bool returnSim = 4;
+    public static final int RETURNSIM_FIELD_NUMBER = 4;
+    private boolean returnSim_;
+    /**
+     * <code>optional bool returnSim = 4;</code>
+     */
+    public boolean hasReturnSim() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bool returnSim = 4;</code>
      */
     public boolean getReturnSim() {
       return returnSim_;
@@ -230,6 +261,7 @@ public final class Similarity {
     private void initFields() {
       traj_ = "";
       threshold_ = 0D;
+      func_ = 0;
       returnSim_ = false;
     }
     private byte memoizedIsInitialized = -1;
@@ -255,7 +287,10 @@ public final class Similarity {
         output.writeDouble(2, threshold_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBool(7, returnSim_);
+        output.writeInt32(3, func_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(4, returnSim_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -276,7 +311,11 @@ public final class Similarity {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(7, returnSim_);
+          .computeInt32Size(3, func_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, returnSim_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -310,6 +349,11 @@ public final class Similarity {
       if (hasThreshold()) {
         result = result && (Double.doubleToLongBits(getThreshold())    == Double.doubleToLongBits(other.getThreshold()));
       }
+      result = result && (hasFunc() == other.hasFunc());
+      if (hasFunc()) {
+        result = result && (getFunc()
+            == other.getFunc());
+      }
       result = result && (hasReturnSim() == other.hasReturnSim());
       if (hasReturnSim()) {
         result = result && (getReturnSim()
@@ -336,6 +380,10 @@ public final class Similarity {
         hash = (37 * hash) + THRESHOLD_FIELD_NUMBER;
         hash = (53 * hash) + hashLong(
             Double.doubleToLongBits(getThreshold()));
+      }
+      if (hasFunc()) {
+        hash = (37 * hash) + FUNC_FIELD_NUMBER;
+        hash = (53 * hash) + getFunc();
       }
       if (hasReturnSim()) {
         hash = (37 * hash) + RETURNSIM_FIELD_NUMBER;
@@ -454,8 +502,10 @@ public final class Similarity {
         bitField0_ = (bitField0_ & ~0x00000001);
         threshold_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000002);
-        returnSim_ = false;
+        func_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
+        returnSim_ = false;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -495,6 +545,10 @@ public final class Similarity {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
+        result.func_ = func_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
         result.returnSim_ = returnSim_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -519,6 +573,9 @@ public final class Similarity {
         }
         if (other.hasThreshold()) {
           setThreshold(other.getThreshold());
+        }
+        if (other.hasFunc()) {
+          setFunc(other.getFunc());
         }
         if (other.hasReturnSim()) {
           setReturnSim(other.getReturnSim());
@@ -661,34 +718,67 @@ public final class Similarity {
         return this;
       }
 
-      // optional bool returnSim = 7;
-      private boolean returnSim_ ;
+      // optional int32 func = 3;
+      private int func_ ;
       /**
-       * <code>optional bool returnSim = 7;</code>
+       * <code>optional int32 func = 3;</code>
        */
-      public boolean hasReturnSim() {
+      public boolean hasFunc() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional bool returnSim = 7;</code>
+       * <code>optional int32 func = 3;</code>
+       */
+      public int getFunc() {
+        return func_;
+      }
+      /**
+       * <code>optional int32 func = 3;</code>
+       */
+      public Builder setFunc(int value) {
+        bitField0_ |= 0x00000004;
+        func_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 func = 3;</code>
+       */
+      public Builder clearFunc() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        func_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional bool returnSim = 4;
+      private boolean returnSim_ ;
+      /**
+       * <code>optional bool returnSim = 4;</code>
+       */
+      public boolean hasReturnSim() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bool returnSim = 4;</code>
        */
       public boolean getReturnSim() {
         return returnSim_;
       }
       /**
-       * <code>optional bool returnSim = 7;</code>
+       * <code>optional bool returnSim = 4;</code>
        */
       public Builder setReturnSim(boolean value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         returnSim_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool returnSim = 7;</code>
+       * <code>optional bool returnSim = 4;</code>
        */
       public Builder clearReturnSim() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         returnSim_ = false;
         onChanged();
         return this;
@@ -719,10 +809,10 @@ public final class Similarity {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021Similartity.proto\"F\n\020SimilarityFilter\022" +
-      "\014\n\004traj\030\001 \002(\t\022\021\n\tthreshold\030\002 \001(\001\022\021\n\tretu" +
-      "rnSim\030\007 \001(\010B\'\n\021filters.generatedB\nSimila" +
-      "rityH\001\210\001\001\240\001\001"
+      "\n\021Similartity.proto\"T\n\020SimilarityFilter\022" +
+      "\014\n\004traj\030\001 \002(\t\022\021\n\tthreshold\030\002 \001(\001\022\014\n\004func" +
+      "\030\003 \001(\005\022\021\n\treturnSim\030\004 \001(\010B\'\n\021filters.gen" +
+      "eratedB\nSimilarityH\001\210\001\001\240\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -734,7 +824,7 @@ public final class Similarity {
           internal_static_SimilarityFilter_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_SimilarityFilter_descriptor,
-              new java.lang.String[] { "Traj", "Threshold", "ReturnSim", });
+              new java.lang.String[] { "Traj", "Threshold", "Func", "ReturnSim", });
           return null;
         }
       };

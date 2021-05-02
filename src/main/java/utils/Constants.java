@@ -7,11 +7,11 @@ package utils;
  * @modified by :
  **/
 public class Constants {
+    public static String FEATURE = "fea";
     public static String DEFAULT_CF = "cf";
-    public static String START_POINT = "start_point";
-    public static String PIVOT = "pivot";
-    public static String END_POINT = "end_point";
-    public static String DEFAULT_COL = "v";
+    public static String START_POINT = FEATURE + "start_point";
+    public static String PIVOT = FEATURE + "tmp";
+    public static String END_POINT = FEATURE + "end_point";
     public static String T_ID = "tid";
     public static String GEOM = "geom";
     public static Short DEFALUT_G = 16;

@@ -95,13 +95,23 @@ public final class PivotPointFilter {
     com.google.protobuf.ByteString
         getMbrsBytes();
 
-    // required bool returnSim = 7;
+    // optional int32 func = 7;
     /**
-     * <code>required bool returnSim = 7;</code>
+     * <code>optional int32 func = 7;</code>
+     */
+    boolean hasFunc();
+    /**
+     * <code>optional int32 func = 7;</code>
+     */
+    int getFunc();
+
+    // required bool returnSim = 8;
+    /**
+     * <code>required bool returnSim = 8;</code>
      */
     boolean hasReturnSim();
     /**
-     * <code>required bool returnSim = 7;</code>
+     * <code>required bool returnSim = 8;</code>
      */
     boolean getReturnSim();
   }
@@ -204,6 +214,11 @@ public final class PivotPointFilter {
             }
             case 56: {
               bitField0_ |= 0x00000020;
+              func_ = input.readInt32();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000040;
               returnSim_ = input.readBool();
               break;
             }
@@ -461,17 +476,33 @@ public final class PivotPointFilter {
       }
     }
 
-    // required bool returnSim = 7;
-    public static final int RETURNSIM_FIELD_NUMBER = 7;
-    private boolean returnSim_;
+    // optional int32 func = 7;
+    public static final int FUNC_FIELD_NUMBER = 7;
+    private int func_;
     /**
-     * <code>required bool returnSim = 7;</code>
+     * <code>optional int32 func = 7;</code>
      */
-    public boolean hasReturnSim() {
+    public boolean hasFunc() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>required bool returnSim = 7;</code>
+     * <code>optional int32 func = 7;</code>
+     */
+    public int getFunc() {
+      return func_;
+    }
+
+    // required bool returnSim = 8;
+    public static final int RETURNSIM_FIELD_NUMBER = 8;
+    private boolean returnSim_;
+    /**
+     * <code>required bool returnSim = 8;</code>
+     */
+    public boolean hasReturnSim() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>required bool returnSim = 8;</code>
      */
     public boolean getReturnSim() {
       return returnSim_;
@@ -484,6 +515,7 @@ public final class PivotPointFilter {
       traj_ = "";
       pivots_ = java.util.Collections.emptyList();
       mbrs_ = "";
+      func_ = 0;
       returnSim_ = false;
     }
     private byte memoizedIsInitialized = -1;
@@ -537,7 +569,10 @@ public final class PivotPointFilter {
         output.writeBytes(6, getMbrsBytes());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeBool(7, returnSim_);
+        output.writeInt32(7, func_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBool(8, returnSim_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -579,7 +614,11 @@ public final class PivotPointFilter {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(7, returnSim_);
+          .computeInt32Size(7, func_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(8, returnSim_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -630,6 +669,11 @@ public final class PivotPointFilter {
         result = result && getMbrs()
             .equals(other.getMbrs());
       }
+      result = result && (hasFunc() == other.hasFunc());
+      if (hasFunc()) {
+        result = result && (getFunc()
+            == other.getFunc());
+      }
       result = result && (hasReturnSim() == other.hasReturnSim());
       if (hasReturnSim()) {
         result = result && (getReturnSim()
@@ -672,6 +716,10 @@ public final class PivotPointFilter {
       if (hasMbrs()) {
         hash = (37 * hash) + MBRS_FIELD_NUMBER;
         hash = (53 * hash) + getMbrs().hashCode();
+      }
+      if (hasFunc()) {
+        hash = (37 * hash) + FUNC_FIELD_NUMBER;
+        hash = (53 * hash) + getFunc();
       }
       if (hasReturnSim()) {
         hash = (37 * hash) + RETURNSIM_FIELD_NUMBER;
@@ -798,8 +846,10 @@ public final class PivotPointFilter {
         bitField0_ = (bitField0_ & ~0x00000010);
         mbrs_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
-        returnSim_ = false;
+        func_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
+        returnSim_ = false;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -856,6 +906,10 @@ public final class PivotPointFilter {
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000020;
         }
+        result.func_ = func_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000040;
+        }
         result.returnSim_ = returnSim_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -905,6 +959,9 @@ public final class PivotPointFilter {
           bitField0_ |= 0x00000020;
           mbrs_ = other.mbrs_;
           onChanged();
+        }
+        if (other.hasFunc()) {
+          setFunc(other.getFunc());
         }
         if (other.hasReturnSim()) {
           setReturnSim(other.getReturnSim());
@@ -1351,34 +1408,67 @@ public final class PivotPointFilter {
         return this;
       }
 
-      // required bool returnSim = 7;
-      private boolean returnSim_ ;
+      // optional int32 func = 7;
+      private int func_ ;
       /**
-       * <code>required bool returnSim = 7;</code>
+       * <code>optional int32 func = 7;</code>
        */
-      public boolean hasReturnSim() {
+      public boolean hasFunc() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>required bool returnSim = 7;</code>
+       * <code>optional int32 func = 7;</code>
+       */
+      public int getFunc() {
+        return func_;
+      }
+      /**
+       * <code>optional int32 func = 7;</code>
+       */
+      public Builder setFunc(int value) {
+        bitField0_ |= 0x00000040;
+        func_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 func = 7;</code>
+       */
+      public Builder clearFunc() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        func_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // required bool returnSim = 8;
+      private boolean returnSim_ ;
+      /**
+       * <code>required bool returnSim = 8;</code>
+       */
+      public boolean hasReturnSim() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>required bool returnSim = 8;</code>
        */
       public boolean getReturnSim() {
         return returnSim_;
       }
       /**
-       * <code>required bool returnSim = 7;</code>
+       * <code>required bool returnSim = 8;</code>
        */
       public Builder setReturnSim(boolean value) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         returnSim_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required bool returnSim = 7;</code>
+       * <code>required bool returnSim = 8;</code>
        */
       public Builder clearReturnSim() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         returnSim_ = false;
         onChanged();
         return this;
@@ -1409,12 +1499,12 @@ public final class PivotPointFilter {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026PivotPointFilter.proto\"\201\001\n\rPivotsFilte" +
+      "\n\026PivotPointFilter.proto\"\217\001\n\rPivotsFilte" +
       "r2\022\016\n\006spoint\030\001 \002(\t\022\016\n\006epoint\030\002 \002(\t\022\021\n\tth" +
       "reshold\030\003 \002(\001\022\014\n\004traj\030\004 \002(\t\022\016\n\006pivots\030\005 " +
-      "\003(\005\022\014\n\004mbrs\030\006 \001(\t\022\021\n\treturnSim\030\007 \002(\010B-\n\021" +
-      "filters.generatedB\020PivotPointFilterH\001\210\001\001" +
-      "\240\001\001"
+      "\003(\005\022\014\n\004mbrs\030\006 \001(\t\022\014\n\004func\030\007 \001(\005\022\021\n\tretur" +
+      "nSim\030\010 \002(\010B-\n\021filters.generatedB\020PivotPo" +
+      "intFilterH\001\210\001\001\240\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1426,7 +1516,7 @@ public final class PivotPointFilter {
           internal_static_PivotsFilter2_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_PivotsFilter2_descriptor,
-              new java.lang.String[] { "Spoint", "Epoint", "Threshold", "Traj", "Pivots", "Mbrs", "ReturnSim", });
+              new java.lang.String[] { "Spoint", "Epoint", "Threshold", "Traj", "Pivots", "Mbrs", "Func", "ReturnSim", });
           return null;
         }
       };

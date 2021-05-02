@@ -3,7 +3,7 @@ package com.just.ksim.experiments.preprocessing
 import com.just.ksim.entity.Trajectory
 import com.just.ksim.preprocess.HeuristicFilterAndSegment
 import org.apache.spark.{SparkConf, SparkContext}
-import org.locationtech.jts.geom.{Coordinate, Envelope, MultiPoint, Point, PrecisionModel}
+import org.locationtech.jts.geom._
 
 import java.sql.Timestamp
 import scala.collection.JavaConverters._
@@ -28,6 +28,7 @@ object SegmentingLorry {
     val maxSize = args(5).toInt
     val isQuery = args(6).toBoolean
     val querySize = args(7).toInt
+    val dataVolume = args(8).toInt
     val mbr = new Envelope(-180.0, 180, -90, 90)
 
     //20, 11*60
@@ -60,10 +61,15 @@ object SegmentingLorry {
           v._1
         })).saveAsTextFile(outFilePath)
       } else {
-        rawRDD.map(v => {
-          v._1.setId(v._2.toString)
-          v._1
-        }).saveAsTextFile(outFilePath)
+        var size = 0L
+        for (i <- 1 to dataVolume) {
+          val rdd = rawRDD.map(v => {
+            v._1.setId((v._2 + size).toString)
+            v._1
+          })
+          size = rdd.count()
+          rdd.saveAsTextFile(outFilePath + "/" + i)
+        }
       }
 
       context.stop()
