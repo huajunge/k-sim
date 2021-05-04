@@ -9,6 +9,9 @@ We have implemented the proposed framework in HBase, a popular disk-based NoSQL 
 
 ### 2. Experiments
 
+- Data
+  tdrive and tdrive_q are experimental data (sampled), see in Supplementary Material.zip
+
 - Storing
 
   ```
