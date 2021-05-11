@@ -28,7 +28,7 @@ We have implemented the proposed framework in HBase, a popular disk-based NoSQL 
 
   where,  ./tdrive_q is the path query trajectories; tdrive_table is the table stored with tdrive data; 0.015 is the threshold; hdfs:///sim_015 is the path of query time; 8 is the shards; 16 is the maximum resolution of XZ* index.
 
-  Top-k Similarity Search
+-  Top-k Similarity Search
 
   ```
   spark-submit --class com.just.ksim.experiments.query.KNNQuery disks.jar  ./tdrive_q tdrive_table 150 hdfs:///knn_150 8 0.002 16
