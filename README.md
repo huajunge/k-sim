@@ -18,7 +18,7 @@ We have implemented the proposed framework in HBase, a popular disk-based NoSQL 
   spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 disks.jar  ./tdrive tdrive_table hdfs:///index_time 8 1 1 16
   ```
 
-  where,  ./tdrive is data path; tdrive_table is the table for storing data; hdfs:///index_time is the path to record the indexing time; 8 is the shards; 1  1 is the data size; 16 is the maximum resolution of XZ* index.
+  where,  ./tdrive is data path; tdrive_table is the table for storing data; hdfs:///index_time is the path to record the indexing time; 8 is the shards; 1  1 is the range of data size (e.g., 1 2 means that we will use two copies of the dataset); 16 is the maximum resolution of XZ* index.
 
 - Threshold Similarity Search
 
