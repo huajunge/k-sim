@@ -5,7 +5,7 @@ We have implemented the proposed framework in HBase, a popular disk-based NoSQL 
 ### 1. Setup
 
 - (1) puting the disk-sim.jar to the lib path of HBase.  
-- (2) building this project to get disks.jar (k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar).
+- (2) building this project to get disks.jar (k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar), or using disks.jar in the Supplementary Material.zip.
 
 ### 2. Experiments
 
