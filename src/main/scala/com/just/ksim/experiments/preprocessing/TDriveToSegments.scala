@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 object TDriveToSegments {
   def main(args: Array[String]): Unit = {
     val conf = new SparkConf()
-      //.setMaster("local[*]")
+      .setMaster("local[*]")
       .setAppName("TDriveToSegments")
     val context = new SparkContext(conf)
     //hbaseConf.set(TableOutputFormat.OUTPUT_TABLE, "test_table")
@@ -35,7 +35,7 @@ object TDriveToSegments {
     try {
       val pre = new PrecisionModel()
       // val rawRDD = context.wholeTextFiles("D:\\工作文档\\data\\T-drive\\release\\tmp")
-      val rawRDD = context.wholeTextFiles(filePath, 20)
+      val rawRDD = context.wholeTextFiles(filePath, 100)
       val outPath = outFilePath
       val mbr = new Envelope(-180.0, 180, -90, 90)
 
