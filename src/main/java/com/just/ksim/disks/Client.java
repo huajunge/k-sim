@@ -150,6 +150,32 @@ public class Client {
         return trajectories;
     }
 
+    public List<Trajectory> xz2SimQuery(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
+        filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), disFunc, false));
+        //filter.add(new SimilarityFilter(traj.toText(), threshold));
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.xz2RangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        query(ranges, this.hTable, filter, res -> {
+            String v = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM)));
+            try {
+                Geometry geo = WKTUtils.read(v);
+                String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+                trajectories.add(new Trajectory(id, (MultiPoint) geo));
+            }catch (Exception ignored) {
+
+            }
+
+            //System.out.println());
+        });
+        return trajectories;
+    }
+
     public List<Trajectory> simQueryWithoutMemory(Trajectory traj, double threshold, int disFunc) throws IOException {
         List<Filter> filter = new ArrayList<>(2);
         //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
@@ -201,6 +227,77 @@ public class Client {
         List<Trajectory> trajectories = new ArrayList<>();
         final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
         List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        AtomicInteger integer = new AtomicInteger(0);
+        query(ranges, this.hTable, filter, res -> {
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
+    }
+
+    public int simQueryCountWithoutMemory(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        filter.add(new FirstKeyOnlyFilter()); //filter.add(new FirstKeyOnlyFilter());
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        AtomicInteger integer = new AtomicInteger(0);
+        query(ranges, this.hTable, filter, res -> {
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
+    }
+
+    public int xzSimQueryCount(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        filter.add(new SimilarityFilterCount(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), disFunc, false));
+        //filter.add(new FirstKeyOnlyFilter());
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.xz2RangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        AtomicInteger integer = new AtomicInteger(0);
+        query(ranges, this.hTable, filter, res -> {
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
+    }
+
+    public int xzSimQueryCountWithOutMemory(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        filter.add(new FirstKeyOnlyFilter());
+        //filter.add(new FirstKeyOnlyFilter());
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.xz2RangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        AtomicInteger integer = new AtomicInteger(0);
+        query(ranges, this.hTable, filter, res -> {
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
+    }
+
+    public int xzSimQueryCountWithOutMemory2(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        filter.add(new FirstKeyOnlyFilter());
+        //filter.add(new FirstKeyOnlyFilter());
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.xz2RangesForKnn(traj, threshold, root);
         //List<IndexRange> ranges = sfc.simRange(traj, threshold);
 
         //sfc.simRange(traj, threshold)
@@ -355,6 +452,162 @@ public class Client {
                     break;
                 }
             }
+        }
+        return count.get();
+    }
+
+    public int xz2knnQueryCount(Trajectory traj, int k, Double interval, int disFunc) throws IOException {
+        double threshold;
+        //double interval = 0.002;
+        AtomicInteger currentSize = new AtomicInteger();
+        List<Filter> filter = new ArrayList<>(1);
+        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
+        filter.add(new CalculateSimilarity(traj.toText(), disFunc));
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        MinMaxPriorityQueue<Tuple2<Trajectory, Double>> tmpResult = MinMaxPriorityQueue.orderedBy((Comparator<Tuple2<Trajectory, Double>>) (o1, o2) -> Double.compare(o1._2, o2._2)).maximumSize(k).create();
+        int iter = 0;
+        double c = 1;
+        AtomicInteger count = new AtomicInteger(0);
+        for (; iter <= MAX_ITERTOR; iter++) {
+            threshold = interval * (double) iter;
+            //long time = System.currentTimeMillis();
+            List<IndexRange> ranges = sfc.xz2RangesForKnn(traj, threshold, root);
+            //System.out.println("iter:" + iter + ",threshold:" + threshold + ",ranges time:" + (System.currentTimeMillis() - time) + ",size" + ranges.size());
+            List<Tuple2<Trajectory, Double>> tmpTrajs = new ArrayList<>();
+            // System.out.println(ranges.size());
+            if (currentSize.get() >= k) {
+                double maxThreshold = tmpResult.peekLast()._2;
+                Filter filterThreshold = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), disFunc, true);
+                filter.clear();
+                //filter.add(new CalculateSimilarity(traj.toText()));
+                filter.add(filterThreshold);
+//                List<Filter> filter2 = new ArrayList<>(1);
+//                filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
+//                query(ranges, this.hTable, filter2, res -> {
+//                    count.incrementAndGet();
+//                    //System.out.println());
+//                });
+                //filter.add(new SimilarityFilter(traj.toText(), maxThreshold, true));
+            }
+            List<Filter> filter2 = new ArrayList<>(1);
+            filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
+            query(ranges, this.hTable, filter2, res -> {
+                count.incrementAndGet();
+                //System.out.println());
+            });
+            query(ranges, hTable, filter, res -> {
+//                if (currentSize.get() < k) {
+//                    count.incrementAndGet();
+//                }
+                currentSize.getAndIncrement();
+                //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
+                //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID))));
+                try {
+                    String[] values = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))).split("-");
+                    Geometry geo = WKTUtils.read(values[0]);
+                    String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+                    //System.out.println(id);
+                    if (values.length == 2) {
+                        BigDecimal d = new BigDecimal(values[1]);
+                        tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
+                    }
+                } catch (Exception ignored) {
+
+                }
+
+//                BigDecimal d = new BigDecimal(values[1]);
+//                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
+            });
+
+            if (!tmpTrajs.isEmpty()) {
+                tmpResult.addAll(tmpTrajs);
+            }
+
+            if (currentSize.get() >= k) {
+                double maxThreshold = tmpResult.peekLast()._2;
+                //System.out.println(maxThreshold);
+                if (maxThreshold <= threshold) {
+                    break;
+                }
+            }
+        }
+        return count.get();
+    }
+    public int knnQueryCountWithoutM(Trajectory traj, int k, Double interval, int disFunc) throws IOException {
+        double threshold;
+        //double interval = 0.002;
+        AtomicInteger currentSize = new AtomicInteger();
+        List<Filter> filter = new ArrayList<>(1);
+        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), null));
+        filter.add(new CalculateSimilarity(traj.toText(), disFunc));
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        MinMaxPriorityQueue<Tuple2<Trajectory, Double>> tmpResult = MinMaxPriorityQueue.orderedBy((Comparator<Tuple2<Trajectory, Double>>) (o1, o2) -> Double.compare(o1._2, o2._2)).maximumSize(k).create();
+        int iter = 0;
+        double c = 1;
+        AtomicInteger count = new AtomicInteger(0);
+        for (; iter <= MAX_ITERTOR; iter++) {
+            threshold = interval * (double) iter;
+            //long time = System.currentTimeMillis();
+            List<IndexRange> ranges = sfc.rangesForKnn(traj, threshold, root);
+            //System.out.println("iter:" + iter + ",threshold:" + threshold + ",ranges time:" + (System.currentTimeMillis() - time) + ",size" + ranges.size());
+            List<Tuple2<Trajectory, Double>> tmpTrajs = new ArrayList<>();
+            // System.out.println(ranges.size());
+            if (currentSize.get() >= k) {
+                double maxThreshold = tmpResult.peekLast()._2;
+                Filter filterThreshold = new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), maxThreshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), disFunc, true);
+                filter.clear();
+                //filter.add(new CalculateSimilarity(traj.toText()));
+                filter.add(filterThreshold);
+//                List<Filter> filter2 = new ArrayList<>(1);
+//                filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
+//                query(ranges, this.hTable, filter2, res -> {
+//                    count.incrementAndGet();
+//                    //System.out.println());
+//                });
+                //filter.add(new SimilarityFilter(traj.toText(), maxThreshold, true));
+            }
+
+            query(ranges, hTable, filter, res -> {
+//                if (currentSize.get() < k) {
+//                    count.incrementAndGet();
+//                }
+                currentSize.getAndIncrement();
+                //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))));
+                //System.out.println(Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID))));
+                try {
+                    String[] values = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM))).split("-");
+                    Geometry geo = WKTUtils.read(values[0]);
+                    String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+                    //System.out.println(id);
+                    if (values.length == 2) {
+                        BigDecimal d = new BigDecimal(values[1]);
+                        tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
+                    }
+                } catch (Exception ignored) {
+
+                }
+
+//                BigDecimal d = new BigDecimal(values[1]);
+//                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
+            });
+
+            if (!tmpTrajs.isEmpty()) {
+                tmpResult.addAll(tmpTrajs);
+            }
+
+            if (currentSize.get() >= k) {
+                double maxThreshold = tmpResult.peekLast()._2;
+                //System.out.println(maxThreshold);
+                if (maxThreshold <= threshold) {
+                    break;
+                }
+            }
+            List<Filter> filter2 = new ArrayList<>(1);
+            filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
+            query(ranges, this.hTable, filter2, res -> {
+                count.incrementAndGet();
+                //System.out.println());
+            });
         }
         return count.get();
     }

@@ -20,6 +20,14 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     index2(geometry, lenient)._1
   }
 
+  def indexLength(geometry: Geometry, lenient: Boolean = false): String = {
+    var s = ""
+    for (_ <- 0 to index2(geometry, lenient)._3) {
+      s = s + "1"
+    }
+    s
+  }
+
   def index2(geometry: Geometry, lenient: Boolean = false): (Long, Long, Int) = {
     //geometry.getBoundary
     val mbr = geometry.getEnvelopeInternal
@@ -268,7 +276,7 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     var maximumResolution = minimumResolution.length
     var currXS = minimumResolution.xWidth * 2
     var currYS = minimumResolution.yWidth * 2
-    //优化,有bug
+    //优化
     while ((boundaryEnv.getWidth - currXS) / 2.0 < dis && (boundaryEnv.getHeight - currYS) / 2.0 < dis && maximumResolution < g) {
       maximumResolution += 1
       currXS /= 2.0
@@ -287,6 +295,80 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       } else {
         if (next.neededToCheck(boundaryEnv, dis)) {
           val candidates = next.checkPositionCode(searTraj, dis, spoint, epoint)
+          if (null != candidates) {
+            ranges.addAll(candidates)
+          }
+          if (level < maximumResolution) {
+            //next.getChildren.asScala
+            next.getChildren.asScala.foreach(v => {
+              remaining.add(v)
+            })
+          }
+        }
+      }
+    }
+    if (ranges.size() > 0) {
+      ranges.sort(IndexRange.IndexRangeIsOrdered)
+      var current = ranges.get(0) // note: should always be at least one range
+      val result = ArrayBuffer.empty[IndexRange]
+      var i = 1
+      while (i < ranges.size()) {
+        val range = ranges.get(i)
+        if (range.lower <= current.upper + 1) {
+          current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+        } else {
+          result.append(current)
+          current = range
+        }
+        i += 1
+      }
+      result.append(current)
+      result.asJava
+    } else {
+      ranges
+    }
+  }
+
+  def xz2RangesForKnn(searTraj: Trajectory, dis: Double, root: ElementKNN): java.util.List[IndexRange] = {
+    val ranges = new java.util.ArrayList[IndexRange](100)
+    val boundary1 = searTraj.getMultiPoint.getEnvelopeInternal
+    val boundaryEnv = searTraj.getMultiPoint.getEnvelopeInternal
+
+    boundary1.expandBy(dis)
+    //val buffer = searTraj.buffer(threshold)
+    val remaining = new java.util.ArrayDeque[ElementKNN](200)
+    val minimumResolution = indexSpace2(boundary1, 0L)
+
+    val levelStop = new ElementKNN(-1, -1, -1, -1, -1, -1, pre, 0)
+
+    remaining.add(root.search(root, minimumResolution.xTrue, minimumResolution.yTrue, minimumResolution.length))
+    remaining.add(root.search(root, minimumResolution.xTrue + minimumResolution.xWidth, minimumResolution.yTrue, minimumResolution.length))
+    remaining.add(root.search(root, minimumResolution.xTrue, minimumResolution.yTrue + minimumResolution.yWidth, minimumResolution.length))
+    remaining.add(root.search(root, minimumResolution.xTrue + minimumResolution.xWidth, minimumResolution.yTrue + minimumResolution.yWidth, minimumResolution.length))
+
+    remaining.add(levelStop)
+    var maximumResolution = minimumResolution.length
+    var currXS = minimumResolution.xWidth * 2
+    var currYS = minimumResolution.yWidth * 2
+    //优化
+    while ((boundaryEnv.getWidth - currXS) / 2.0 < dis && (boundaryEnv.getHeight - currYS) / 2.0 < dis && maximumResolution < g) {
+      maximumResolution += 1
+      currXS /= 2.0
+      currYS /= 2.0
+    }
+    //maximumResolution = 16
+    //println(s"${minimumResolution.length},$maximumResolution")
+    val spoint = searTraj.getGeometryN(0)
+    val epoint = searTraj.getGeometryN(searTraj.getNumGeometries - 1)
+    var level = minimumResolution.length
+    while (!remaining.isEmpty) {
+      val next = remaining.poll
+      if (next == levelStop && !remaining.isEmpty && level < maximumResolution) {
+        remaining.add(levelStop)
+        level = level + 1
+      } else {
+        if (next.neededToCheck(boundaryEnv, dis)) {
+          val candidates = next.xz2CheckPositionCode(searTraj, dis, spoint, epoint)
           if (null != candidates) {
             ranges.addAll(candidates)
           }

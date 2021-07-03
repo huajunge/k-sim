@@ -75,6 +75,27 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     children
   }
 
+  def xz2CheckPositionCode(traj: Trajectory, threshold: Double, spoint: Geometry, epoint: Geometry): util.List[IndexRange] = {
+    val results = new java.util.ArrayList[Long](8)
+    if ((addedPositionCodes == 0x1FF && level < g) || (addedPositionCodes == 0x3FF && level == g)) {
+      return new java.util.ArrayList[IndexRange]
+    }
+    for (i <- 1 to 9) {
+      results.add(i)
+    }
+    addedPositionCodes = 0x1FF
+    if (level == g) {
+      results.add(10)
+      addedPositionCodes = 0x3FF
+    }
+
+    results.asScala.map(v => {
+      //println(s"$level,$v,$elementCode")
+      IndexRange(v + elementCode - 10L, v + elementCode - 10L, contained = false)
+    }
+    ).asJava
+  }
+
   def checkPositionCode(traj: Trajectory, threshold: Double, spoint: Geometry, epoint: Geometry): util.List[IndexRange] = {
 
     if ((addedPositionCodes == 0x1FF && level < g) || (addedPositionCodes == 0x3FF && level == g)) {
