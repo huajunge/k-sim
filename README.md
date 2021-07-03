@@ -1,6 +1,28 @@
-# DiskS
+
+
+
+
+**Outline**
+
+[TOC]
+
+# TraSS
 
 We have implemented the proposed framework in HBase, a popular disk-based NoSQL database. We have published the framework, experimental code and the results in https://github.com/huajunge/k-sim.git
+
+# Appendix of TraSS
+
+***Pleas see appendix.pdf***
+
+![image-20210703151530511](images/image-20210703151530511.png)
+
+![image-20210703151622144](images/image-20210703151622144.png)
+
+![image-20210703151635261](images/image-20210703151635261.png)
+
+
+
+# Experiments
 
 ### 1. Setup
 
