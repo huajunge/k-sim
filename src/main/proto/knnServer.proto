@@ -1,0 +1,44 @@
+option java_package = "coprocessor.generated";
+option java_outer_classname = "KNNServer";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+
+message KnnRequest {
+  required int32 k = 1;
+  required string traj = 2;
+  repeated Range ranges = 3;
+  repeated int32 pivots = 4;
+  optional string mbrs = 5;
+  optional int32 func = 6;
+  required double threshold = 7;
+}
+
+message Range {
+  required int64 start = 1;
+  required int64 end = 2;
+}
+
+message Traj {
+  required string trajId = 1;
+  required string trajGeom = 2;
+  required float sim = 3;
+}
+
+message KnnResponse {
+  repeated Traj trajs = 1;
+}
+
+service KnnService {
+  rpc getTopK(KnnRequest)
+      returns (KnnResponse);
+}
+
+
+/*
+public interface RowCountProtocol extends CoprocessorProtocol {
+  long getRowCount() throws IOException;
+  long getRowCount(Filter filter) throws IOException;
+  long getKeyValueCount() throws IOException;
+}
+*/

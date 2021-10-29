@@ -1,6 +1,6 @@
 dft
 //threshold
-spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.001 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_001 1
+spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.001 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_001 1 1
 
 spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 0.005 0 hdfs:///experiment/ksim/result/dft/sim/tdrive_005 1
 
@@ -25,7 +25,7 @@ spark-submit --class edu.utah.cs.trajectory.DualIndexingThresholdSolution --mast
 //KNN
 //KNN
 //KNN
-spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 50 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_50 1
+spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/dft_tdrive_all 50 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_50 1 1
 
 spark-submit --class edu.utah.cs.trajectory.DualIndexingSolution --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 traj-sim-assembly-1.0.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_dft_q hdfs:///experiment/ksim/cleaned_data/tdrive_dft 100 0 hdfs:///experiment/ksim/result/dft/knn/tdrive_100 1
 

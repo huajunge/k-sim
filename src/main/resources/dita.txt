@@ -1,7 +1,7 @@
 dita
 
 //threshold
-spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_001
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_001 100 1
 
 spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.005 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_005
 
@@ -49,7 +49,7 @@ spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mod
 //KNN
 //KNN
 //KNN
-spark-submit --class tsinghua.dita.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 50 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_001
+spark-submit --class tsinghua.dita.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive_all 50 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_001 100 1
 
 spark-submit --class tsinghua.dita.KNNCountQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 100 1 hdfs:///experiment/ksim/result/dita/knn/tdrive_005
 

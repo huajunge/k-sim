@@ -22,20 +22,23 @@ public class EndpointExample {
 
   public static void main(String[] args) throws IOException {
     Configuration conf = HBaseConfiguration.create();
-    TableName tableName = TableName.valueOf("testtable");
+    String name = "testtable21";
+    TableName tableName = TableName.valueOf(name);
     Connection connection = ConnectionFactory.createConnection(conf);
     // ^^ EndpointExample
     HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    helper.createTable("testtable", "colfam1", "colfam2");
-    helper.put("testtable",
+    if(helper.existsTable(name)) {
+      helper.dropTable(name);
+    }
+    helper.createTable(name, "colfam1", "colfam2");
+    helper.put(name,
       new String[]{"row1", "row2", "row3", "row4", "row5"},
       new String[]{"colfam1", "colfam2"},
       new String[]{"qual1", "qual1"},
       new long[]{1, 2},
       new String[]{"val1", "val2"});
     System.out.println("Before endpoint call...");
-    helper.dump("testtable",
+    helper.dump(name,
       new String[]{"row1", "row2", "row3", "row4", "row5"},
       null, null);
     Admin admin = connection.getAdmin();
