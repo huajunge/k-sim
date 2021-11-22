@@ -47,9 +47,10 @@ public class CalculateSimilarity extends FilterBase {
         //System.out.println(Bytes.toString(v.getQualifierArray()));
         //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
         //v.getv
-        if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
+        if (Bytes.toString(v.getQualifierArray(), v.getQualifierOffset(), v.getQualifierLength()).equals(GEOM)) {
+            //Bytes.toString(v.getQualifierArray(), v.getQualifierOffset(), v.getQualifierLength());
             //System.out.println("-------");
-            Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+            Geometry geom = WKTUtils.read(Bytes.toString(v.getValueArray(), v.getValueOffset(), v.getValueLength()));
             if (null != geom) {
                 Geometry trajGeo = WKTUtils.read(this.traj);
                 assert trajGeo != null;
@@ -60,8 +61,8 @@ public class CalculateSimilarity extends FilterBase {
                     threshold = BigDecimal.valueOf(Hausdorff.calulateDistance(trajGeo, geom));
                 }
                 //BigDecimal d1 = new BigDecimal(threshold);
-                return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + threshold.toString()));
+                return CellUtil.createCell(CellUtil.cloneRow(v), CellUtil.cloneFamily(v), CellUtil.cloneQualifier(v),
+                        System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(CellUtil.cloneValue(v)) + "-" + threshold.toString()));
             }
         }
         return v;

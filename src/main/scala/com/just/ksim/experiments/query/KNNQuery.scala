@@ -28,7 +28,7 @@ object KNNQuery {
     val g = args(6).toShort
     val client = new Client(g, trajPath, shard)
     val conf = new SparkConf()
-      //.setMaster("local[*]")
+      .setMaster("local[*]")
       .setAppName("SimilarityQuery")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     var local = false
@@ -65,10 +65,15 @@ object KNNQuery {
         elem.getDPFeature.getIndexes
         elem.getDPFeature.getMBRs
         val time = System.currentTimeMillis()
-        client.knnQuery(elem, k, interval, func)
+        val result = client.knnQuery(elem, k, interval, func)
         val tmp = System.currentTimeMillis() - time
         timeStatistic.add(System.currentTimeMillis() - time)
-        println(s"${elem.getId}-s,$tmp")
+//        val ite = result.iterator()
+//        while(ite.hasNext) {
+//         val t = ite.next()
+//          println(s"${t._1.getId},${t._2}")
+//        }
+        println(s"${elem.getId}-s,$tmp,${result.peekLast()._2}")
         Thread.sleep(200)
       }
     }

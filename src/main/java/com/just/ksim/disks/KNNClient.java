@@ -1,12 +1,6 @@
 package com.just.ksim.disks;
 
-import com.google.common.collect.MinMaxPriorityQueue;
 import com.just.ksim.entity.Trajectory;
-import com.just.ksim.filter.CalculateSimilarity;
-import com.just.ksim.filter.PivotsFilter;
-import com.just.ksim.filter.SimilarityFilterCount;
-import com.just.ksim.filter.WithoutMemoryFilter;
-import com.just.ksim.index.ElementKNN;
 import com.just.ksim.index.XZStarSFC;
 import com.just.ksim.utils.ByteArrays;
 import org.apache.hadoop.conf.Configuration;
@@ -15,24 +9,9 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.filter.Filter;
-import org.apache.hadoop.hbase.filter.FilterList;
-import org.apache.hadoop.hbase.filter.FirstKeyOnlyFilter;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.MultiPoint;
-import org.locationtech.jts.geom.PrecisionModel;
-import org.locationtech.sfcurve.IndexRange;
-import scala.Tuple2;
-import utils.WKTUtils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static utils.Constants.*;
 
@@ -48,7 +27,7 @@ public class KNNClient {
     private int beta = 1;
     private XZStarSFC sfc;
     private Admin admin;
-    private HTable hTable;
+    private Table hTable;
     private String tableName;
     private static int MAX_ITERTOR = 100;
     private Connection connection;
@@ -72,7 +51,7 @@ public class KNNClient {
         if (!admin.tableExists(table.getTableName())) {
             create();
         }
-        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        this.hTable = connection.getTable(TableName.valueOf(tableName));
         this.g = precise;
         this.sfc = XZStarSFC.apply(g, beta);
     }
@@ -86,7 +65,7 @@ public class KNNClient {
         if (!admin.tableExists(table.getTableName())) {
             create();
         }
-        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        this.hTable = connection.getTable(TableName.valueOf(tableName));
         this.g = precise;
         this.sfc = XZStarSFC.apply(g, beta);
     }
@@ -104,6 +83,7 @@ public class KNNClient {
     public void knnQuery() {
 
     }
+
     public void insert(Trajectory traj) throws IOException {
         hTable.put(getPut(traj));
     }

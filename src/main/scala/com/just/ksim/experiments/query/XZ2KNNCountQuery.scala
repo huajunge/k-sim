@@ -68,7 +68,7 @@ object XZ2KNNCountQuery {
         elem.getDPFeature.getIndexes
         elem.getDPFeature.getMBRs
         val time = System.currentTimeMillis()
-        val size = client.knnQueryCountWithoutM(elem, k, interval, func)
+        val size = client.xz2knnQueryCount(elem, k, interval, func)
         val tmp = System.currentTimeMillis() - time
         timeStatistic.add(System.currentTimeMillis() - time)
         count.add(size)

@@ -12,7 +12,7 @@ import java.util
 import scala.collection.JavaConverters._
 
 
-object XZ2SimilarityQuery {
+object QuadSimilarityQuery {
   private def getTrajectory(tra: String): Trajectory = {
     val t = tra.split("-")
     new Trajectory(t(0), WKTUtils.read(t(1)).asInstanceOf[MultiPoint])
@@ -68,7 +68,7 @@ object XZ2SimilarityQuery {
         elem.getDPFeature.getIndexes
         elem.getDPFeature.getMBRs
         val time = System.currentTimeMillis()
-        client.xz2SimQuery(elem, threshold, func)
+        client.quadSimQuery(elem, threshold, func)
         val tmp = System.currentTimeMillis() - time
         timeStatistic.add(tmp)
         //val size = client.xzSimQueryCountWithOutMemory(elem, threshold, func)

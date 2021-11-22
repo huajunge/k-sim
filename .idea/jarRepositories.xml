@@ -32,6 +32,11 @@
       <option name="url" value="http://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="bintray" />
+      <option name="name" value="Bintray Repository" />
+      <option name="url" value="https://repos.spark-packages.org" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="libs-releases" />
       <option name="name" value="libs-releases" />
       <option name="url" value="http://artifactory.jd.com/libs-releases-local" />

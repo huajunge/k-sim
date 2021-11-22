@@ -2,6 +2,7 @@ package com.just.ksim.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterBase;
@@ -63,15 +64,15 @@ public class CountFilter extends FilterBase {
     @Override
     public ReturnCode filterKeyValue(Cell v) throws IOException {
         if (!this.checkedAllPoint && !this.filterRow) {
-            if (Bytes.toString(v.getQualifier()).equals(START_POINT)) {
-                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+            if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(START_POINT)) {
+                Geometry geom = WKTUtils.read(Bytes.toString(CellUtil.cloneValue(v)));
                 if (null != geom) {
                     if (geom.distance(this.spointGeo) > this.threshold) {
                         this.filterRow = true;
                     }
                 }
-            } else if (Bytes.toString(v.getQualifier()).equals(END_POINT)) {
-                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+            } else if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(END_POINT)) {
+                Geometry geom = WKTUtils.read(Bytes.toString(CellUtil.cloneValue(v)));
                 if (null != geom) {
                     if (geom.distance(this.epointGeo) > this.threshold) {
                         this.filterRow = true;

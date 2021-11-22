@@ -18,7 +18,8 @@
         <scalalogging.version>3.8.0</scalalogging.version>
         <specs2.version>4.3.2</specs2.version>
         <junit.version>4.12</junit.version>
-        <hbase.version>1.4.9</hbase.version>
+<!--        <hbase.version>1.4.9</hbase.version>-->
+        <hbase.version>2.2.3</hbase.version>
         <grpc.version>1.6.1</grpc.version>
         <protobuf.version>2.5.0</protobuf.version>
         <jts.version>1.16.1</jts.version>
@@ -49,7 +50,37 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
             <version>${hbase.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </exclusion>
+            </exclusions>
 <!--            <scope>provided</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <version>${hbase.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </exclusion>
+            </exclusions>
+<!--            <scope>provided</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-mapreduce</artifactId>
+            <version>${hbase.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </exclusion>
+            </exclusions>
+<!--                        <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -57,12 +88,7 @@
             <version>2.3.3</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-server</artifactId>
-            <version>${hbase.version}</version>
-<!--            <scope>provided</scope>-->
-        </dependency>
+
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
@@ -263,6 +289,11 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>bintray</id>
+            <name>Bintray Repository</name>
+            <url>https://repos.spark-packages.org</url>
         </repository>
     </repositories>
 </project>

@@ -15,10 +15,7 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.filter.Filter;
-import org.apache.hadoop.hbase.filter.FilterList;
-import org.apache.hadoop.hbase.filter.FirstKeyOnlyFilter;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
+import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPoint;
@@ -30,6 +27,7 @@ import utils.WKTUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,7 +46,7 @@ public class Client {
     private int beta = 1;
     private XZStarSFC sfc;
     private Admin admin;
-    private HTable hTable;
+    private Table hTable;
     private String tableName;
     private static int MAX_ITERTOR = 100;
     private Connection connection;
@@ -72,7 +70,9 @@ public class Client {
         if (!admin.tableExists(table.getTableName())) {
             create();
         }
-        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        //TableBuilderBase base = ;
+        this.hTable = connection.getTable(TableName.valueOf(tableName));
+        //this.hTable = new HTable(TableName.valueOf(tableName), connection);
         this.g = precise;
         this.sfc = XZStarSFC.apply(g, beta);
     }
@@ -86,7 +86,8 @@ public class Client {
         if (!admin.tableExists(table.getTableName())) {
             create();
         }
-        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        this.hTable = connection.getTable(TableName.valueOf(tableName));
+        //this.hTable = new HTable(TableName.valueOf(tableName), connection);
         this.g = precise;
         this.sfc = XZStarSFC.apply(g, beta);
     }
@@ -124,6 +125,25 @@ public class Client {
         return simQuery(traj, threshold, 0);
     }
 
+    public int  rangeQuery(double lat1, double lng1, double lat2, double lng2) throws IOException {
+        List<IndexRange> ranges = sfc.ranges(lat1, lng1, lat2, lng2);
+        List<Trajectory> trajectories = new ArrayList<>();
+        AtomicInteger integer=new AtomicInteger(0);
+        query(ranges, this.hTable, Collections.singletonList(new FirstKeyOnlyFilter()), res -> {
+//            String v = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM)));
+//            try {
+//                Geometry geo = WKTUtils.read(v);
+//                String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+//                trajectories.add(new Trajectory(id, (MultiPoint) geo));
+//            } catch (Exception ignored) {
+//
+//            }
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
+    }
+
     public List<Trajectory> simQuery(Trajectory traj, double threshold, int disFunc) throws IOException {
         List<Filter> filter = new ArrayList<>(2);
         //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
@@ -141,7 +161,7 @@ public class Client {
                 Geometry geo = WKTUtils.read(v);
                 String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
                 trajectories.add(new Trajectory(id, (MultiPoint) geo));
-            }catch (Exception ignored) {
+            } catch (Exception ignored) {
 
             }
 
@@ -167,10 +187,35 @@ public class Client {
                 Geometry geo = WKTUtils.read(v);
                 String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
                 trajectories.add(new Trajectory(id, (MultiPoint) geo));
-            }catch (Exception ignored) {
+            } catch (Exception ignored) {
 
             }
 
+            //System.out.println());
+        });
+        return trajectories;
+    }
+
+    public List<Trajectory> quadSimQuery(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
+        filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), disFunc, false));
+        //filter.add(new SimilarityFilter(traj.toText(), threshold));
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.quadRangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        query(ranges, this.hTable, filter, res -> {
+            String v = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM)));
+            try {
+                Geometry geo = WKTUtils.read(v);
+                String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+                trajectories.add(new Trajectory(id, (MultiPoint) geo));
+            } catch (Exception ignored) {
+
+            }
             //System.out.println());
         });
         return trajectories;
@@ -193,7 +238,7 @@ public class Client {
                 Geometry geo = WKTUtils.read(v);
                 String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
                 trajectories.add(new Trajectory(id, (MultiPoint) geo));
-            }catch (Exception ignored) {
+            } catch (Exception ignored) {
 
             }
 
@@ -319,6 +364,7 @@ public class Client {
 
     public MinMaxPriorityQueue<Tuple2<Trajectory, Double>> knnQuery(Trajectory traj, int k, Double interval, int disFunc) throws IOException {
         double threshold;
+        double currentThreshold = Double.MAX_VALUE;
         //double interval = 0.002;
         AtomicInteger currentSize = new AtomicInteger();
         List<Filter> filter = new ArrayList<>(1);
@@ -363,6 +409,36 @@ public class Client {
 //                BigDecimal d = new BigDecimal(values[1]);
 //                tmpTrajs.add(new Tuple2<>(new Trajectory(id, (MultiPoint) geo), d.doubleValue()));
             });
+//            if(!ranges.isEmpty()) {
+//                final KNNServer.KnnRequest request = KNNServer.KnnRequest.newBuilder()
+//                        .setFunc(disFunc)
+//                        .setK(k)
+//                        .setThreshold(currentThreshold)
+//                        .setMbrs(traj.getDPFeature().getMBRs().toText())
+//                        .addAllPivots(traj.getDPFeature().getIndexes())
+//                        .setTraj(traj.toText())
+//                        .addAllRanges(ranges.stream().map(v -> KNNServer.Range.newBuilder().setStart(v.lower()).setEnd(v.upper() + 1L).build()).collect(Collectors.toList()))
+//                        .build();
+//                Map<byte[], KNNServer.KnnResponse> result = null;
+//                try {
+//                    result = hTable.coprocessorService(KNNServer.KnnService.class, null, null, instance -> {
+//                        BlockingRpcCallback<KNNServer.KnnResponse> rpcCallback =
+//                                new BlockingRpcCallback<>();
+//                        instance.getTopK(null, request, rpcCallback);
+//                        return rpcCallback.get();
+//                    });
+//                } catch (Throwable e) {
+//                    e.printStackTrace();
+//                }
+//                for (KNNServer.KnnResponse value : result.values()) {
+//                    for (KNNServer.Traj traj1 : value.getTrajsList()) {
+//                        Geometry geo = WKTUtils.read(traj1.getTrajGeom());
+//                        tmpResult.add(new Tuple2<>(new Trajectory("", (MultiPoint) geo), (double) traj1.getSim()));
+//                        currentSize.getAndIncrement();
+//                    }
+//                }
+//            }
+
 
             if (!tmpTrajs.isEmpty()) {
                 tmpResult.addAll(tmpTrajs);
@@ -370,6 +446,7 @@ public class Client {
 
             if (currentSize.get() >= k) {
                 double maxThreshold = tmpResult.peekLast()._2;
+                currentThreshold = maxThreshold;
                 //System.out.println(maxThreshold);
                 if (maxThreshold <= threshold) {
                     break;
@@ -489,12 +566,12 @@ public class Client {
 //                });
                 //filter.add(new SimilarityFilter(traj.toText(), maxThreshold, true));
             }
-            List<Filter> filter2 = new ArrayList<>(1);
-            filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
-            query(ranges, this.hTable, filter2, res -> {
-                count.incrementAndGet();
-                //System.out.println());
-            });
+//            List<Filter> filter2 = new ArrayList<>(1);
+//            filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
+//            query(ranges, this.hTable, filter2, res -> {
+//                count.incrementAndGet();
+//                //System.out.println());
+//            });
             query(ranges, hTable, filter, res -> {
 //                if (currentSize.get() < k) {
 //                    count.incrementAndGet();
@@ -533,6 +610,7 @@ public class Client {
         }
         return count.get();
     }
+
     public int knnQueryCountWithoutM(Trajectory traj, int k, Double interval, int disFunc) throws IOException {
         double threshold;
         //double interval = 0.002;
@@ -616,7 +694,7 @@ public class Client {
         void process(Result result);
     }
 
-    public void query(List<IndexRange> ranges, HTable table, List<Filter> filter, ResultProcess process) throws IOException {
+    public void query(List<IndexRange> ranges, Table table, List<Filter> filter, ResultProcess process) throws IOException {
         if (ranges.isEmpty()) {
             return;
         }
@@ -654,7 +732,7 @@ public class Client {
             e.printStackTrace();
         }
         //assert resultScanner != null;
-        if (null != resultScanner ) {
+        if (null != resultScanner) {
             for (Result res : resultScanner) {
                 process.process(res);
             }
