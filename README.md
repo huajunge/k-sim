@@ -26,9 +26,10 @@ We have implemented the proposed framework in HBase, a popular key-value data st
 
 ### 1. Setup
 
-- (1) [Supplementary Material](./SupplementaryMaterial) gives  the resource of TraSS and sample data for testing TraSS;
+- (1) [SupplementaryMaterial](./SupplementaryMaterial) gives  the resource of TraSS and sample data for testing TraSS;
 - (2) Putting the trass.jar to the lib path of HBase.
-- (3) building this project to get disks.jar (k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar), or using disks.jar in the [Supplementary Material](./SupplementaryMaterial).
+- (3) building this project to get disks.jar (k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar), or using disks.jar in the [SupplementaryMaterial](./SupplementaryMaterial).
+
 ### 2. Storing and Querying
 
 - Storing
