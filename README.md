@@ -26,15 +26,11 @@ We have implemented the proposed framework in HBase, a popular key-value data st
 
 ### 1. Setup
 
-
-- (1) [Supplementary Material](./images) gives  the resource of TraSS and sample data for testing TraSS;
+- (1) [SupplementaryMaterial](./SupplementaryMaterial) gives  the resource of TraSS and sample data for testing TraSS;
 - (2) Putting the trass.jar to the lib path of HBase.
-- (3) building this project to get disks.jar (k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar), or using disks.jar in [Supplementary Material](./Supplementary Material).
+- (3) building this project to get disks.jar (k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar), or using disks.jar in the [SupplementaryMaterial](./SupplementaryMaterial).
 
 ### 2. Storing and Querying
-
-- Data
-  tdrive and tdrive_q are experimental data (sampled), see in Supplementary Material.zip
 
 - Storing
 
@@ -42,7 +38,7 @@ We have implemented the proposed framework in HBase, a popular key-value data st
   spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 trass.jar  ./tdrive tdrive_table hdfs:///index_time 8 1 1 16
   ```
 
-  where,  ./tdrive is data path; tdrive_table is the table for storing data; hdfs:///index_time is the path to record the indexing time; 8 is the shards; 1  1 is the range of data size (e.g., 1 2 means that we will use two copies of the dataset); 16 is the maximum resolution of XZ* index.
+  where,  ./tdrive is data path; tdrive_table is the table for storing data; hdfs:///index_time is the path to record the indexing time; 8 is the shards; 1  1 is the data size; 16 is the maximum resolution of XZ* index.
 
 - Threshold Similarity Search
 
