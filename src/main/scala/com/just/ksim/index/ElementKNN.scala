@@ -1,6 +1,7 @@
 package com.just.ksim.index
 
 import com.just.ksim.entity.Trajectory
+import com.just.ksim.index.XZStarSFC.QueryWindow
 import org.locationtech.jts.geom._
 import org.locationtech.sfcurve.IndexRange
 
@@ -26,11 +27,81 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
   //    level
   //  }
 
+  def insertion(window: QueryWindow): Boolean = {
+    window.xmax >= xmin && window.ymax >= ymin && window.xmin <= xmax + xLength && window.ymin <= ymax + yLength
+  }
+
+  def insertion(window: QueryWindow, x1: Double, y1: Double, x2: Double, y2: Double): Boolean = {
+    window.xmax >= x1 && window.ymax >= y1 && window.xmin <= x2 && window.ymin <= y2
+  }
+
+  def isContained(window: QueryWindow): Boolean = {
+    window.xmin <= xmin && window.ymin <= ymin && window.xmax >= xmax + xLength && window.ymax >= ymax + yLength
+  }
+
+  def insertCodes(window: QueryWindow): util.List[IndexRange] = {
+    var pos = 0
+    val xeMax = xmax + xLength
+    val yeMax = ymax + yLength
+    val xCenter = xmax
+    val yCenter = ymax
+
+    if (insertion(window, xmin, ymin, xCenter, yCenter)) {
+      pos |= 1
+    }
+    if (insertion(window, xCenter, ymin, xeMax, yCenter)) {
+      pos |= 2
+    }
+    if (insertion(window, xmin, yCenter, xCenter, yeMax)) {
+      pos |= 4
+    }
+    if (insertion(window, xCenter, yCenter, xeMax, yeMax)) {
+      pos |= 8
+    }
+    val results = new java.util.ArrayList[Long](8)
+
+    var pSize = 9L
+    if (level < g) {
+      pSize = 8L
+    }
+    for (i <- 0L to pSize) {
+      if ((positionIndex(i.toInt) & pos) != 0) {
+        results.add(i + 1L)
+      }
+    }
+
+    results.asScala.map(v => {
+      //println(s"$level,$v,$elementCode")
+      IndexRange(v + elementCode - 10L, v + elementCode - 10L, contained = false)
+    }
+    ).asJava
+  }
+
   def neededToCheck(traj: Envelope, threshold: Double): Boolean = {
     if (checked) {
       return checked
     }
     val enlElement = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
+    enlElement.expandBy(threshold)
+    checked = enlElement.contains(traj)
+    checked
+  }
+
+  def neededToCheckXZ(traj: Envelope, threshold: Double): Boolean = {
+    if (checked) {
+      return checked
+    }
+    val enlElement = new Envelope(xmin, xmax + xLength, ymin, ymax + yLength)
+    enlElement.expandBy(threshold)
+    checked = enlElement.contains(traj)
+    checked
+  }
+
+  def neededToCheckQuad(traj: Envelope, threshold: Double): Boolean = {
+    if (checked) {
+      return checked
+    }
+    val enlElement = new Envelope(xmin, xmax, ymin, ymax)
     enlElement.expandBy(threshold)
     checked = enlElement.contains(traj)
     checked
@@ -44,6 +115,17 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       children.add(new ElementKNN(xCenter, ymin, xmax, yCenter, level + 1, g, pre, elementCode + 9L + 1L * IS(level + 1)))
       children.add(new ElementKNN(xmin, yCenter, xCenter, ymax, level + 1, g, pre, elementCode + 9L + 2L * IS(level + 1)))
       children.add(new ElementKNN(xCenter, yCenter, xmax, ymax, level + 1, g, pre, elementCode + 9L + 3L * IS(level + 1)))
+    }
+  }
+
+  def split1(): Unit = {
+    if (children.isEmpty) {
+      val xCenter = (xmax + xmin) / 2.0
+      val yCenter = (ymax + ymin) / 2.0
+      children.add(new ElementKNN(xmin, ymin, xCenter, yCenter, level + 1, g, pre, elementCode + 1L))
+      children.add(new ElementKNN(xCenter, ymin, xmax, yCenter, level + 1, g, pre, elementCode + 1L + +1L * (math.pow(4, g - level).toLong - 1L) / 3L))
+      children.add(new ElementKNN(xmin, yCenter, xCenter, ymax, level + 1, g, pre, elementCode + 1L + +2L * (math.pow(4, g - level).toLong - 1L) / 3L))
+      children.add(new ElementKNN(xCenter, yCenter, xmax, ymax, level + 1, g, pre, elementCode + 1L + +3L * (math.pow(4, g - level).toLong - 1L) / 3L))
     }
   }
 
@@ -74,7 +156,12 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     }
     children
   }
-
+  def getChildrenQuadTree: util.ArrayList[ElementKNN] = {
+    if (children.isEmpty) {
+      split1()
+    }
+    children
+  }
   def xz2CheckPositionCode(traj: Trajectory, threshold: Double, spoint: Geometry, epoint: Geometry): util.List[IndexRange] = {
     val results = new java.util.ArrayList[Long](8)
     if ((addedPositionCodes == 0x1FF && level < g) || (addedPositionCodes == 0x3FF && level == g)) {

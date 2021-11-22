@@ -13,7 +13,7 @@ spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master ya
 spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q tdrive_pivot 0.02 hdfs:///experiment/ksim/result/disks/pivot/0005/sim020 4
 
 
-spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q tdrive_pivot 50 hdfs:///experiment/ksim/result/disks/pivot/0005/knn50 4 0.004
+spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q tdrive_pivot 50 hdfs:///experiment/ksim/result/disks/pivot/0005/knn50 4 0.004 1 1
 
 spark-submit --class com.just.ksim.experiments.query.KNNQuery --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tdrive_q tdrive_pivot 100 hdfs:///experiment/ksim/result/disks/pivot/0005/knn100 4 0.004
 

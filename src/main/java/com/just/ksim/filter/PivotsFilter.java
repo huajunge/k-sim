@@ -91,27 +91,28 @@ public class PivotsFilter extends FilterBase {
 
     @Override
     public ReturnCode filterKeyValue(Cell v) throws IOException {
+        //CellUtil.cloneQualifier(v)
         if (!this.filterRow) {
-            if (Bytes.toString(v.getQualifier()).equals(START_POINT) && func == 0) {
+            if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(START_POINT) && func == 0) {
                 //System.out.println("1");
-                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+                Geometry geom = WKTUtils.read(Bytes.toString(CellUtil.cloneValue(v)));
                 if (null != geom) {
                     if (geom.distance(this.spointGeo) > this.threshold) {
                         this.filterRow = true;
                     }
                 }
-            } else if (Bytes.toString(v.getQualifier()).equals(END_POINT) && func == 0) {
+            } else if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(END_POINT) && func == 0) {
                 //System.out.println("2");
-                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+                Geometry geom = WKTUtils.read(Bytes.toString(CellUtil.cloneValue(v)));
                 if (null != geom) {
                     if (geom.distance(this.epointGeo) > this.threshold) {
                         this.filterRow = true;
                     }
                 }
-            } else if (Bytes.toString(v.getQualifier()).equals(PIVOT)) {
+            } else if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(PIVOT)) {
                 //System.out.println("3");
                 long time = System.currentTimeMillis();
-                String[] p = Bytes.toString(v.getValue()).split("--");
+                String[] p = Bytes.toString(CellUtil.cloneValue(v)).split("--");
                 Geometry geom = WKTUtils.read(p[0]);
                 this.othterMbrGeo = geom;
                 if (null != this.mbrGeo) {
@@ -131,8 +132,8 @@ public class PivotsFilter extends FilterBase {
                 //Geometry geom = WKTUtils.read(p[0]);
                 indexes = p[1].split(",");
                 //System.out.println("mbr time:" + (System.currentTimeMillis() - time));
-            } else if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
-                Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+            } else if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(GEOM)) {
+                Geometry geom = WKTUtils.read(Bytes.toString(CellUtil.cloneValue(v)));
                 //System.out.println("4");
                 otherTrajGeo = geom;
                 if (null != otherTrajGeo && !this.filterRow) {
@@ -180,13 +181,13 @@ public class PivotsFilter extends FilterBase {
 
     @Override
     public Cell transformCell(Cell v) {
-        //System.out.println(Bytes.toString(v.getQualifierArray()));
+        //System.out.println(Bytes.toString(CellUtil.cloneQualifier(v)));
         //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
         //v.getv
-        if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM) && null != this.currentThreshold) {
+        if (returnSim && !filterRow && Bytes.toString(CellUtil.cloneQualifier(v)).equals(GEOM) && null != this.currentThreshold) {
             //System.out.println("-------");
-            return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold.toString()));
+            return CellUtil.createCell(CellUtil.cloneRow(v), CellUtil.cloneFamily(v), CellUtil.cloneQualifier(v),
+                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(CellUtil.cloneValue(v)) + "-" + this.currentThreshold.toString()));
         }
         return v;
     }

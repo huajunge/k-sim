@@ -9,18 +9,13 @@ import com.just.ksim.filter.WithoutMemoryFilter;
 import com.just.ksim.index.ElementKNN;
 import com.just.ksim.index.XZStarSFC;
 import com.just.ksim.utils.ByteArrays;
-import coprocessor.generated.KNNServer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.filter.Filter;
-import org.apache.hadoop.hbase.filter.FilterList;
-import org.apache.hadoop.hbase.filter.FirstKeyOnlyFilter;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
-import org.apache.hadoop.hbase.ipc.BlockingRpcCallback;
+import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPoint;
@@ -32,11 +27,10 @@ import utils.WKTUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static utils.Constants.*;
 
@@ -52,7 +46,7 @@ public class Client {
     private int beta = 1;
     private XZStarSFC sfc;
     private Admin admin;
-    private HTable hTable;
+    private Table hTable;
     private String tableName;
     private static int MAX_ITERTOR = 100;
     private Connection connection;
@@ -76,7 +70,9 @@ public class Client {
         if (!admin.tableExists(table.getTableName())) {
             create();
         }
-        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        //TableBuilderBase base = ;
+        this.hTable = connection.getTable(TableName.valueOf(tableName));
+        //this.hTable = new HTable(TableName.valueOf(tableName), connection);
         this.g = precise;
         this.sfc = XZStarSFC.apply(g, beta);
     }
@@ -90,7 +86,8 @@ public class Client {
         if (!admin.tableExists(table.getTableName())) {
             create();
         }
-        this.hTable = new HTable(TableName.valueOf(tableName), connection);
+        this.hTable = connection.getTable(TableName.valueOf(tableName));
+        //this.hTable = new HTable(TableName.valueOf(tableName), connection);
         this.g = precise;
         this.sfc = XZStarSFC.apply(g, beta);
     }
@@ -126,6 +123,25 @@ public class Client {
 
     public List<Trajectory> simQuery(Trajectory traj, double threshold) throws IOException {
         return simQuery(traj, threshold, 0);
+    }
+
+    public int  rangeQuery(double lat1, double lng1, double lat2, double lng2) throws IOException {
+        List<IndexRange> ranges = sfc.ranges(lat1, lng1, lat2, lng2);
+        List<Trajectory> trajectories = new ArrayList<>();
+        AtomicInteger integer=new AtomicInteger(0);
+        query(ranges, this.hTable, Collections.singletonList(new FirstKeyOnlyFilter()), res -> {
+//            String v = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM)));
+//            try {
+//                Geometry geo = WKTUtils.read(v);
+//                String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+//                trajectories.add(new Trajectory(id, (MultiPoint) geo));
+//            } catch (Exception ignored) {
+//
+//            }
+            integer.incrementAndGet();
+            //System.out.println());
+        });
+        return integer.get();
     }
 
     public List<Trajectory> simQuery(Trajectory traj, double threshold, int disFunc) throws IOException {
@@ -175,6 +191,31 @@ public class Client {
 
             }
 
+            //System.out.println());
+        });
+        return trajectories;
+    }
+
+    public List<Trajectory> quadSimQuery(Trajectory traj, double threshold, int disFunc) throws IOException {
+        List<Filter> filter = new ArrayList<>(2);
+        //filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), false));
+        filter.add(new PivotsFilter(traj.getGeometryN(0).toText(), traj.getGeometryN(traj.getNumGeometries() - 1).toText(), threshold, traj.toText(), traj.getDPFeature().getIndexes(), traj.getDPFeature().getMBRs().toText(), disFunc, false));
+        //filter.add(new SimilarityFilter(traj.toText(), threshold));
+        List<Trajectory> trajectories = new ArrayList<>();
+        final ElementKNN root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel(), 0L);
+        List<IndexRange> ranges = sfc.quadRangesForKnn(traj, threshold, root);
+        //List<IndexRange> ranges = sfc.simRange(traj, threshold);
+
+        //sfc.simRange(traj, threshold)
+        query(ranges, this.hTable, filter, res -> {
+            String v = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(GEOM)));
+            try {
+                Geometry geo = WKTUtils.read(v);
+                String id = Bytes.toString(res.getValue(Bytes.toBytes(DEFAULT_CF), Bytes.toBytes(T_ID)));
+                trajectories.add(new Trajectory(id, (MultiPoint) geo));
+            } catch (Exception ignored) {
+
+            }
             //System.out.println());
         });
         return trajectories;
@@ -525,12 +566,12 @@ public class Client {
 //                });
                 //filter.add(new SimilarityFilter(traj.toText(), maxThreshold, true));
             }
-            List<Filter> filter2 = new ArrayList<>(1);
-            filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
-            query(ranges, this.hTable, filter2, res -> {
-                count.incrementAndGet();
-                //System.out.println());
-            });
+//            List<Filter> filter2 = new ArrayList<>(1);
+//            filter2.add(new FirstKeyOnlyFilter());//filter2.add(new FirstKeyOnlyFilter());
+//            query(ranges, this.hTable, filter2, res -> {
+//                count.incrementAndGet();
+//                //System.out.println());
+//            });
             query(ranges, hTable, filter, res -> {
 //                if (currentSize.get() < k) {
 //                    count.incrementAndGet();
@@ -653,7 +694,7 @@ public class Client {
         void process(Result result);
     }
 
-    public void query(List<IndexRange> ranges, HTable table, List<Filter> filter, ResultProcess process) throws IOException {
+    public void query(List<IndexRange> ranges, Table table, List<Filter> filter, ResultProcess process) throws IOException {
         if (ranges.isEmpty()) {
             return;
         }

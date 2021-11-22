@@ -90,8 +90,8 @@ public class WithoutMemoryFilter extends FilterBase {
 
     @Override
     public ReturnCode filterKeyValue(Cell v) throws IOException {
-        if (Bytes.toString(v.getQualifier()).equals(GEOM)) {
-            Geometry geom = WKTUtils.read(Bytes.toString(v.getValue()));
+        if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(GEOM)) {
+            Geometry geom = WKTUtils.read(Bytes.toString(CellUtil.cloneValue(v)));
             if (func == 0) {
                 assert geom != null;
                 double th = Frechet.calulateDistance(trajGeo, geom);
@@ -109,13 +109,13 @@ public class WithoutMemoryFilter extends FilterBase {
 
     @Override
     public Cell transformCell(Cell v) {
-        //System.out.println(Bytes.toString(v.getQualifierArray()));
-        //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
+        //System.out.println(Bytes.toString(CellUtil.cloneQualifierArray()));
+        //System.out.println(Bytes.toString(CellUtil.cloneQualifier()).equals(GEOM));
         //v.getv
-        if (returnSim && !filterRow && Bytes.toString(v.getQualifier()).equals(GEOM) && null != this.currentThreshold) {
+        if (returnSim && !filterRow && Bytes.toString(CellUtil.cloneQualifier(v)).equals(GEOM) && null != this.currentThreshold) {
             //System.out.println("-------");
-            return CellUtil.createCell(v.getRow(), v.getFamily(), v.getQualifier(),
-                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(v.getValue()) + "-" + this.currentThreshold.toString()));
+            return CellUtil.createCell(CellUtil.cloneRow(v), CellUtil.cloneFamily(v), CellUtil.cloneQualifier(v),
+                    System.currentTimeMillis(), KeyValue.Type.Put.getCode(), Bytes.toBytes(Bytes.toString(CellUtil.cloneValue(v)) + "-" + this.currentThreshold.toString()));
         }
         return v;
     }

@@ -1,6 +1,7 @@
 package com.just.ksim.index
 
 import com.just.ksim.entity.Trajectory
+import com.just.ksim.index.XZStarSFC.QueryWindow
 import org.locationtech.jts.geom._
 import org.locationtech.sfcurve.IndexRange
 
@@ -26,6 +27,47 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
       s = s + "1"
     }
     s
+  }
+
+  def indexQuadTree(geometry: Geometry, lenient: Boolean = false): Long = {
+    val mbr = geometry.getEnvelopeInternal
+    val (nxmin, nymin, nxmax, nymax) = normalize(mbr.getMinX, mbr.getMinY, mbr.getMaxX, mbr.getMaxY, lenient)
+    encode(nxmin, nymin, nxmax, nymax)
+  }
+
+  def indexQuadTree2(nxmin: Double, nymin: Double, nxmax: Double, nymax: Double): Long = {
+    encode(nxmin, nymin, nxmax, nymax)
+  }
+
+  def encode(nxmin: Double, nymin: Double, nxmax: Double, nymax: Double): Long = {
+    var xmin = 0.0
+    var ymin = 0.0
+    var xmax = 1.0
+    var ymax = 1.0
+
+    var cs = 0L
+    var i = 0
+    var flag = true
+    while (i < g && flag) {
+      val xCenter = (xmin + xmax) / 2.0
+      val yCenter = (ymin + ymax) / 2.0
+      if (nxmin < xCenter && nxmax > xCenter) {
+        flag = false
+      }
+      if (nymin < yCenter && nymax > yCenter) {
+        flag = false
+      }
+      if (flag) {
+        (nxmin < xCenter, nymin < yCenter) match {
+          case (true, true) => cs += 1L; xmax = xCenter; ymax = yCenter
+          case (false, true) => cs += 1L + 1L * (math.pow(4, g - i).toLong - 1L) / 3L; xmin = xCenter; ymax = yCenter
+          case (true, false) => cs += 1L + 2L * (math.pow(4, g - i).toLong - 1L) / 3L; xmax = xCenter; ymin = yCenter
+          case (false, false) => cs += 1L + 3L * (math.pow(4, g - i).toLong - 1L) / 3L; xmin = xCenter; ymin = yCenter
+        }
+        i += 1
+      }
+    }
+    cs
   }
 
   def index2(geometry: Geometry, lenient: Boolean = false): (Long, Long, Int) = {
@@ -329,6 +371,122 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     }
   }
 
+  def ranges(lat1: Double, lng1: Double, lat2: Double, lng2: Double): java.util.List[IndexRange] = {
+    val queryWindow = QueryWindow(lat1, lng1, lat2, lng2)
+    val ranges = new java.util.ArrayList[IndexRange](100)
+    val remaining = new java.util.ArrayDeque[ElementKNN](200)
+    val levelStop = new ElementKNN(-1, -1, -1, -1, -1, -1, pre, 0)
+    val root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel, 0L)
+    root.split()
+    root.children.asScala.foreach(remaining.add)
+    remaining.add(levelStop)
+    var level: Short = 1
+    while (!remaining.isEmpty) {
+      val next = remaining.poll
+      if (next.eq(levelStop)) {
+        // we've fully processed a level, increment our state
+        if (!remaining.isEmpty && level < g) {
+          level = (level + 1).toShort
+          remaining.add(levelStop)
+        }
+      } else {
+        checkValue(next, level)
+      }
+    }
+
+    def checkValue(quad: ElementKNN, level: Short): Unit = {
+      if (quad.isContained(queryWindow)) {
+        val (min, max) = (quad.elementCode + 1L, quad.elementCode + quad.IS(level) - 1L)
+        ranges.add(IndexRange(min, max, contained = true))
+      } else if (quad.insertion(queryWindow)) {
+        ranges.addAll(quad.insertCodes(queryWindow))
+        if (level < g) {
+          quad.split()
+          quad.children.asScala.foreach(remaining.add)
+        }
+      }
+    }
+
+    if (ranges.size() > 0) {
+      ranges.sort(IndexRange.IndexRangeIsOrdered)
+      var current = ranges.get(0) // note: should always be at least one range
+      val result = ArrayBuffer.empty[IndexRange]
+      var i = 1
+      while (i < ranges.size()) {
+        val range = ranges.get(i)
+        if (range.lower <= current.upper + 1) {
+          current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+        } else {
+          result.append(current)
+          current = range
+        }
+        i += 1
+      }
+      result.append(current)
+      result.asJava
+    } else {
+      ranges
+    }
+  }
+
+  def withIn(lat1: Double, lng1: Double, lat2: Double, lng2: Double): java.util.List[IndexRange] = {
+    val queryWindow = QueryWindow(lat1, lng1, lat2, lng2)
+    val ranges = new java.util.ArrayList[IndexRange](100)
+    val remaining = new java.util.ArrayDeque[ElementKNN](200)
+    val levelStop = new ElementKNN(-1, -1, -1, -1, -1, -1, pre, 0)
+    val root = new ElementKNN(-180.0, -90.0, 180.0, 90.0, 0, g, new PrecisionModel, 0L)
+    root.split()
+    root.children.asScala.foreach(remaining.add)
+    remaining.add(levelStop)
+    var level: Short = 1
+    while (!remaining.isEmpty) {
+      val next = remaining.poll
+      if (next.eq(levelStop)) {
+        // we've fully processed a level, increment our state
+        if (!remaining.isEmpty && level < g) {
+          level = (level + 1).toShort
+          remaining.add(levelStop)
+        }
+      } else {
+        checkValue(next, level)
+      }
+    }
+
+    def checkValue(quad: ElementKNN, level: Short): Unit = {
+      if (quad.isContained(queryWindow)) {
+        val (min, max) = (quad.elementCode + 1L, quad.elementCode + quad.IS(level))
+        ranges.add(IndexRange(min, max, contained = true))
+      } else if (quad.insertion(queryWindow)) {
+        ranges.addAll(quad.insertCodes(queryWindow))
+        if (level < g) {
+          quad.split()
+          quad.children.asScala.foreach(remaining.add)
+        }
+      }
+    }
+
+    if (ranges.size() > 0) {
+      ranges.sort(IndexRange.IndexRangeIsOrdered)
+      var current = ranges.get(0) // note: should always be at least one range
+      val result = ArrayBuffer.empty[IndexRange]
+      var i = 1
+      while (i < ranges.size()) {
+        val range = ranges.get(i)
+        if (range.lower <= current.upper + 1) {
+          current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+        } else {
+          result.append(current)
+          current = range
+        }
+        i += 1
+      }
+      result.append(current)
+      result.asJava
+    } else {
+      ranges
+    }
+  }
+
   def xz2RangesForKnn(searTraj: Trajectory, dis: Double, root: ElementKNN): java.util.List[IndexRange] = {
     val ranges = new java.util.ArrayList[IndexRange](100)
     val boundary1 = searTraj.getMultiPoint.getEnvelopeInternal
@@ -340,7 +498,6 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     val minimumResolution = indexSpace2(boundary1, 0L)
 
     val levelStop = new ElementKNN(-1, -1, -1, -1, -1, -1, pre, 0)
-
     remaining.add(root.search(root, minimumResolution.xTrue, minimumResolution.yTrue, minimumResolution.length))
     remaining.add(root.search(root, minimumResolution.xTrue + minimumResolution.xWidth, minimumResolution.yTrue, minimumResolution.length))
     remaining.add(root.search(root, minimumResolution.xTrue, minimumResolution.yTrue + minimumResolution.yWidth, minimumResolution.length))
@@ -363,18 +520,71 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
     var level = minimumResolution.length
     while (!remaining.isEmpty) {
       val next = remaining.poll
-      if (next == levelStop && !remaining.isEmpty && level < maximumResolution) {
+      if (next == levelStop && !remaining.isEmpty) {
         remaining.add(levelStop)
         level = level + 1
       } else {
-        if (next.neededToCheck(boundaryEnv, dis)) {
+        if (next.neededToCheckXZ(boundaryEnv, dis)) {
           val candidates = next.xz2CheckPositionCode(searTraj, dis, spoint, epoint)
           if (null != candidates) {
             ranges.addAll(candidates)
           }
-          if (level < maximumResolution) {
+          if (level < g) {
             //next.getChildren.asScala
             next.getChildren.asScala.foreach(v => {
+              remaining.add(v)
+            })
+          }
+        }
+      }
+    }
+    if (ranges.size() > 0) {
+      ranges.sort(IndexRange.IndexRangeIsOrdered)
+      var current = ranges.get(0) // note: should always be at least one range
+      val result = ArrayBuffer.empty[IndexRange]
+      var i = 1
+      while (i < ranges.size()) {
+        val range = ranges.get(i)
+        if (range.lower <= current.upper + 1) {
+          current = IndexRange(current.lower, math.max(current.upper, range.upper), current.contained && range.contained)
+        } else {
+          result.append(current)
+          current = range
+        }
+        i += 1
+      }
+      result.append(current)
+      result.asJava
+    } else {
+      ranges
+    }
+  }
+
+  def quadRangesForKnn(searTraj: Trajectory, dis: Double, root: ElementKNN): java.util.List[IndexRange] = {
+    val ranges = new java.util.ArrayList[IndexRange](100)
+    val boundaryEnv = searTraj.getMultiPoint.getEnvelopeInternal
+
+    val remaining = new java.util.ArrayDeque[ElementKNN](200)
+
+    val levelStop = new ElementKNN(-1, -1, -1, -1, -1, -1, pre, 0)
+    for (elem <- root.getChildrenQuadTree.asScala) {
+      remaining.add(elem)
+    }
+    remaining.add(levelStop)
+    var level = 1
+
+    while (!remaining.isEmpty) {
+      val next = remaining.poll
+      if (next == levelStop && !remaining.isEmpty) {
+        remaining.add(levelStop)
+        level = level + 1
+      } else {
+        if (next.neededToCheckQuad(boundaryEnv, dis)) {
+          //val candidates = indexQuadTree2(next.xmin, next.ymin, next.xmax, next.ymax)
+          ranges.add(IndexRange(next.elementCode, next.elementCode, contained = false))
+          if (level < g) {
+            //next.getChildren.asScala
+            next.getChildrenQuadTree.asScala.foreach(v => {
               remaining.add(v)
             })
           }
@@ -407,6 +617,8 @@ class XZStarSFC(g: Short, xBounds: (Double, Double), yBounds: (Double, Double), 
 object XZStarSFC extends Serializable {
   // the initial level of quads
   private val cache = new java.util.concurrent.ConcurrentHashMap[(Short, Int), XZStarSFC]()
+
+  case class QueryWindow(xmin: Double, ymin: Double, xmax: Double, ymax: Double)
 
   def apply(g: Short, beta: Int): XZStarSFC = {
     var sfc = cache.get((g, beta))

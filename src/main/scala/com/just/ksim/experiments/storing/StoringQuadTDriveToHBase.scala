@@ -13,7 +13,7 @@ import org.locationtech.jts.geom.MultiPoint
 import utils.Constants.DEFAULT_CF
 import utils.{PutUtils, WKTUtils}
 
-object StoringTDriveToHBase {
+object StoringQuadTDriveToHBase {
   def main(args: Array[String]): Unit = {
     val hbaseConf = HBaseConfiguration.create()
     val connection = ConnectionFactory.createConnection(hbaseConf)
@@ -67,7 +67,7 @@ object StoringTDriveToHBase {
     val tmp = tmp2.zipWithIndex().map(tra => {
       val t = tra._1.split("\t")
       val tid = tra._2
-      putUtils.getPut(new Trajectory(tid.toString, WKTUtils.read(t(2)).asInstanceOf[MultiPoint]), shards)
+      putUtils.getQuadTreePut(new Trajectory(tid.toString, WKTUtils.read(t(2)).asInstanceOf[MultiPoint]), shards)
     })
     count = tmp.count()
     //size = count
