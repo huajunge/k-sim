@@ -20,25 +20,14 @@
 
 # TraSS
 
-We have implemented the proposed framework in HBase, a popular disk-based NoSQL database. We have published the framework, experimental code and the results in https://github.com/huajunge/k-sim.git
-
-# Appendix of TraSS
-
-***Pleas see appendix.pdf***
-
-![image-20210703151530511](images/image-20210703151530511.png)
-
-![image-20210703151622144](images/image-20210703151622144.png)
-
-![image-20210703151635261](images/image-20210703151635261.png)
-
-
+We have implemented the proposed framework in HBase, a popular key-value data store. We have published the framework, experimental code and the results in https://github.com/huajunge/k-sim.git. Details of DTW, Hausdorff and Range query，pleas refer to [other_measures.pdf](./other_measures.pdf)
 
 # Experiments
 
 ### 1. Setup
 
 - (1) puting the disk-sim.jar to the lib path of HBase.
+- (2) 
 
 ### 2. Experiments
 
@@ -58,11 +47,19 @@ We have implemented the proposed framework in HBase, a popular disk-based NoSQL 
 
   where,  ./tdrive_q is the path query trajectories; tdrive_table is the table stored with tdrive data; 0.015 is the threshold; hdfs:///sim_015 is the path of query time; 8 is the shards; 16 is the maximum resolution of XZ* index.
 
-  Top-k Similarity Search
+- Top-k Similarity Search
 
   ```
   spark-submit --class com.just.ksim.experiments.query.KNNQuery disks.jar  ./tdrive_q tdrive_table 150 hdfs:///knn_150 8 0.002 16
   ```
 
   where,  ./tdrive_q is the path query trajectories; tdrive_table is the table stored with tdrive data; 150 is the k; hdfs:///knn_015 is the path of query time; 8 is the shards; 16 is the maximum resolution of XZ* index. 
+
+- Range query
+
+  ```
+  spark-submit --class com.just.ksim.experiments.query.RangeQuery disks.jar '116.20094,39.97886,116.21094,39.98886;116.20094,39.97886,116.21094,39.98886' tdrive_table hdfs:///range_query_results 4 16
+  ```
+
+  
 
