@@ -1,9 +1,10 @@
-package com.just.ksim.filter;
+package just.urbancomputing.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.just.ksim.similarity.DTW;
-import com.just.ksim.similarity.Frechet;
-import com.just.ksim.similarity.Hausdorff;
+import just.urbancomputing.similarity.DTW;
+import just.urbancomputing.similarity.Frechet;
+import just.urbancomputing.similarity.Hausdorff;
+import just.urbancomputing.utils.WKTUtils;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.KeyValue;
@@ -13,14 +14,14 @@ import org.apache.hadoop.hbase.filter.FilterBase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.locationtech.jts.geom.Geometry;
 import scala.Tuple2;
-import utils.WKTUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
-import static utils.Constants.*;
+import static just.urbancomputing.utils.Constants.*;
+
 
 /**
  * @author : hehuajun3
@@ -92,7 +93,6 @@ public class PivotsFilter extends FilterBase {
 
     @Override
     public ReturnCode filterKeyValue(Cell v) throws IOException {
-        //CellUtil.cloneQualifier(v)
         if (!this.filterRow) {
             if (Bytes.toString(CellUtil.cloneQualifier(v)).equals(START_POINT) && func == 0) {
                 //System.out.println("1");
@@ -171,7 +171,7 @@ public class PivotsFilter extends FilterBase {
                             Tuple2<Boolean, Double> th = Hausdorff.calulateDistance(trajGeo, otherTrajGeo, threshold);
                             this.filterRow = !th._1;
                             this.currentThreshold = BigDecimal.valueOf(th._2);
-                        }else if (func == 2) {
+                        } else if (func == 2) {
                             double th = DTW.calulateDistance(trajGeo, otherTrajGeo);
                             this.filterRow = th > threshold;
                             this.currentThreshold = BigDecimal.valueOf(th);
@@ -186,9 +186,9 @@ public class PivotsFilter extends FilterBase {
 
     @Override
     public Cell transformCell(Cell v) {
-        //System.out.println(Bytes.toString(CellUtil.cloneQualifier(v)));
-        //System.out.println(Bytes.toString(v.getQualifier()).equals(GEOM));
-        //v.getv
+        //System.out.println(Bytes.toString(CellUtil.cloneQualifierArray()));
+        //System.out.println(Bytes.toString(CellUtil.cloneQualifier()).equals(GEOM));
+        //CellUtil.clonev
         if (returnSim && !filterRow && Bytes.toString(CellUtil.cloneQualifier(v)).equals(GEOM) && null != this.currentThreshold) {
             //System.out.println("-------");
             return CellUtil.createCell(CellUtil.cloneRow(v), CellUtil.cloneFamily(v), CellUtil.cloneQualifier(v),

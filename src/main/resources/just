@@ -1,7 +1,7 @@
 //storing
 spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/tdrive  just_tdrive  hdfs:///experiment/ksim/result/just/indexing
 
-spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar hdfs:///experiment/ksim/cleaned_data/lorry  just_lorry  hdfs:///experiment/ksim/result/just/lorry/indexing 1 1
+spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry_1  hdfs:///experiment/ksim/result/just/lorry/indexing 1 1
 
 spark-submit --class com.urbancomputing.just.io.Storing --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 geomesa-io_2.11-2.3.2-jar-with-dependencies.jar.0 hdfs:///experiment/ksim/cleaned_data/lorry10  just_lorry10  hdfs:///experiment/ksim/result/just/lorry/indexing 1 2
 

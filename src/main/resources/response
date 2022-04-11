@@ -1,0 +1,109 @@
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 \
+TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar \
+TDRIVE \
+hdfs:///experiment/ksim/cleaned_data/tdrive/1 \
+hdfs:///experiment/ksim/cleaned_data/tdrive_q \
+hdfs:///experiment/ksim/result/repose/knn \
+1 \
+100 \
+50 \
+Frechet \
+1 \
+5 \
+-90 \
+90 \
+-180 \
+180 \
+1 \
+
+KNN
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 \
+TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar \
+TDRIVE \
+hdfs:///experiment/ksim/cleaned_data/tdrive/1 \
+hdfs:///experiment/ksim/cleaned_data/tdrive_q \
+hdfs:///experiment/ksim/result/repose/knn \
+1 \
+100 \
+50 \
+Frechet \
+1 \
+5 \
+-90 \
+90 \
+-180 \
+180 \
+1 \
+
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 \
+TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar \
+TDRIVE \
+hdfs:///experiment/ksim/cleaned_data/tdrive10/1 \
+hdfs:///experiment/ksim/cleaned_data/tdrive_q \
+hdfs:///experiment/ksim/result/repose/Hausdorff/knn50 \
+1 \
+100 \
+50 \
+Hausdorff \
+1 \
+5 \
+-90 \
+90 \
+-180 \
+180 \
+1 \
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/Hausdorff/knn50 1 100 50 Hausdorff 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/Hausdorff/knn100 1 100 100 Hausdorff 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/Hausdorff/knn150 1 100 150 Hausdorff 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/Hausdorff/knn200 1 100 200 Hausdorff 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/Hausdorff/knn250 1 100 250 Hausdorff 1 5 -90 90 -180 180 1
+
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/DTW/knn50 1 100 50 DTW 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/DTW/knn100 1 100 100 DTW 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/DTW/knn150 1 100 150 DTW 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/DTW/knn200 1 100 200 DTW 1 5 -90 90 -180 180 1
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar TDRIVE hdfs:///experiment/ksim/cleaned_data/tdrive10/1 hdfs:///experiment/ksim/cleaned_data/tdrive_q hdfs:///experiment/ksim/result/repose/DTW/knn250 1 100 250 DTW 1 5 -90 90 -180 180 1
+
+hdfs dfs -cat /experiment/ksim/result/repose/Hausdorff/knn50
+
+hdfs dfs -cat /experiment/ksim/result/repose/Hausdorff/knn100
+
+hdfs dfs -cat /experiment/ksim/result/repose/Hausdorff/knn150
+
+hdfs dfs -cat /experiment/ksim/result/repose/Hausdorff/knn200
+
+hdfs dfs -cat /experiment/ksim/result/repose/Hausdorff/knn250
+
+
+spark-submit --class Main --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 \
+TrajecorySearch-1.0-SNAPSHOT-jar-with-dependencies.jar \
+TDRIVE \
+hdfs:///experiment/ksim/cleaned_data/tdrive/1 \
+hdfs:///experiment/ksim/cleaned_data/tdrive_q \
+hdfs:///experiment/ksim/result/repose/knn \
+1 \
+100 \
+50 \
+Frechet \
+1 \
+5 \
+-90 \
+90 \
+-180 \
+180 \
+1 \
+
+
+hdfs:///experiment/ksim/cleaned_data/tdrive_q tdrive_pivot 50 hdfs:///experiment/ksim/result/disks/pivot/0005/knn50 4 0.004 1 1

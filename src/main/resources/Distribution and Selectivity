@@ -1,0 +1,4 @@
+spark-submit --class com.just.ksim.experiments.statistic.DistributionStatistic --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/lorry10/1 hdfs:///experiment/ksim/result/distriAndSelectivity/distri 20
+
+spark-submit --class com.just.ksim.experiments.statistic.Selectivity --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/lorry10/1 hdfs:///experiment/ksim/result/distriAndSelectivity/Selectivity 14 20
+

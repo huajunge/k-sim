@@ -72,8 +72,8 @@ object XZ2SimilarityQuery {
         val tmp = System.currentTimeMillis() - time
         timeStatistic.add(tmp)
         //val size = client.xzSimQueryCountWithOutMemory(elem, threshold, func)
-        //val size = client.xzSimQueryCountWithOutMemory(elem, threshold, func)
-        count.add(0)
+        val size = client.xzSimQueryCountWithOutMemory(elem, threshold, func)
+        count.add(size)
         // println(s"${elem.getId}-s,$size,$tmp")
         Thread.sleep(200)
       }
