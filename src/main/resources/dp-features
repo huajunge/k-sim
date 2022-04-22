@@ -1,0 +1,5 @@
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2  k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.1  /experiment/ksim/cleaned_data/lorry10 lorry_010 hdfs:///experiment/ksim/result/lorry/lorry010 4 1 1 16
+
+
+spark-submit --class com.just.ksim.experiments.query.SimilarityQuery --master yarn --deploy-mode cluster --num-executors 20 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies005.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q lorry_005_2 0.015  hdfs:///experiment/ksim/result/dp/005 4 16
+

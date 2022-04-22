@@ -1,6 +1,7 @@
 package com.just.ksim.filter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.just.ksim.similarity.DTW;
 import com.just.ksim.similarity.Frechet;
 import com.just.ksim.similarity.Hausdorff;
 import org.apache.hadoop.hbase.Cell;
@@ -102,6 +103,11 @@ public class WithoutMemoryFilter extends FilterBase {
                 Tuple2<Boolean, Double> th = Hausdorff.calulateDistance(trajGeo, geom, threshold);
                 this.filterRow = !th._1;
                 this.currentThreshold = BigDecimal.valueOf(th._2);
+            }else if (func == 2) {
+                assert geom != null;
+                double th = DTW.calulateDistance(trajGeo, geom);
+                this.filterRow = th > threshold;
+                this.currentThreshold = BigDecimal.valueOf(th);
             }
         }
         return ReturnCode.INCLUDE;

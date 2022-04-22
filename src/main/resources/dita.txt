@@ -23,6 +23,10 @@ spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mod
 spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry 0.02 1 hdfs:///experiment/ksim/result/dita/sim/lorry_02
 
 
+spark-submit --class tsinghua.dita.SimilarityQueryFilteringTime --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.1  hdfs:///experiment/ksim/cleaned_data/lorry_q  hdfs:///experiment/ksim/cleaned_data/lorry10 0.01 1 hdfs:///experiment/ksim/result/dita/sim/with_lf_lorry_01 100 1
+
+spark-submit --class tsinghua.dita.SimilarityQueryFilteringTime --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.2  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 0.01 1 hdfs:///experiment/ksim/result/dita/sim/with_lf_tdrive_01 100 1
+
 //threshold tmp
 spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive_q  hdfs:///experiment/ksim/cleaned_data/tmp_tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tmp_tdrive_001
 
@@ -93,3 +97,18 @@ spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode clust
 
 spark-submit --class tsinghua.dita.KnnQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry_q  hdfs:///experiment/ksim/cleaned_data/tmp_lorry 0.02 1 hdfs:///experiment/ksim/result/dita/knn/tmp_lorry_02
 
+
+
+//DTW
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 0.001 1 hdfs:///experiment/ksim/result/dita/dtw/sim_tdrive_001 100 1 1
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 0.005 1 hdfs:///experiment/ksim/result/dita/dtw/sim_tdrive_005 100 1 1
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 0.01 1 hdfs:///experiment/ksim/result/dita/dtw/sim_tdrive_01 100 1 1
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 0.015 1 hdfs:///experiment/ksim/result/dita/dtw/sim_tdrive_015 100 1 1
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive10 0.02 1 hdfs:///experiment/ksim/result/dita/dtw/sim_tdrive_02 100 1 1
+
+
+spark-submit --class tsinghua.dita.SimilarityQueryApp --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 DITA-1.0-SNAPSHOT-jar-with-dependencies.jar.4  hdfs:///experiment/ksim/cleaned_data/tdrive_q  hdfs:///experiment/ksim/cleaned_data/tdrive 0.001 1 hdfs:///experiment/ksim/result/dita/sim/tdrive_001 100 1

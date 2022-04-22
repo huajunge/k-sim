@@ -64,6 +64,23 @@ public class PutUtils implements Serializable {
         return put;
     }
 
+    public Put getPutKey(Trajectory traj, Short shard) {
+        String id = traj.getId();
+        long index = sfc.index(traj.getMultiPoint(), false);
+        short s = (short) (index % shard);
+        byte[] bytes = new byte[9 + id.length()];
+        bytes[0] = (byte) s;
+        ByteArrays.writeLong(index, bytes, 1);
+        System.arraycopy(Bytes.toBytes(id), 0, bytes, 9, id.length());
+        Put put = new Put(bytes);
+        put.addColumn(Bytes.toBytes(Constants.DEFAULT_CF), Bytes.toBytes(Constants.T_ID), Bytes.toBytes(id));
+        StringBuilder indexString = new StringBuilder();
+        for (Integer integer : traj.getDPFeature().getIndexes()) {
+            indexString.append(integer).append(",");
+        }
+      return put;
+    }
+
     public Put getQuadTreePut(Trajectory traj, Short shard) {
         String id = traj.getId();
         long index = sfc.indexQuadTree(traj.getMultiPoint(), false);

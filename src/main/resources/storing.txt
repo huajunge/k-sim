@@ -9,3 +9,4 @@ spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --ma
 
 spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 10 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT.jar  hdfs:///experiment/ksim/cleaned_data/tmp_lorry ksim_tmp_lorry  hdfs:///experiment/ksim/result/tmp_lorry_indexing 4
 
+spark-submit --class com.just.ksim.experiments.storing.StoringTDriveToHBase --master yarn --deploy-mode cluster --num-executors 30 --executor-memory 8G --executor-cores 2 k-sim-traj-1.0-SNAPSHOT-jar-with-dependencies.jar.5  /experiment/ksim/cleaned_data/lorry10 lorry_10 hdfs:///experiment/ksim/result/datasize/overhead 4 1 1
