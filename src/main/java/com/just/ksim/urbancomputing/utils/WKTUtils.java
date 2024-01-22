@@ -6,15 +6,21 @@
  * http://www.opensource.org/licenses/apache2.0.php.
  ***********************************************************************/
 
-package com.just.ksim.index
+package com.just.ksim.urbancomputing.utils;
 
-object XZSFC {
 
-  val DefaultPrecision: Short = 12
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
-  val LogPointFive: Double = math.log(0.5)
-
-  def main(args: Array[String]): Unit = {
-
-  }
+public class WKTUtils {
+    public static Geometry read(String WKTgeometry) {
+        WKTReader reader = new WKTReader();
+        try {
+            return reader.read(WKTgeometry);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

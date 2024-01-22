@@ -1,15 +1,90 @@
 package com.just.ksim.experiments.storing
 
+import com.just.ksim.entity.Trajectory
 import com.just.ksim.index.XZStarSFC
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
+import org.apache.hadoop.hbase.client.ConnectionFactory
+import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable
+import org.apache.hadoop.hbase.mapred.TableOutputFormat
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.{SparkConf, SparkContext}
 import org.locationtech.jts.geom.MultiPoint
-import utils.WKTUtils
+import utils.Constants.DEFAULT_CF
+import utils.{PutUtils, WKTUtils}
 
 object StoringTDriveToHBase {
   def main(args: Array[String]): Unit = {
+//    val trajPath = args(0)
+//    val tableName = args(1)
+//    val countPath = args(2)
+//    val shards = args(3).toShort
+//    val dataVolume = args(4).toInt
+//    val endVolume = args(5).toInt
+//    var g = 16.toShort
+//    val sfc = XZStarSFC.apply(g, 1)
+//    try {
+//      g = args(6).toShort
+//    } catch {
+//      case i: Exception =>
+//    }
+    //    val tableName = "tdrive_throughput"
+    //    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
+    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
+    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out\\part-00000"
+//    val conf = new SparkConf()
+//      //.setMaster("local[*]")
+//      .setAppName("StoringTDrive")
+//    val context = new SparkContext(conf)
+//
+//    //val shard = 4.toShort
+//    var filePath = trajPath + "/" + dataVolume
+//    for (i <- dataVolume + 1 to endVolume) {
+//      filePath += "," + trajPath + "/" + i
+//    }
+//    val time = System.currentTimeMillis()
+//    val tmp2 = context.textFile(filePath, 100)
+//    val tmp = tmp2.zipWithIndex().map(tra => {
+//      val t = tra._1.split("-")
+//      val tid = tra._2
+//
+//      val integerKey = tid.toString.length + 9
+//      val length = Bytes.toBytes(sfc.indexLength(WKTUtils.read(t(1)).asInstanceOf[MultiPoint])).length
+//      val stringKey = tid.toString.length + length + 1
+//      //putUtils.getPut(new Trajectory(tid.toString, WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shards)
+//      (integerKey.toLong, stringKey.toLong)
+//    })
+//    val result = tmp.reduce((a, b) => (a._1 + b._1, a._2 + b._2))
+//
+//    val path = new Path(countPath)
+//    val fs = path.getFileSystem(new Configuration())
+//    if (!fs.exists(path)) {
+//      val outputStream = fs.create(path)
+//      outputStream.writeBytes("integer: ")
+//      outputStream.writeBytes((result._1 / 8).toString)
+//      outputStream.writeBytes("\n")
+//      outputStream.writeBytes("string: ")
+//      outputStream.writeBytes((result._2 / 8).toString)
+//      outputStream.flush()
+//      outputStream.flush()
+//      outputStream.close()
+//    } else {
+//      val outputStream = fs.append(path)
+//      outputStream.writeBytes("integer: ")
+//      outputStream.writeBytes((result._1 / 8).toString)
+//      outputStream.writeBytes("\n")
+//      outputStream.writeBytes("string: ")
+//      outputStream.writeBytes((result._2 / 8).toString)
+//      outputStream.flush()
+//      outputStream.flush()
+//      outputStream.close()
+//    }
+//    fs.close()
+    val hbaseConf = HBaseConfiguration.create()
+    val connection = ConnectionFactory.createConnection(hbaseConf)
+    val admin = connection.getAdmin
     val trajPath = args(0)
     val tableName = args(1)
     val countPath = args(2)
@@ -17,22 +92,37 @@ object StoringTDriveToHBase {
     val dataVolume = args(4).toInt
     val endVolume = args(5).toInt
     var g = 16.toShort
+
     val sfc = XZStarSFC.apply(g, 1)
     try {
+      g =args(6).toShort
       g = args(6).toShort
     } catch {
       case i: Exception =>
     }
-    //    val tableName = "tdrive_throughput"
-    //    val trajPath = "D:\\工作文档\\data\\T-drive\\release\\segment_0"
-    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out"
-    //val trajPath = "D:\\工作文档\\data\\T-drive\\release\\out\\part-00000"
+    val table = new HTableDescriptor(TableName.valueOf(tableName))
+    if (!admin.tableExists(table.getTableName)) {
+      val table = new HTableDescriptor(TableName.valueOf(tableName))
+      if (admin.tableExists(table.getTableName)) {
+        admin.disableTable(table.getTableName)
+        admin.deleteTable(table.getTableName)
+      }
+      table.addFamily(new HColumnDescriptor(DEFAULT_CF))
+      admin.createTable(table)
+    }
     val conf = new SparkConf()
-      //.setMaster("local[*]")
+      .setMaster("local[*]")
       .setAppName("StoringTDrive")
     val context = new SparkContext(conf)
+    val job = new JobConf(hbaseConf)
+    job.setOutputFormat(classOf[TableOutputFormat])
+    job.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
+    val putUtils = new PutUtils(g)
+    var count = 0L
+    var indexingTime = 0L
     //val shard = 4.toShort
+    var size = 0L
     var filePath = trajPath + "/" + dataVolume
     for (i <- dataVolume + 1 to endVolume) {
       filePath += "," + trajPath + "/" + i
@@ -42,39 +132,32 @@ object StoringTDriveToHBase {
     val tmp = tmp2.zipWithIndex().map(tra => {
       val t = tra._1.split("-")
       val tid = tra._2
-
-      val integerKey = tid.toString.length + 9
-      val length = Bytes.toBytes(sfc.indexLength(WKTUtils.read(t(1)).asInstanceOf[MultiPoint])).length
-      val stringKey = tid.toString.length + length + 1
-      //putUtils.getPut(new Trajectory(tid.toString, WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shards)
-      (integerKey.toLong, stringKey.toLong)
+      putUtils.getPut(new Trajectory(tid.toString, WKTUtils.read(t(1)).asInstanceOf[MultiPoint]), shards)
     })
-    val result = tmp.reduce((a, b) => (a._1 + b._1, a._2 + b._2))
+    count = tmp.count()
+    //size = count
+    indexingTime = System.currentTimeMillis() - time
+    tmp.map(put => (new ImmutableBytesWritable(), put)).saveAsHadoopDataset(job)
 
     val path = new Path(countPath)
     val fs = path.getFileSystem(new Configuration())
     if (!fs.exists(path)) {
       val outputStream = fs.create(path)
-      outputStream.writeBytes("integer: ")
-      outputStream.writeBytes((result._1 / 8).toString)
-      outputStream.writeBytes("\n")
-      outputStream.writeBytes("string: ")
-      outputStream.writeBytes((result._2 / 8).toString)
+      outputStream.writeBytes(count.toString)
+      outputStream.writeBytes("\t")
+      outputStream.writeBytes(indexingTime.toString)
       outputStream.flush()
       outputStream.flush()
       outputStream.close()
     } else {
       val outputStream = fs.append(path)
-      outputStream.writeBytes("integer: ")
-      outputStream.writeBytes((result._1 / 8).toString)
-      outputStream.writeBytes("\n")
-      outputStream.writeBytes("string: ")
-      outputStream.writeBytes((result._2 / 8).toString)
+      outputStream.writeBytes(count.toString)
+      outputStream.writeBytes("\t")
+      outputStream.writeBytes(indexingTime.toString)
       outputStream.flush()
       outputStream.flush()
       outputStream.close()
     }
     fs.close()
-
   }
 }
