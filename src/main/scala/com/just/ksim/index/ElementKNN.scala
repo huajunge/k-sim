@@ -245,23 +245,6 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
     val upperRight = new Coordinate(xmax, ymax)
     val lowerRight = new Coordinate(xmax, ymin)
     //
-    //    val thr_center_ll = new Coordinate(xCenter - threshold, yCenter - threshold)
-    //    val thr_center_rl = new Coordinate(xCenter + threshold, yCenter - threshold)
-    //    val thr_center_lu = new Coordinate(xCenter - threshold, yCenter + threshold)
-    //    val thr_center_ru = new Coordinate(xCenter + threshold, yCenter + threshold)
-    //    val thr_upperCenter_l = new Coordinate(xCenter - threshold, ymax + threshold)
-    //    val thr_upperCenter_r = new Coordinate(xCenter + threshold, ymax + threshold)
-    //    val thr_lowerCenter_l = new Coordinate(xCenter - threshold, ymin - threshold)
-    //    val thr_lowerCenter_r = new Coordinate(xCenter + threshold, ymin - threshold)
-    //    val thr_centerLeft_l = new Coordinate(xmin - threshold, yCenter - threshold)
-    //    val thr_centerLeft_u = new Coordinate(xmin - threshold, yCenter + threshold)
-    //    val thr_centerRight_l = new Coordinate(xmax + threshold, yCenter - threshold)
-    //    val thr_centerRight_u = new Coordinate(xmax + threshold, yCenter + threshold)
-    //
-    //    val thr_lowerLeft = new Coordinate(xmin - threshold, ymin - threshold)
-    //    val thr_upperLeft = new Coordinate(xmin - threshold, ymax + threshold)
-    //    val thr_upperRight = new Coordinate(xmax + threshold, ymax + threshold)
-    //    val thr_lowerRight = new Coordinate(xmax + threshold, ymin - threshold)
 
     val results = new java.util.ArrayList[Long](8)
     var pSize = 9L
@@ -272,15 +255,6 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
       val sig = positionIndex(i.toInt)
       if (!((sig.toInt & outPositions) > 0) && ((addedPositionCodes & (1 << i.toInt)) == 0)) {
         var checked = true
-        //        if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
-        //          //check = positionDisMap.get(i)._1 <= threshold
-        //          checked = !positionDisMap2.get(i)
-        //        }
-        //        if (sig == 15 || !checked) {
-        //          this.addedPositionCodes |= (1 << i.toInt)
-        //          results.add(i + 1L)
-        //        }
-        //if (!checked) {
         if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
           checked = positionDisMap.get(i)._1 <= threshold
         }
@@ -316,40 +290,10 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
               case 15 =>
                 cps = Array(lowerLeft, upperLeft, upperRight, lowerRight, lowerLeft)
             }
-            //            sig match {
-            //              case 1 =>
-            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_ru, thr_lowerCenter_r, thr_lowerLeft)
-            //              case 3 =>
-            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_centerRight_u, thr_lowerRight, thr_lowerLeft)
-            //              case 5 =>
-            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperCenter_r, thr_lowerCenter_r, thr_lowerLeft)
-            //              case 6 =>
-            //                cps = Array(thr_centerLeft_l, thr_upperLeft, thr_upperCenter_r, thr_center_ru, thr_centerRight_u, thr_lowerRight, thr_lowerCenter_l, thr_center_ll, thr_centerLeft_l)
-            //              case 7 =>
-            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperCenter_r, thr_center_ru, thr_centerRight_u, thr_lowerRight, thr_lowerLeft)
-            //              case 9 =>
-            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_lu, thr_upperCenter_l, thr_upperRight, thr_centerRight_l, thr_center_rl, thr_lowerCenter_r, thr_lowerLeft)
-            //              case 11 =>
-            //                cps = Array(thr_lowerLeft, thr_centerLeft_u, thr_center_lu, thr_upperCenter_l, thr_upperRight, thr_lowerRight, thr_lowerLeft)
-            //              case 13 =>
-            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperRight, thr_centerRight_l, thr_center_rl, thr_lowerCenter_r, thr_lowerLeft)
-            //              case 14 =>
-            //                cps = Array(thr_centerLeft_l, thr_upperLeft, thr_upperRight, thr_lowerRight, thr_lowerCenter_l, thr_center_ll, thr_centerLeft_l)
-            //              case 15 =>
-            //                cps = Array(thr_lowerLeft, thr_upperLeft, thr_upperRight, thr_lowerRight, thr_lowerLeft)
-            //            }
-            //var st = System.currentTimeMillis()
+
             var dis = (0.0, true, 1)
             var disTmp = 0.0
 
-            //            var contained = true
-            //            contained = disOfPosAndTraj(cps, threshold, 1)._2
-            //            positionDisMap2.put(i, contained)
-            //            if (contained) {
-            //              this.addedPositionCodes |= (1 << i.toInt)
-            //              results.add(i + 1L)
-            //              //println(s"$sig,${i + 1L}")
-            //            }
             if ((checkedPositionCodes & (1 << i.toInt)) > 0) {
               dis = disOfPosAndTraj(cps, threshold, positionDisMap.get(i)._2)
               disTmp = positionDisMap.get(i)._1
@@ -366,8 +310,6 @@ class ElementKNN(val xmin: Double, val ymin: Double, val xmax: Double, val ymax:
               //println(s"$sig,${i + 1L}")
             }
           }
-          //var et = System.currentTimeMillis()
-          //println(s"checking----:${et-st}")
         }
       }
     }

@@ -29,7 +29,7 @@ object SimilarityQuery {
     val client = new Client(g, trajPath, shard)
 
     val conf = new SparkConf()
-      //.setMaster("local[*]")
+      .setMaster("local[*]")
       .setAppName("SimilarityQuery")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     var local = false
